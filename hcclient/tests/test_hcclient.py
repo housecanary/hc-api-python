@@ -12,14 +12,26 @@ class TestHouseCanaryClient(unittest.TestCase):
 		self.client = hcclient.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET)
 
 	def test_init(self):
+		self.assertEqual(self.client._version, "v1")
+		self.assertEqual(self.client._endpoint_prefix, "/v1/property/")
+
 		del os.environ["HC_API_KEY"]
 		del os.environ["HC_API_SECRET"]
 
-		with self.assertRaises(ValueError):
-			c = hcclient.HouseCanaryClient()
+		with self.assertRaises(ValueError) as cm:
+			hcclient.HouseCanaryClient()
+		ex = cm.exception
+		self.assertTrue(ex.message.startswith("Missing authentication key."))
 
-		with self.assertRaises(ValueError):
-			c = hcclient.HouseCanaryClient(self.TEST_API_KEY)
+		with self.assertRaises(ValueError)as cm:
+			hcclient.HouseCanaryClient(self.TEST_API_KEY)
+		ex = cm.exception
+		self.assertTrue(ex.message.startswith("Missing authentication secret."))
+
+		with self.assertRaises(ValueError) as cm:
+			hcclient.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET, "v2")
+		ex = cm.exception
+		self.assertEqual(ex.message, "Only 'v1' is allowed for version.")
 
 	def test_init_with_env_vars(self):
 		os.environ["HC_API_KEY"] = self.TEST_API_KEY

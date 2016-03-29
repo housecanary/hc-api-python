@@ -36,7 +36,9 @@ class HouseCanaryClient(object):
 
 	AVAILABLE_APIS = ["value_report", "score", "avm"]
 
-	def __init__(self, auth_key=None, auth_secret=None):
+	AVAILABLE_VERSIONS = ["v1"]
+
+	def __init__(self, auth_key=None, auth_secret=None, version="v1"):
 		"""Initialize the client object for calling the HouseCanary API.
 
 		Args:
@@ -60,8 +62,14 @@ class HouseCanaryClient(object):
 				"or set it in the HC_API_SECRET environment variable.")
 			raise ValueError(msg)
 
+		if version not in self.AVAILABLE_VERSIONS:
+			msg = "Only 'v1' is allowed for version."
+			raise ValueError(msg)
+
 		self._auth_key = auth_key or os.environ[self.KEY_ENV_VAR]
 		self._auth_secret = auth_secret or os.environ[self.SECRET_ENV_VAR]
+		self._version = version
+		self._endpoint_prefix = "/" + self._version + "/property/"
 
 	def get(self, api, address, zipcode, format="all", report_type="full"):
 		"""Call the HouseCanary Property API with a single address.
@@ -108,7 +116,7 @@ class HouseCanaryClient(object):
 			query_params["format"] = format or "all"
 			query_params["report_type"] = report_type or "full"
 
-		endpoint = "/v1/property/" + api
+		endpoint = self._endpoint_prefix + api
 		method = "GET"
 		data = None
 
@@ -163,7 +171,7 @@ class HouseCanaryClient(object):
 			query_params["format"] = format or "all"
 			query_params["report_type"] = report_type or "full"
 
-		endpoint = "/v1/property/" + api
+		endpoint = self._endpoint_prefix + api
 		method = "POST"
 
 		response = self._make_request(endpoint, query_params, method, data_structure)
@@ -326,7 +334,8 @@ class HouseCanaryResponse(object):
 		return self._has_business_error
 
 	def hc_properties(self):
-		"""Return a list of HouseCanaryProperty objects containing their returned data from the API."""
+		"""Return a list of HouseCanaryProperty objects containing their returned json data from the API.
+		Returns an empty list of the request format was PDF."""
 		if not self._hc_properties:
 			body_json = self.body_json()
 			if not isinstance(body_json, dict):
