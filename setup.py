@@ -4,7 +4,7 @@ def readme():
 	with open('README.rst') as f:
 		return f.read()
 
-setup(name='hcapi',
+setup(name='hc-api-python',
 	version='0.1',
 	description='Client Wrapper for the HouseCanary Property API',
 	long_description=readme(),
