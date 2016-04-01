@@ -47,9 +47,9 @@ The `get` method calls the HouseCanary API with a single address and returns a H
 
 ###### Args:
 - **api** (required) -- The endpoint to call. Can be one of:
-	- "value_report" -- for the Value Report API
-	- "score" -- for the Property Score API
-	- "avm" -- for the Automated Valuation Model API
+	- `"value_report"` -- for the Value Report API
+	- `"score"` -- for the Property Score API
+	- `"avm"` -- for the Automated Valuation Model API
 - **address** (optional) -- Building number, street name and unit number. Default is None.
 	If specified, zipcode must also be specified. 
 - **zipcode** (optional) -- Zipcode that matches the address. Default is None.
@@ -71,9 +71,9 @@ The `get_multi` method calls the HouseCanary API with multiple addresses in batc
 
 ###### Args:
 - **api** (required) -- The endpoint to call. Can be one of:
-	- "value_report" -- for the Value Report API
-	- "score" -- for the Property Score API
-	- "avm" -- for the Automated Valuation Model API
+	- `"value_report"` -- for the Value Report API
+	- `"score"` -- for the Property Score API
+	- `"avm"` -- for the Automated Valuation Model API
 - **address_list** (required) -- A list used for calling the API with multiple addresses. Can be one of:
 	- A two dimensional list of address and zipcode strings
 		Example: `[["85 Clay St", "02140"], ["47 Perley Ave", "01960"]]`
