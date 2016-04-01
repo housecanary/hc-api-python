@@ -2,14 +2,14 @@ import unittest
 import mock
 import json
 import os
-import hcclient
+import hcapi
 
 class TestHouseCanaryClient(unittest.TestCase):
 	TEST_API_KEY = "test_key"
 	TEST_API_SECRET = "test_secret"
 
 	def setUp(self):
-		self.client = hcclient.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET)
+		self.client = hcapi.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET)
 
 	def test_init(self):
 		self.assertEqual(self.client._version, "v1")
@@ -19,17 +19,17 @@ class TestHouseCanaryClient(unittest.TestCase):
 		del os.environ["HC_API_SECRET"]
 
 		with self.assertRaises(ValueError) as cm:
-			hcclient.HouseCanaryClient()
+			hcapi.HouseCanaryClient()
 		ex = cm.exception
 		self.assertTrue(ex.message.startswith("Missing authentication key."))
 
 		with self.assertRaises(ValueError)as cm:
-			hcclient.HouseCanaryClient(self.TEST_API_KEY)
+			hcapi.HouseCanaryClient(self.TEST_API_KEY)
 		ex = cm.exception
 		self.assertTrue(ex.message.startswith("Missing authentication secret."))
 
 		with self.assertRaises(ValueError) as cm:
-			hcclient.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET, "v2")
+			hcapi.HouseCanaryClient(self.TEST_API_KEY, self.TEST_API_SECRET, "v2")
 		ex = cm.exception
 		self.assertEqual(ex.message, "Only 'v1' is allowed for version.")
 
@@ -37,7 +37,7 @@ class TestHouseCanaryClient(unittest.TestCase):
 		os.environ["HC_API_KEY"] = self.TEST_API_KEY
 		os.environ["HC_API_SECRET"] = self.TEST_API_SECRET
 
-		c = hcclient.HouseCanaryClient()
+		c = hcapi.HouseCanaryClient()
 		self.assertEqual(c._auth_key, self.TEST_API_KEY)
 		self.assertEqual(c._auth_secret, self.TEST_API_SECRET)
 
@@ -52,8 +52,8 @@ class TestHouseCanaryClient(unittest.TestCase):
 		ex = cm.exception
 		self.assertEqual(ex.message, "address must be provided if zipcode is provided.")
 
-	@mock.patch('hcclient.HouseCanaryResponse.create_from_http_response')
-	@mock.patch('hcclient.HouseCanaryClient._make_request')
+	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
+	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get(self, make_request, create_response):
 		make_request.return_value = "Response"
 		create_response.return_value = "HouseCanary Response"
@@ -71,8 +71,8 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 		self.assertEqual(res, "HouseCanary Response")
 
-	@mock.patch('hcclient.HouseCanaryResponse.create_from_http_response')
-	@mock.patch('hcclient.HouseCanaryClient._make_request')
+	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
+	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get_with_optional_params(self, make_request, create_response):
 		make_request.return_value = "Response"
 		create_response.return_value = "HouseCanary Response"
@@ -90,9 +90,9 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 		self.assertEqual(res, "HouseCanary Response")
 
-	@mock.patch('hcclient.HouseCanaryClient._get_data_structure_from_args')
-	@mock.patch('hcclient.HouseCanaryResponse.create_from_http_response')
-	@mock.patch('hcclient.HouseCanaryClient._make_request')
+	@mock.patch('hcapi.HouseCanaryClient._get_data_structure_from_args')
+	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
+	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get_multi(self, make_request, create_response, get_data_structure):
 		make_request.return_value = "Response"
 		create_response.return_value = "HouseCanary Response"
@@ -109,9 +109,9 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 		self.assertEqual(res, "HouseCanary Response")
 
-	@mock.patch('hcclient.HouseCanaryClient._get_data_structure_from_args')
-	@mock.patch('hcclient.HouseCanaryResponse.create_from_http_response')
-	@mock.patch('hcclient.HouseCanaryClient._make_request')
+	@mock.patch('hcapi.HouseCanaryClient._get_data_structure_from_args')
+	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
+	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get_multi_with_optional_params(self, make_request, create_response, get_data_structure):
 		make_request.return_value = "Response"
 		create_response.return_value = "HouseCanary Response"
@@ -158,8 +158,8 @@ class TestHouseCanaryClient(unittest.TestCase):
 			self.assertTrue(v["address"]["zipcode"] in ["00000", "11111"])
 
 	def test_get_data_structure_from_args_list_of_objects(self):
-		addr1 = hcclient.HouseCanaryProperty("1 Main St", "00000", "property_1")
-		addr2 = hcclient.HouseCanaryProperty("2 Center St", "11111", "property_2")
+		addr1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "property_1")
+		addr2 = hcapi.HouseCanaryProperty("2 Center St", "11111", "property_2")
 
 		res = self.client._get_data_structure_from_args([addr1, addr2])
 
@@ -170,8 +170,8 @@ class TestHouseCanaryClient(unittest.TestCase):
 		self.assertEqual(res[addr2.unique_id]["address"]["address"], "2 Center St")
 		self.assertEqual(res[addr2.unique_id]["address"]["zipcode"], "11111")
 
-	@mock.patch('hcclient.hcclient.urlopen', autospec=True)
-	@mock.patch('hcclient.HouseCanaryClient._construct_request')
+	@mock.patch('hcapi.hcapi.urlopen', autospec=True)
+	@mock.patch('hcapi.HouseCanaryClient._construct_request')
 	def test_make_request(self, construct_request, urlopen):
 		urlopen.return_value = "Response"
 		construct_request.return_value = "Request"
@@ -180,8 +180,8 @@ class TestHouseCanaryClient(unittest.TestCase):
 		construct_request.assert_called_with("endpoint", "qp", "GET", None)
 		urlopen.assert_called_with("Request")
 
-	@mock.patch('hcclient.hcclient.urlopen', autospec=True)
-	@mock.patch('hcclient.HouseCanaryClient._construct_request')
+	@mock.patch('hcapi.hcapi.urlopen', autospec=True)
+	@mock.patch('hcapi.HouseCanaryClient._construct_request')
 	def test_make_request_with_error(self, construct_request, urlopen):
 		construct_request.return_value = "Request"
 		urlopen.side_effect = ValueError
@@ -208,7 +208,7 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 class TestHouseCanaryResponse(unittest.TestCase):
 	def test_init(self):
-		r = hcclient.HouseCanaryResponse("Body", 200, "Req Info")
+		r = hcapi.HouseCanaryResponse("Body", 200, "Req Info")
 		self.assertEqual(r.body(), "Body")
 		self.assertEqual(r.status_code(), 200)
 		self.assertEqual(r.request_info(), "Req Info")
@@ -218,17 +218,17 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		http_response.read.return_value = "Response body"
 		http_response.getcode.return_value = 200
 
-		r = hcclient.HouseCanaryResponse.create_from_http_response(http_response, "req info")
+		r = hcapi.HouseCanaryResponse.create_from_http_response(http_response, "req info")
 
 		self.assertEqual(r.body(), "Response body")
 		self.assertEqual(r.status_code(), 200)
 
 	def test_body_json(self):
-		r = hcclient.HouseCanaryResponse("Body", 200, "Req Info")
+		r = hcapi.HouseCanaryResponse("Body", 200, "Req Info")
 		self.assertEqual(r.body_json(), "Body")
 
 		body = {"address": "test"}
-		r = hcclient.HouseCanaryResponse(json.dumps(body), 200, "Req Info")
+		r = hcapi.HouseCanaryResponse(json.dumps(body), 200, "Req Info")
 		self.assertEqual(r.body_json(), body)
 
 	def test_hc_properties_with_get(self):
@@ -243,7 +243,7 @@ class TestHouseCanaryResponse(unittest.TestCase):
 			"method": "GET"
 		}
 
-		r = hcclient.HouseCanaryResponse(body, 200, request_info)
+		r = hcapi.HouseCanaryResponse(body, 200, request_info)
 		self.assertEqual(len(r.hc_properties()), 1)
 		prop = r.hc_properties()[0]
 		self.assertEqual(prop.address, "1 Main St")
@@ -270,7 +270,7 @@ class TestHouseCanaryResponse(unittest.TestCase):
 			"method": "POST"
 		}
 
-		r = hcclient.HouseCanaryResponse(body, 200, request_info)
+		r = hcapi.HouseCanaryResponse(body, 200, request_info)
 		self.assertEqual(len(r.hc_properties()), 2)
 
 		prop1 = next(p for p in r.hc_properties() if p.unique_id == "property_1")
@@ -288,25 +288,25 @@ class TestHouseCanaryResponse(unittest.TestCase):
 			"method": "POST"
 		}
 
-		r = hcclient.HouseCanaryResponse(body, 200, request_info)
+		r = hcapi.HouseCanaryResponse(body, 200, request_info)
 		self.assertEqual(r.hc_properties(), [])
 
 	def test_has_business_error_with_one(self):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
-		r._hc_properties = [hcclient.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 1001)]
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
+		r._hc_properties = [hcapi.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 1001)]
 		self.assertTrue(r.has_business_error())
 
 	def test_has_business_error_with_many(self):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
-		p1 = hcclient.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 1001)
-		p2 = hcclient.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
-		p3 = hcclient.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
+		p1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 1001)
+		p2 = hcapi.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
+		p3 = hcapi.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
 		r._hc_properties = [p1, p2, p3]
 		self.assertTrue(r.has_business_error())
 
@@ -314,10 +314,10 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
-		p1 = hcclient.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 0)
-		p2 = hcclient.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
-		p3 = hcclient.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
+		p1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 0)
+		p2 = hcapi.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
+		p3 = hcapi.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
 		r._hc_properties = [p1, p2, p3]
 		self.assertFalse(r.has_business_error())
 
@@ -325,7 +325,7 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
 		r._hc_properties = []
 		self.assertFalse(r.has_business_error())
 
@@ -333,11 +333,11 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
 		data = {"code_description": "Test error"}
-		p1 = hcclient.HouseCanaryProperty("1 Main St", "00000", "prop_1", data, 1001)
-		p2 = hcclient.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
-		p3 = hcclient.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
+		p1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "prop_1", data, 1001)
+		p2 = hcapi.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
+		p3 = hcapi.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
 		r._hc_properties = [p1, p2, p3]
 		self.assertEqual(r.get_business_error_messages(), [{"prop_1": "Test error"}])
 
@@ -345,10 +345,10 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
-		p1 = hcclient.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 0)
-		p2 = hcclient.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
-		p3 = hcclient.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
+		p1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "prop_1", None, 0)
+		p2 = hcapi.HouseCanaryProperty("2 Main St", "00000", "prop_2", None, 0)
+		p3 = hcapi.HouseCanaryProperty("3 Main St", "00000", "prop_3", None, 0)
 		r._hc_properties = [p1, p2, p3]
 		self.assertEqual(r.get_business_error_messages(), [])
 
@@ -356,13 +356,13 @@ class TestHouseCanaryResponse(unittest.TestCase):
 		request_info = {
 			"method": "POST"
 		}
-		r = hcclient.HouseCanaryResponse("", 200, request_info)
+		r = hcapi.HouseCanaryResponse("", 200, request_info)
 		r._hc_properties = []
 		self.assertEqual(r.get_business_error_messages(), [])
 
 class TestHouseCanaryProperty(unittest.TestCase):
 	def test_init(self):
-		p = hcclient.HouseCanaryProperty("1 Main St", "00000")
+		p = hcapi.HouseCanaryProperty("1 Main St", "00000")
 		self.assertEqual(p.address, "1 Main St")
 		self.assertEqual(p.zipcode, "00000")
 		self.assertIsNotNone(p.unique_id)
@@ -375,7 +375,7 @@ class TestHouseCanaryProperty(unittest.TestCase):
 			}
 		}
 
-		p = hcclient.HouseCanaryProperty.create_from_json("prop_1", body)
+		p = hcapi.HouseCanaryProperty.create_from_json("prop_1", body)
 
 		self.assertEqual(p.address, "1 Main St")
 		self.assertEqual(p.zipcode, "00000")
@@ -391,7 +391,7 @@ class TestHouseCanaryProperty(unittest.TestCase):
 			"code": 1001
 		}
 
-		p = hcclient.HouseCanaryProperty.create_from_json("prop_1", body)
+		p = hcapi.HouseCanaryProperty.create_from_json("prop_1", body)
 
 		self.assertEqual(p.address, "1 Main St")
 		self.assertEqual(p.zipcode, "00000")
@@ -399,7 +399,7 @@ class TestHouseCanaryProperty(unittest.TestCase):
 		self.assertEqual(p.hc_business_error_code, 1001)
 
 	def test_has_business_error(self):
-		p = hcclient.HouseCanaryProperty("prop_1", "00000")
+		p = hcapi.HouseCanaryProperty("prop_1", "00000")
 		p.hc_business_error_code = 1001
 		self.assertTrue(p.has_business_error())
 		p.hc_business_error_code = 0
@@ -415,7 +415,7 @@ class TestHouseCanaryProperty(unittest.TestCase):
 			"code_description": "Test error"
 		}
 
-		p = hcclient.HouseCanaryProperty.create_from_json("prop_1", body)
+		p = hcapi.HouseCanaryProperty.create_from_json("prop_1", body)
 		self.assertEqual(p.get_business_error(), "Test error")
 
 	def test_get_business_error_none(self):
@@ -427,5 +427,5 @@ class TestHouseCanaryProperty(unittest.TestCase):
 			"code": 0
 		}
 
-		p = hcclient.HouseCanaryProperty.create_from_json("prop_1", body)
+		p = hcapi.HouseCanaryProperty.create_from_json("prop_1", body)
 		self.assertEqual(p.get_business_error(), None)
