@@ -4,7 +4,7 @@ The HouseCanary API Python Client provides an easy interface to call the HouseCa
 
 ## Installation
 
-To install::
+To install:
 ```
 pip install hc-api-python
 ```
@@ -12,7 +12,7 @@ pip install hc-api-python
 ## Basic Usage
 
 
-```    
+```python   
 import hcapi
 client = hcapi.HouseCanaryClient("my_auth_key", "my_secret")
 result = client.get("value_report", "85 Clay St", "02140", "json")
@@ -25,7 +25,7 @@ print result.body_json()
 
 When you create an instance of a HouseCanaryClient, you need to give it your API key and secret provided to you by HouseCanary. You can pass these values to the HouseCanaryClient constructor:
 
-```
+```python
 client = hcapi.HouseCanaryClient("my_auth_key", "my_secret")
 ```
 
@@ -36,7 +36,7 @@ Alternatively, instead of passing in your key and secret to the constructor, you
 
 Creating an instance of HouseCanaryClient with no arguments will read your key and secret from those environment variables:
 
-```
+```python
 client = hcapi.HouseCanaryClient()
 ```
 
@@ -61,7 +61,7 @@ The `get` method calls the HouseCanary API with a single address and returns a H
 	**report_type** is only used when **api** is set to "value_report"
 
 ###### Example:
-```
+```python
 client = hcapi.HouseCanaryClient()
 result = client.get("value_report", "85 Clay St", "02140", "json")
 ```
@@ -85,13 +85,13 @@ The `get_multi` method calls the HouseCanary API with multiple addresses in batc
 	**report_type** is only used when **api** is set to "value_report"
 
 ###### Example with list of address and zipcode strings:
-```
+```python
 client = hcapi.HouseCanaryClient()
 result = client.get_multi("value_report", [["85 Clay St", "02140"], ["47 Perley Ave", "01960"]], "json")
 ```
 
 ###### Example with list of HouseCanaryProperty objects:
-```
+```python
 client = hcapi.HouseCanaryClient()
 addr1 = hcapi.HouseCanaryProperty("85 Clay St", "02140")
 addr2 = hcapi.HouseCanaryProperty("47 Perley Ave", "01960")
@@ -100,7 +100,7 @@ result = client.get_multi("value_report", [addr1, addr2], "json")
 
 The benefit of using a list of HouseCanaryProperty objects is that you can give each object a unique identifier that will be returned in the response to map each address to it's data. Example:
 
-```
+```python
 client = hcapi.HouseCanaryClient()
 addr1 = hcapi.HouseCanaryProperty("85 Clay St", "02140", "prop_1")
 addr2 = hcapi.HouseCanaryProperty("47 Perley Ave", "01960", "prop_2")
@@ -120,7 +120,7 @@ Both the `get` and `get_multi` methods return an instance of HouseCanaryResponse
 - **hc_properties** - returns a list of HouseCanaryProperty objects. Each object has a `data` field that contains the data returned for an individual address.
 
 ###### Example:
-```
+```python
 result = client.get_multi("value_report", [addr1, addr2], "json")
 for p in result.hc_properties():
 	print p.unique_id
