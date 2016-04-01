@@ -1,12 +1,16 @@
 hc-api-python
 --------
 
-# Installation
+=============
+Installation
+=============
 To install::
 
 	>>> pip install hc-api-python
 
-# Usage
+=====
+Usage
+=====
 Basic usage::
 
     >>> import hcapi
