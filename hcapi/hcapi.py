@@ -81,9 +81,9 @@ class HouseCanaryClient(object):
 				- 'value_report' -- for the Value Report API
 				- 'score' -- for the Property Score API
 				- 'avm' -- for the Automated Valuation Model API
-			address (optional) -- Building number, street name and unit number. Default is None.
+			address (required) -- Building number, street name and unit number. Default is None.
 				If specified, zipcode must also be specified. 
-			zipcode (optional) -- Zipcode that matches the address. Default is None.
+			zipcode (required) -- Zipcode that matches the address. Default is None.
 				If specified, address must also be specified.
 			format (optional) -- Output format. Can be 'json', 'pdf' or 'all'. 
 				The default is 'all', which is a zip of all available formats.
@@ -335,7 +335,7 @@ class HouseCanaryResponse(object):
 
 	def hc_properties(self):
 		"""Return a list of HouseCanaryProperty objects containing their returned json data from the API.
-		Returns an empty list of the request format was PDF."""
+		Returns an empty list if the request format was PDF."""
 		if not self._hc_properties:
 			body_json = self.body_json()
 			if not isinstance(body_json, dict):
