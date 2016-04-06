@@ -81,10 +81,8 @@ class HouseCanaryClient(object):
 				- 'value_report' -- for the Value Report API
 				- 'score' -- for the Property Score API
 				- 'avm' -- for the Automated Valuation Model API
-			address (required) -- Building number, street name and unit number. Default is None.
-				If specified, zipcode must also be specified. 
-			zipcode (required) -- Zipcode that matches the address. Default is None.
-				If specified, address must also be specified.
+			address (required) -- Building number, street name and unit number.
+			zipcode (required) -- Zipcode that matches the address.
 			format (optional) -- Output format. Can be 'json', 'pdf' or 'all'. 
 				The default is 'all', which is a zip of all available formats.
 				format is only used when api is set to 'value_report'
@@ -147,7 +145,6 @@ class HouseCanaryClient(object):
 					- A two dimensional list of address and zipcode strings
 						Example: [['700 Boylston St', '02116'], ['201 Spear St', '94105']]		
 					- A list of HouseCanaryProperty objects
-				Default is None.
 			format (optional) -- Output format. Can be 'json', 'pdf' or 'all'. 
 				The default is 'all', which is a zip of all available formats.
 				format is only used when api is set to 'value_report'
