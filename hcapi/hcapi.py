@@ -161,7 +161,7 @@ class HouseCanaryClient(object):
 		api = api.lower()
 		self._check_api_param(api)
 
-		data_structure = self._get_data_structure_from_args(address_list)
+		data_structure = self._get_post_data_structure_from_args(address_list)
 
 		query_params = {}
 		if api == "value_report":
@@ -187,7 +187,7 @@ class HouseCanaryClient(object):
 			raise ValueError("api param is invalid. It must be one of " + ", ".join(self.AVAILABLE_APIS))
 		return True
 
-	def _get_data_structure_from_args(self, address_list):
+	def _get_post_data_structure_from_args(self, address_list):
 		if not address_list:
 			raise ValueError("You must provide a non-empty address_list.")
 

@@ -90,7 +90,7 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 		self.assertEqual(res, "HouseCanary Response")
 
-	@mock.patch('hcapi.HouseCanaryClient._get_data_structure_from_args')
+	@mock.patch('hcapi.HouseCanaryClient._get_post_data_structure_from_args')
 	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
 	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get_multi(self, make_request, create_response, get_data_structure):
@@ -109,7 +109,7 @@ class TestHouseCanaryClient(unittest.TestCase):
 
 		self.assertEqual(res, "HouseCanary Response")
 
-	@mock.patch('hcapi.HouseCanaryClient._get_data_structure_from_args')
+	@mock.patch('hcapi.HouseCanaryClient._get_post_data_structure_from_args')
 	@mock.patch('hcapi.HouseCanaryResponse.create_from_http_response')
 	@mock.patch('hcapi.HouseCanaryClient._make_request')
 	def test_get_multi_with_optional_params(self, make_request, create_response, get_data_structure):
@@ -137,19 +137,19 @@ class TestHouseCanaryClient(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			self.client._check_api_param("wrong")
 
-	def test_get_data_structure_from_args_error_handling(self):
+	def test_get_post_data_structure_from_args_error_handling(self):
 		with self.assertRaises(ValueError) as cm:
-			self.client._get_data_structure_from_args([])
+			self.client._get_post_data_structure_from_args([])
 		ex = cm.exception
 		self.assertEqual(ex.message, "You must provide a non-empty address_list.")
 
 		with self.assertRaises(ValueError) as cm:
-			self.client._get_data_structure_from_args("string")
+			self.client._get_post_data_structure_from_args("string")
 		ex = cm.exception
 		self.assertEqual(ex.message, "address_list must be a non-empty list")
 
-	def test_get_data_structure_from_args_list_of_strings(self):
-		res = self.client._get_data_structure_from_args([["1 Main St", "00000"], ["2 Center St", "11111"]])
+	def test_get_post_data_structure_from_args_list_of_strings(self):
+		res = self.client._get_post_data_structure_from_args([["1 Main St", "00000"], ["2 Center St", "11111"]])
 
 		self.assertEqual(2, len(res.keys()))
 
@@ -157,11 +157,11 @@ class TestHouseCanaryClient(unittest.TestCase):
 			self.assertTrue(v["address"]["address"] in ["1 Main St", "2 Center St"])
 			self.assertTrue(v["address"]["zipcode"] in ["00000", "11111"])
 
-	def test_get_data_structure_from_args_list_of_objects(self):
+	def test_get_post_data_structure_from_args_list_of_objects(self):
 		addr1 = hcapi.HouseCanaryProperty("1 Main St", "00000", "property_1")
 		addr2 = hcapi.HouseCanaryProperty("2 Center St", "11111", "property_2")
 
-		res = self.client._get_data_structure_from_args([addr1, addr2])
+		res = self.client._get_post_data_structure_from_args([addr1, addr2])
 
 		self.assertEqual(2, len(res.keys()))
 
