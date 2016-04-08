@@ -208,8 +208,7 @@ class TestHouseCanaryClient(unittest.TestCase):
     def test_construct_request(self):
         req = self.client._construct_request("/endpoint", {}, "GET", None)
 
-        expected = "https://api.housecanary.com/endpoint\
-                   ?AuthKey=test_key&AuthProto=hc_hmac_v1&AuthTimestamp="
+        expected = "https://api.housecanary.com/endpoint?AuthKey=test_key&AuthProto=hc_hmac_v1&AuthTimestamp="
         self.assertTrue(req.get_full_url().startswith(expected))
         self.assertEqual(req.get_method(), "GET")
         self.assertTrue(req.has_header('X-auth-signature'))
@@ -217,8 +216,7 @@ class TestHouseCanaryClient(unittest.TestCase):
     def test_construct_request_with_data(self):
         req = self.client._construct_request("/endpoint", {}, "POST", {"x": "y"})
 
-        expected = "https://api.housecanary.com/endpoint\
-                   ?AuthKey=test_key&AuthProto=hc_hmac_v1&AuthTimestamp="
+        expected = "https://api.housecanary.com/endpoint?AuthKey=test_key&AuthProto=hc_hmac_v1&AuthTimestamp="
         self.assertTrue(req.get_full_url().startswith(expected))
         self.assertEqual(req.get_method(), "POST")
         self.assertTrue(req.has_header('X-auth-signature'))
