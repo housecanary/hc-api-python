@@ -54,9 +54,9 @@ The `get` method calls the HouseCanary API with a single address and returns a H
 	If specified, zipcode must also be specified. 
 - **zipcode** (optional) -- Zipcode that matches the address. Default is None.
 	If specified, address must also be specified.
-- **format** (optional) -- Output format. Can be "json", "pdf" or "all". 
+- **output_format** (optional) -- Output format. Can be "json", "pdf" or "all". 
 	The default is "all", which is a zip of all available formats.
-	**format** is only used when **api** is set to "value_report"
+	**output_format** is only used when **api** is set to "value_report"
 - **report_type** (optional) -- Type of report. Can be "summary" or "full". The default is "full".
 	**report_type** is only used when **api** is set to "value_report"
 
@@ -78,9 +78,9 @@ The `get_multi` method calls the HouseCanary API with multiple addresses in batc
 	- A two dimensional list of address and zipcode strings
 		Example: `[["85 Clay St", "02140"], ["47 Perley Ave", "01960"]]`
 	- A list of HouseCanaryProperty objects.
-- **format** (optional) -- Output format. Can be "json", "pdf" or "all". 
+- **output_format** (optional) -- Output format. Can be "json", "pdf" or "all". 
 	The default is "all", which is a zip of all available formats.
-	**format** is only used when **api** is set to "value_report"
+	**output_format** is only used when **api** is set to "value_report"
 - **report_type** (optional) -- Type of report. Can be "summary" or "full". The default is "full".
 	**report_type** is only used when **api** is set to "value_report"
 
