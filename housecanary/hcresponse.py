@@ -24,7 +24,7 @@ class HouseCanaryResponse(object):
         self._response = original_response
         self._hc_properties = []
         self._has_property_error = None
-        self._property_error_messages = None
+        self._property_errors = None
 
     @property
     def endpoint_name(self):
@@ -61,12 +61,12 @@ class HouseCanaryResponse(object):
         Returns:
             List of strings
         """
-        if self._property_error_messages is None:
-            self._property_error_messages = [{p.address: p.get_property_error()}
+        if self._property_errors is None:
+            self._property_errors = [{p.address: p.get_property_error()}
                                              for p in self.hc_properties()
                                              if p.has_property_error()]
 
-        return self._property_error_messages
+        return self._property_errors
 
     def has_property_error(self):
         """Returns true if any requested address had a business logic error,

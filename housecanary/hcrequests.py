@@ -14,13 +14,12 @@ class HouseCanaryRequestClient(object):
     def __init__(self, output_generator=None, authenticator=None):
         """Constructor.
 
-        Subclasses should override self._auth with an implementation of requests.auth.AuthBase
-
         Args:
-            output_generator - Optional. An instance of an OutputGenerator used
-                               to process the response from the server request and return
-                               an object from the execute_request method. Can be used
-                               to implement custom serialization of the response data.
+            output_generator - Optional. An instance of an OutputGenerator that implements
+                               a `process_response` method. Can be used to implement custom
+                               serialization of the response data from the `execute_request`
+                               method. If not specified, `execute_request` returns the
+                               response from the requests lib unchanged.
             authenticator - Optional. An instance of a requests.auth.AuthBase implementation
                             for providing authentication to the request.
         """

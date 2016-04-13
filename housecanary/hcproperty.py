@@ -59,7 +59,7 @@ class HouseCanaryProperty(object):
         hc_property.lat = address_info["lat"]
         hc_property.lng = address_info["lng"]
         hc_property.state = address_info["state"]
-        hc_property.unit = address_info["city"]
+        hc_property.unit = address_info["unit"]
 
         hc_property.meta = None
         if "meta" in json_data:
