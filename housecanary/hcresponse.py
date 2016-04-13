@@ -13,16 +13,16 @@ from housecanary.hcproperty import HouseCanaryProperty
 class HouseCanaryResponse(object):
     """Encapsulate an http response from the HouseCanary API."""
 
-    def __init__(self, endpoint_name, body_json, original_response):
+    def __init__(self, endpoint_name, json_body, original_response):
         """ Initialize the response object's data.
 
         Args:
             endpoint_name (str) - The endpoint of the request, such as "property/value"
-            body_json - The response body in json format.
+            json_body - The response body in json format.
             original_response (response object) - server response returned from an http request.
         """
         self._endpoint_name = endpoint_name
-        self._body_json = body_json
+        self._json_body = json_body
         self._response = original_response
         self._hc_properties = []
         self._has_property_error = None
@@ -38,13 +38,13 @@ class HouseCanaryResponse(object):
         return self._endpoint_name
 
     @property
-    def body_json(self):
+    def json_body(self):
         """Gets the response body as json
 
         Returns:
             Json of the response body
         """
-        return self._body_json
+        return self._json_body
 
     @property
     def response(self):
@@ -95,15 +95,15 @@ class HouseCanaryResponse(object):
             List of HouseCanaryProperty objects
         """
         if not self._hc_properties:
-            body_json = self.body_json
+            body = self.json_body
 
             self._hc_properties = []
 
-            if not isinstance(body_json, list):
+            if not isinstance(body, list):
                 # TODO - raise exception?
                 return []
 
-            for address_result in body_json:
+            for address_result in body:
                 hc_property = HouseCanaryProperty.create_from_json(self.endpoint_name, address_result)
                 self._hc_properties.append(hc_property)
 
