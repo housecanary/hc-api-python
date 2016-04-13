@@ -1,4 +1,1 @@
-import hcapiclient
-import hcrequests
-import authentication
-import output
+from hcapiclient import PropertyApiClient
