@@ -136,7 +136,7 @@ class PropertyApiClient(ApiClient):
 
     def value(self, address_data):
         """Call the value endpoint"""
-        return self.fetch("property/avm", self._get_post_data(address_data))
+        return self.fetch("property/value", self._get_post_data(address_data))
 
     def value_forecast(self, address_data):
         """Call the value_forecast endpoint"""
