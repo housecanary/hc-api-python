@@ -6,13 +6,6 @@ and an implementation specific to the HouseCanary API.
 
 """
 
-try:
-    # Python 3
-    from urllib.parse import urljoin
-except ImportError:
-    # Python 2
-    from urlparse import urljoin
-
 import requests
 
 class HouseCanaryRequestClient(object):
@@ -53,7 +46,7 @@ class HouseCanaryRequestClient(object):
 
         response = requests.request(http_method, url, params=query_params,
                                     auth=self._auth, json=post_data)
-        # todo - handle exceptions here
+
         if self._output_generator is not None:
             return self._output_generator.process_response(response)
         else:

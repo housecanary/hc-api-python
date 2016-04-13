@@ -7,7 +7,7 @@ Custom exceptions for the HouseCanary API client.
 class RequestException(Exception):
     """Exception representing an error due to an incorrect request structure
     or missing required fields."""
-    
+
     def __init__(self, status_code, message):
         Exception.__init__(self)
         self._status_code = status_code
@@ -23,9 +23,3 @@ class UnauthorizedException(RequestException):
 class InvalidInputException(Exception):
     """Exception representing invalid input passed to the API Client."""
     pass
-    # def __init(self, message):
-    #     Exception.__init__(self)
-    #     self._message = message
-
-    # def __str__(self):
-    #     return message

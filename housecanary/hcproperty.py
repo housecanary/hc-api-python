@@ -5,8 +5,6 @@ This module provides a HouseCanaryProperty class which encapsulates
 an address and its associated data from the HouseCanary API.
 """
 
-import uuid
-
 HC_BIZ_CODE_OK = 0
 
 class HouseCanaryProperty(object):
@@ -28,6 +26,17 @@ class HouseCanaryProperty(object):
         self.json_results = data
         self.api_code = int(api_code)
 
+        self.zipcode_plus4 = None
+        self.address_full = None
+        self.city = None
+        self.county_fips = None
+        self.lat = None
+        self.lng = None
+        self.state = None
+        self.unit = None
+        self.meta = None
+        self.api_code_description = None
+
     @classmethod
     def create_from_json(cls, endpoint_name, json_data):
         """Deserialize property json data into a HouseCanaryProperty object
@@ -38,7 +47,7 @@ class HouseCanaryProperty(object):
         Returns:
             HouseCanaryProperty object
 
-        """        
+        """
         hc_property = HouseCanaryProperty()
         address_info = json_data["address_info"]
         hc_property.address = address_info["address"]

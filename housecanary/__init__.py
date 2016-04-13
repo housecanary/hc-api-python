@@ -1,1 +1,1 @@
-from hcapiclient import PropertyApiClient
+from housecanary.hcapiclient import PropertyApiClient

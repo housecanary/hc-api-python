@@ -51,7 +51,7 @@ class ApiClient(object):
         self._auth_secret = auth_secret or os.environ[self.SECRET_ENV_VAR]
 
         self._version = version or self.DEFAULT_VERSION
-        
+
         # user can pass in a custom request_client
         self._request_client = request_client
 
@@ -63,6 +63,13 @@ class ApiClient(object):
             self._request_client = HouseCanaryRequestClient(_output_generator, _auth)
 
     def fetch(self, endpoint_name, post_data):
+        """Calls this instance's request_client's post method with the
+        specified endpoint and the specified post_data
+
+        Args:
+            - endpoint_name (str) - The endpoint to call like "property/score".
+            - post_data - Post data to include in the request
+        """
         endpoint_url = self.URL_PREFIX + "/" + self._version + "/" + endpoint_name
         return self._request_client.post(endpoint_url, post_data)
 
@@ -97,7 +104,8 @@ class PropertyApiClient(ApiClient):
         return post_data
 
     # convert input address tuples into json format
-    def _convert_to_json(self, address_data):
+    @staticmethod
+    def _convert_to_json(address_data):
         if address_data and isinstance(address_data, str):
             # allow just passing an address string, for future support.
             # The api currently requires a zipcode as well, but may not in the future.
@@ -107,8 +115,10 @@ class PropertyApiClient(ApiClient):
         if isinstance(address_data, tuple) and len(address_data) > 0:
             address_json = {}
             address_json["address"] = address_data[0]
-            if len(address_data) > 1: address_json["zipcode"] = address_data[1]
-            if len(address_data) > 2: address_json["meta"] = address_data[2]
+            if len(address_data) > 1:
+                address_json["zipcode"] = address_data[1]
+            if len(address_data) > 2:
+                address_json["meta"] = address_data[2]
             return address_json
 
         elif isinstance(address_data, dict):
@@ -117,7 +127,7 @@ class PropertyApiClient(ApiClient):
                 return address_data
 
         # if we made it here, the input was not valid.
-        msg = ("Input is invalid. Must be a list of (address, zipcode) tuples," 
+        msg = ("Input is invalid. Must be a list of (address, zipcode) tuples,"
                " or a Json formatted list with each item containing at least an 'address' key.")
         raise housecanary.exceptions.InvalidInputException((msg))
 

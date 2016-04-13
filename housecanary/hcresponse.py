@@ -6,8 +6,6 @@ a response from the HouseCanary API.
 
 """
 
-import uuid
-import json
 from housecanary.hcproperty import HouseCanaryProperty
 
 class HouseCanaryResponse(object):
@@ -103,8 +101,8 @@ class HouseCanaryResponse(object):
                 # The API always returns a list in the body. This could maybe raise exception.
                 return []
 
-            for address_result in body:
-                hc_property = HouseCanaryProperty.create_from_json(self.endpoint_name, address_result)
+            for address in body:
+                hc_property = HouseCanaryProperty.create_from_json(self.endpoint_name, address)
                 self._hc_properties.append(hc_property)
 
         return self._hc_properties

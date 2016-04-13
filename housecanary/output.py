@@ -12,8 +12,6 @@ custom serialization of an API response.
 
 """
 
-import json
-
 try:
     # Python 3
     from urllib.parse import urlparse
@@ -31,6 +29,7 @@ class OutputGenerator(object):
     """Base class of an OutputGenerator. This base class just returns the given response."""
 
     def process_response(self, response):
+        """Simply returns the response passed in."""
         return response
 
 class JsonOutputGenerator(OutputGenerator):
@@ -41,6 +40,7 @@ class JsonOutputGenerator(OutputGenerator):
     """
 
     def process_response(self, response):
+        """Return the result of calling the json method on response"""
         return response.json()
 
 class HCResponseOutputGenerator(OutputGenerator):

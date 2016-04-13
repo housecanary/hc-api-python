@@ -8,7 +8,6 @@ import hmac
 import hashlib
 import datetime
 import calendar
-import json
 
 try:
     # Python 3
@@ -62,7 +61,7 @@ class HCAuthV1(requests.auth.AuthBase):
         # recreate the url with the updated query string
         updated_url = urlunparse([scheme, netloc, path, params, query_string, fragment])
         request.url = requests.utils.requote_uri(updated_url)
-        
+
         return request
 
     def _get_signature(self, endpoint_path, query_string, http_method, data):
