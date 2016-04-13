@@ -100,7 +100,7 @@ class HouseCanaryResponse(object):
             self._hc_properties = []
 
             if not isinstance(body, list):
-                # TODO - raise exception?
+                # The API always returns a list in the body. This could maybe raise exception.
                 return []
 
             for address_result in body:
