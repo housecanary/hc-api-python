@@ -1,3 +1,4 @@
-from housecanary.housecanaryclient import HouseCanaryClient
-from housecanary.housecanaryresponse import HouseCanaryResponse
-from housecanary.housecanaryproperty import HouseCanaryProperty
+import hcapiclient
+import hcrequests
+import authentication
+import output

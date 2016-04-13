@@ -13,6 +13,7 @@ setup(name='hc-api-python',
     author_email='jeff.francisco7@gmail.com',
     # license='TODO',
     packages=['housecanary'],
+    install_requires=['requests'],
     zip_safe=False,
     test_suite='nose.collector',
     tests_require=['nose'])
