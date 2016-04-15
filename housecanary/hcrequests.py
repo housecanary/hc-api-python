@@ -46,7 +46,10 @@ class HouseCanaryRequestClient(object):
         response = requests.request(http_method, url, params=query_params,
                                     auth=self._auth, json=post_data)
 
-        if self._output_generator is not None:
+        if isinstance(self._output_generator, str) and self._output_generator.lower() == "json":
+            # shortcut for just getting json back
+            return response.json()
+        elif self._output_generator is not None:
             return self._output_generator.process_response(response)
         else:
             return response
