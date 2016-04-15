@@ -15,7 +15,7 @@ class ApiClient(object):
 
     KEY_ENV_VAR = "HC_API_KEY"
     SECRET_ENV_VAR = "HC_API_SECRET"
-    URL_PREFIX = "https://api-branch.housecanary.net"
+    URL_PREFIX = "https://api.housecanary.com"
     DEFAULT_VERSION = "v2"
 
     def __init__(self, auth_key=None, auth_secret=None, version=None, request_client=None,
@@ -109,6 +109,7 @@ class ApiClient(object):
             address_json = {}
             address_json["address"] = address_data
             return address_json
+
         if isinstance(address_data, tuple) and len(address_data) > 0:
             address_json = {}
             address_json["address"] = address_data[0]
