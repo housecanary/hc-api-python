@@ -18,7 +18,7 @@ client = housecanary.PropertyApiClient("my_auth_key", "my_secret")
 result = client.score(("85 Clay St", "02140"))
 
 # result is an instance of HouseCanaryResponse
-print result.json_body
+print result.json()
 ```
 
 ## Authentication
@@ -94,10 +94,10 @@ result = client.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
 The HouseCanaryResponse object encapsulates an HTTP response from the HouseCanary API.
 
 ###### Properties:
-- **json_body** - Gets the body of the response from the API as json.
 - **endpoint_name** - Gets the endpoint name of the original request
 - **response** - Gets the underlying response object.
 ###### Methods:
+- **json()** - Gets the body of the response from the API as json.
 - **has_property_error()** - Returns true if any requested address had a business logic error, otherwise returns false.
 - **get_business_error_messages()** - Gets a list of business error message strings for each of the requested properties that had a business error. If there was no error, returns an empty list.
 - **hc_properties()** - Gets a list of HouseCanaryProperty objects for the requested properties, each containing the property's returned json data from the API.
