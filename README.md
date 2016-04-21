@@ -129,7 +129,7 @@ The HouseCanaryProperty represents a single address and it's returned data.
 
 ###### Example:
 ```python
-hc_response = client.score(("82 County Line Rd", "72173", "meta information"))
+hc_response = client.property.score(("82 County Line Rd", "72173", "meta information"))
 p = result.hc_properties()[0]
 print p.address
 # "82 County Line Rd"
