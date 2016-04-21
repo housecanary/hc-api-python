@@ -36,15 +36,6 @@ class HouseCanaryResponse(object):
         return self._endpoint_name
 
     @property
-    def json_body(self):
-        """Gets the response body as json
-
-        Returns:
-            Json of the response body
-        """
-        return self._json_body
-
-    @property
     def response(self):
         """Gets the original response
 
@@ -52,6 +43,14 @@ class HouseCanaryResponse(object):
             response object passed in during instantiation.
         """
         return self._response
+
+    def json(self):
+        """Gets the response body as json
+
+        Returns:
+            Json of the response body
+        """
+        return self._json_body
 
     def get_property_errors(self):
         """Gets a list of business error message strings
@@ -93,7 +92,7 @@ class HouseCanaryResponse(object):
             List of HouseCanaryProperty objects
         """
         if not self._hc_properties:
-            body = self.json_body
+            body = self.json()
 
             self._hc_properties = []
 

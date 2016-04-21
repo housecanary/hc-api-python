@@ -17,9 +17,9 @@ class HouseCanaryResponseTestCase(unittest.TestCase):
         response = self.client.fetch("property/score", self.test_data)
         self.assertEqual(response.endpoint_name, "property/score")
 
-    def test_json_body(self):
+    def test_json(self):
         response = self.client.fetch("property/score", self.test_data)
-        self.assertTrue(isinstance(response.json_body, list))
+        self.assertTrue(isinstance(response.json(), list))
 
     def test_response(self):
         response = self.client.fetch("property/score", self.test_data)
