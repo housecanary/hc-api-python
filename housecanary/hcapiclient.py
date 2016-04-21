@@ -57,6 +57,8 @@ class ApiClient(object):
             _auth = auth or HCAuthV1(self._auth_key, self._auth_secret)
             self._request_client = HouseCanaryRequestClient(_output_generator, _auth)
 
+        self._property_wrapper = PropertyEndpointWrapper(self)
+
     def fetch(self, endpoint_name, address_data):
         """Calls this instance's request_client's post method with the
         specified endpoint and the specified address_data
@@ -125,8 +127,12 @@ class ApiClient(object):
                " or a Json formatted list with each item containing at least an 'address' key.")
         raise housecanary.exceptions.InvalidInputException((msg))
 
-class PropertyApiClient(ApiClient):
-    """The client class for calling the HouseCanary Property API
+    @property
+    def property(self):
+        return self._property_wrapper
+
+class PropertyEndpointWrapper(object):
+    """A class for encapsulating Property specific endpoints of the HouseCanary API
 
     All the endpoint methods of this class take address data as parameter. Address data can
     be in one of two forms:
@@ -143,78 +149,86 @@ class PropertyApiClient(ApiClient):
     or the output of a custom OutputGenerator if one was specified in the constructor.
     """
 
+    def __init__(self, api_client=None):
+        """Constructor.
+
+        Args:
+            - api_client - An instances of ApiClient
+        """
+        self._api_client = api_client
+
     def consumer(self, address_data):
         """Call the consumer endpoint"""
-        return self.fetch("property/consumer", address_data)
+        return self._api_client.fetch("property/consumer", address_data)
 
     def flood(self, address_data):
         """Call the flood endpoint"""
-        return self.fetch("property/flood", address_data)
+        return self._api_client.fetch("property/flood", address_data)
 
     def school(self, address_data):
         """Call the school endpoint"""
-        return self.fetch("property/school", address_data)
+        return self._api_client.fetch("property/school", address_data)
 
     def value(self, address_data):
         """Call the value endpoint"""
-        return self.fetch("property/value", address_data)
+        return self._api_client.fetch("property/value", address_data)
 
     def value_forecast(self, address_data):
         """Call the value_forecast endpoint"""
-        return self.fetch("property/value_forecast", address_data)
+        return self._api_client.fetch("property/value_forecast", address_data)
 
     def score(self, address_data):
         """Call the score endpoint"""
-        return self.fetch("property/score", address_data)
+        return self._api_client.fetch("property/score", address_data)
 
     def zip_hpi_historical(self, address_data):
         """Call the zip_hpi_historical endpoint"""
-        return self.fetch("property/zip_hpi_historical", address_data)
+        return self._api_client.fetch("property/zip_hpi_historical", address_data)
 
     def zip_hpi_forecast(self, address_data):
         """Call the zip_hpi_forecast endpoint"""
-        return self.fetch("property/zip_hpi_forecast", address_data)
+        return self._api_client.fetch("property/zip_hpi_forecast", address_data)
 
     def rental_value(self, address_data):
         """Call the rental_value endpoint"""
-        return self.fetch("property/rental_value", address_data)
+        return self._api_client.fetch("property/rental_value", address_data)
 
     def msa_details(self, address_data):
         """Call the msa_details endpoint"""
-        return self.fetch("property/msa_details", address_data)
+        return self._api_client.fetch("property/msa_details", address_data)
 
     def mortgage_lien(self, address_data):
         """Call the mortgage_lien endpoint"""
-        return self.fetch("property/mortgage_lien", address_data)
+        return self._api_client.fetch("property/mortgage_lien", address_data)
 
     def ltv(self, address_data):
         """Call the ltv endpoint"""
-        return self.fetch("property/ltv", address_data)
+        return self._api_client.fetch("property/ltv", address_data)
 
     def ltv_forecast(self, address_data):
         """Call the ltv_forecast endpoint"""
-        return self.fetch("property/ltv_forecast", address_data)
+        return self._api_client.fetch("property/ltv_forecast", address_data)
 
     def owner_occupied(self, address_data):
         """Call the owner_occupied endpoint"""
-        return self.fetch("property/owner_occupied", address_data)
+        return self._api_client.fetch("property/owner_occupied", address_data)
 
     def details(self, address_data):
         """Call the details endpoint"""
-        return self.fetch("property/details", address_data)
+        return self._api_client.fetch("property/details", address_data)
 
     def sales_history(self, address_data):
         """Call the sales_history endpoint"""
-        return self.fetch("property/sales_history", address_data)
+        return self._api_client.fetch("property/sales_history", address_data)
 
     def mls(self, address_data):
         """Call the mls endpoint"""
-        return self.fetch("property/mls", address_data)
+        return self._api_client.fetch("property/mls", address_data)
 
     def nod(self, address_data):
         """Call the nod endpoint"""
-        return self.fetch("property/nod", address_data)
+        return self._api_client.fetch("property/nod", address_data)
 
     def census(self, address_data):
         """Call the census endpoint"""
-        return self.fetch("property/census", address_data)
+        return self._api_client.fetch("property/census", address_data)

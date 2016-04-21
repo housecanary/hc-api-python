@@ -5,12 +5,12 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 # pylint: disable=missing-docstring
 
 import unittest
-from housecanary.hcapiclient import PropertyApiClient
+from housecanary.hcapiclient import ApiClient
 from housecanary.hcproperty import HouseCanaryProperty
 
 class HouseCanaryResponseTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = PropertyApiClient()
+        self.client = ApiClient()
         self.test_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
 
     def test_endpoint_name(self):

@@ -5,7 +5,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 
 import unittest
 import mock
-from housecanary.hcapiclient import ApiClient, PropertyApiClient
+from housecanary.hcapiclient import ApiClient
 from housecanary.hcresponse import HouseCanaryResponse
 from housecanary.output import JsonOutputGenerator
 
@@ -70,102 +70,102 @@ class ApiClientTestCase(unittest.TestCase):
         self.assertEqual(response, "Auth Processed")
 
 
-class PropertyApiClientTestCase(unittest.TestCase):
+class PropertyEndpointWrapperTestCase(unittest.TestCase):
     """Tests for the PropertyApiClient class."""
 
     def setUp(self):
-        self.client = PropertyApiClient()
+        self.client = ApiClient()
         self.test_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
 
     def test_flood(self):
-        response = self.client.flood(self.test_data)
+        response = self.client.property.flood(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/flood"])
 
     def test_school(self):
-        response = self.client.school(self.test_data)
+        response = self.client.property.school(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/school"])
 
     @unittest.skip("Endpoint not available yet")
     def test_value(self):
-        response = self.client.value(self.test_data)
+        response = self.client.property.value(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/value"])
 
     def test_value_forecast(self):
-        response = self.client.value_forecast(self.test_data)
+        response = self.client.property.value_forecast(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/value_forecast"])
 
     def test_score(self):
-        response = self.client.score(self.test_data)
+        response = self.client.property.score(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/score"])
 
     def test_zip_hpi_historical(self):
-        response = self.client.zip_hpi_historical(self.test_data)
+        response = self.client.property.zip_hpi_historical(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/zip_hpi_historical"])
 
     def test_zip_hpi_forecast(self):
-        response = self.client.zip_hpi_forecast(self.test_data)
+        response = self.client.property.zip_hpi_forecast(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/zip_hpi_forecast"])
 
     @unittest.skip("Endpoint not available yet")
     def test_rental_value(self):
-        response = self.client.rental_value(self.test_data)
+        response = self.client.property.rental_value(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/rental_value"])
 
     def test_msa_details(self):
-        response = self.client.msa_details(self.test_data)
+        response = self.client.property.msa_details(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/msa_details"])
 
     def test_mortgage_lien(self):
-        response = self.client.mortgage_lien(self.test_data)
+        response = self.client.property.mortgage_lien(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/mortgage_lien"])
 
     def test_ltv(self):
-        response = self.client.ltv(self.test_data)
+        response = self.client.property.ltv(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/ltv"])
 
     def test_ltv_forecast(self):
-        response = self.client.ltv_forecast(self.test_data)
+        response = self.client.property.ltv_forecast(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/ltv_forecast"])
 
     def test_owner_occupied(self):
-        response = self.client.owner_occupied(self.test_data)
+        response = self.client.property.owner_occupied(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/owner_occupied"])
 
     def test_details(self):
-        response = self.client.details(self.test_data)
+        response = self.client.property.details(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/details"])
 
     def test_sales_history(self):
-        response = self.client.sales_history(self.test_data)
+        response = self.client.property.sales_history(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/sales_history"])
 
     def test_mls(self):
-        response = self.client.mls(self.test_data)
+        response = self.client.property.mls(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/mls"])
 
     def test_nod(self):
-        response = self.client.nod(self.test_data)
+        response = self.client.property.nod(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/nod"])
 
     def test_census(self):
-        response = self.client.census(self.test_data)
+        response = self.client.property.census(self.test_data)
         self.assertTrue(isinstance(response, HouseCanaryResponse))
         self.assertIsNotNone(response.json()[0]["property/census"])
 

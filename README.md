@@ -1,6 +1,6 @@
 # HouseCanary API Python Client
 
-The HouseCanary API Python Client provides an easy interface to call the HouseCanary Property API.
+The HouseCanary API Python Client provides an easy interface to call the HouseCanary API.
 
 ## Installation
 
@@ -14,8 +14,8 @@ pip install hc-api-python
 
 ```python   
 import housecanary
-client = housecanary.PropertyApiClient("my_auth_key", "my_secret")
-result = client.score(("85 Clay St", "02140"))
+client = housecanary.ApiClient("my_auth_key", "my_secret")
+result = client.property.score(("85 Clay St", "02140"))
 
 # result is an instance of HouseCanaryResponse
 print result.json()
@@ -23,10 +23,10 @@ print result.json()
 
 ## Authentication
 
-When you create an instance of a PropertyApiClient, you need to give it your API key and secret provided to you by HouseCanary. You can pass these values to the PropertyApiClient constructor:
+When you create an instance of an ApiClient, you need to give it your API key and secret provided to you by HouseCanary. You can pass these values to the ApiClient constructor:
 
 ```python
-client = housecanary.PropertyApiClient("my_auth_key", "my_secret")
+client = housecanary.ApiClient("my_auth_key", "my_secret")
 ```
 
 Alternatively, instead of passing in your key and secret to the constructor, you can store them in the following environment variables:
@@ -34,16 +34,16 @@ Alternatively, instead of passing in your key and secret to the constructor, you
 - HC_API_KEY
 - HC_API_SECRET
 
-Creating an instance of PropertyApiClient with no arguments will read your key and secret from those environment variables:
+Creating an instance of ApiClient with no arguments will read your key and secret from those environment variables:
 
 ```python
-client = housecanary.PropertyApiClient()
+client = housecanary.ApiClient()
 ```
 
 ## Usage Details
 
 ### Endpoint methods
-The PropertyApiClient class provides various methods for calling the different endpoints of the Property API:
+The ApiClient class provides a `property` wrapper which contains various methods for calling the different endpoints of the HouseCanary API:
 
 - **consumer**
 - **flood**
@@ -64,6 +64,8 @@ The PropertyApiClient class provides various methods for calling the different e
 - **mls**
 - **nod**
 - **census**
+
+More wrapper objects may be added to ApiClient later like "zipcode" and "lat_lng".
 
 ###### Args:
 All of the above endpoint methods take an `address_data` argument. `address_data` can be in one of two forms:
@@ -86,8 +88,8 @@ All the endpoint methods of this class return a HouseCanaryResponse object, or t
 
 ###### Example:
 ```python
-client = housecanary.PropertyApiClient()
-result = client.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
+client = housecanary.ApiClient()
+result = client.propery.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
 ```
 
 ### HouseCanaryResponse
