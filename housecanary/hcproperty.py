@@ -5,7 +5,7 @@ This module provides a HouseCanaryProperty class which encapsulates
 an address and its associated data from the HouseCanary API.
 """
 
-HC_BIZ_CODE_OK = 0
+import housecanary.constants as hcconstants
 
 class HouseCanaryProperty(object):
     """Encapsulate the representation of a single address"""
@@ -79,7 +79,7 @@ class HouseCanaryProperty(object):
         Returns:
             boolean
         """
-        return self.api_code > HC_BIZ_CODE_OK
+        return self.api_code > hcconstants.HC_BIZ_CODE_OK
 
     def get_property_error(self):
         """If there was a business error fetching data for this property,

@@ -9,14 +9,10 @@ from housecanary.authentication import HCAuthV1
 from housecanary.output import HCResponseOutputGenerator
 from housecanary.hcrequests import HouseCanaryRequestClient
 import housecanary.exceptions
+import housecanary.constants as hcconstants
 
 class ApiClient(object):
     """The base class for making API calls"""
-
-    KEY_ENV_VAR = "HC_API_KEY"
-    SECRET_ENV_VAR = "HC_API_SECRET"
-    URL_PREFIX = "https://api.housecanary.com"
-    DEFAULT_VERSION = "v2"
 
     def __init__(self, auth_key=None, auth_secret=None, version=None, request_client=None,
                  output_generator=None, auth=None):
@@ -46,10 +42,10 @@ class ApiClient(object):
                             Default is HCAuthV1.
         """
 
-        self._auth_key = auth_key or os.environ[self.KEY_ENV_VAR]
-        self._auth_secret = auth_secret or os.environ[self.SECRET_ENV_VAR]
+        self._auth_key = auth_key or os.environ[hcconstants.KEY_ENV_VAR]
+        self._auth_secret = auth_secret or os.environ[hcconstants.SECRET_ENV_VAR]
 
-        self._version = version or self.DEFAULT_VERSION
+        self._version = version or hcconstants.DEFAULT_VERSION
 
         # user can pass in a custom request_client
         self._request_client = request_client
@@ -85,7 +81,7 @@ class ApiClient(object):
             A HouseCanaryResponse object, or the output of a custom OutputGenerator
             if one was specified in the constructor.
         """
-        endpoint_url = self.URL_PREFIX + "/" + self._version + "/" + endpoint_name
+        endpoint_url = hcconstants.URL_PREFIX + "/" + self._version + "/" + endpoint_name
         return self._request_client.post(endpoint_url, self._get_post_data(address_data))
 
     def _get_post_data(self, address_data):

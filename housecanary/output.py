@@ -21,9 +21,7 @@ except ImportError:
 
 from housecanary.hcresponse import HouseCanaryResponse
 import housecanary.exceptions
-
-HTTP_CODE_OK = 200
-HTTP_FORBIDDEN = 403
+import housecanary.constants as hcconstants
 
 class OutputGenerator(object):
     """Base class of an OutputGenerator. This base class just returns the given response."""
@@ -55,13 +53,13 @@ class HCResponseOutputGenerator(OutputGenerator):
 
         # handle errors
         code_key = "code"
-        if code_key in response_json and response_json[code_key] != HTTP_CODE_OK:
+        if code_key in response_json and response_json[code_key] != hcconstants.HTTP_CODE_OK:
             code = response_json[code_key]
 
             if "message" in response_json:
                 message = response_json["message"]
 
-            if code == HTTP_FORBIDDEN:
+            if code == hcconstants.HTTP_FORBIDDEN:
                 raise housecanary.exceptions.UnauthorizedException(code, message)
             else:
                 raise housecanary.exceptions.RequestException(code, message)
