@@ -8,6 +8,7 @@ import mock
 from housecanary.hcapiclient import ApiClient
 from housecanary.hcresponse import HouseCanaryResponse
 from housecanary.output import JsonOutputGenerator
+import housecanary.exceptions
 
 class ApiClientTestCase(unittest.TestCase):
     """Tests for the ApiClient class"""
@@ -52,6 +53,12 @@ class ApiClientTestCase(unittest.TestCase):
         post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
         response = client.fetch("property/score", post_data)
         self.assertTrue(isinstance(response, list))
+
+    def test_fetch_with_unallowed_key(self):
+        client = ApiClient()
+        post_data = [{"address":"47 Perley Ave", "zipcode":"01960", "color": "green"}]
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            client.property.score(post_data)
 
     def test_fetch_with_custom_auth(self):
         auth = mock.MagicMock()

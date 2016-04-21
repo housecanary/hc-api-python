@@ -118,7 +118,15 @@ class ApiClient(object):
             return address_json
 
         elif isinstance(address_data, dict):
-            # if it's already a dict, just ensure it contains an "address" key
+            allowed_keys = ["address", "zipcode", "meta"]
+
+            # ensure the dict does not contain any unallowed keys
+            for key in address_data:
+                if key not in allowed_keys:
+                    msg = "Key in address input not allowed: " + key
+                    raise housecanary.exceptions.InvalidInputException(msg)
+
+            # ensure it contains an "address" key
             if "address" in address_data:
                 return address_data
 
