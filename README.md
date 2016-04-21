@@ -93,19 +93,38 @@ result = client.propery.value([("85 Clay St", "02140"), ("82 County Line Rd", "7
 ```
 
 ### HouseCanaryResponse
-The HouseCanaryResponse object encapsulates an HTTP response from the HouseCanary API.
+HouseCanaryResponse is a base class for encapsulating an HTTP response from the HouseCanary API.
+
+Currently, the only implemented subclass is HouseCanaryPropertyResponse, which is related to endpoints for property specific data. Other endpoints in the future may return Zipcode or LatLng specific data instead.
 
 ###### Properties:
 - **endpoint_name** - Gets the endpoint name of the original request
 - **response** - Gets the underlying response object.
 ###### Methods:
 - **json()** - Gets the body of the response from the API as json.
-- **has_property_error()** - Returns true if any requested address had a business logic error, otherwise returns false.
-- **get_business_error_messages()** - Gets a list of business error message strings for each of the requested properties that had a business error. If there was no error, returns an empty list.
-- **hc_properties()** - Gets a list of HouseCanaryProperty objects for the requested properties, each containing the property's returned json data from the API.
+- **has_object_error()** - Returns true if any requested objects had a business logic error, otherwise returns false.
+- **get_object_errors()** - Gets a list of business error message strings for each of the requested objects that had a business error. If there was no error, returns an empty list.
+- **hc_objects()** - Overriden in subclasses.
+
+### HouseCanaryPropertyResponse
+
+###### Methods:
+- **hc_objects()** - Gets a list of HouseCanaryProperty objects for the requested properties, each containing the object's returned json data from the API.
+
+### HouseCanaryObject
+Base class for various types of objects returned from the HouseCanary API. Currently, only the HouseCanaryProperty subclass is implemented.
+
+###### Properties:
+- **api_code**
+- **api_code_description**
+- **json_results**
+
+###### Methods:
+- **has_error()** - Returns boolean of whether there was a business logic error fetching data for this object.
+- **get_error()** - If there was a business error fetching data for this object, returns the error message.
 
 ### HouseCanaryProperty
-The HouseCanaryProperty represents a single address and it's returned data.
+A subclass of HouseCanaryObject, the HouseCanaryProperty represents a single address and it's returned data.
 
 ###### Properties:
 - **address**
@@ -119,13 +138,9 @@ The HouseCanaryProperty represents a single address and it's returned data.
 - **state**
 - **unit**
 - **meta**
-- **api_code**
-- **api_code_description**
-- **json_results**
 
 ###### Methods:
-- **has_property_error()** - Returns boolean of whether there was a business logic error fetching data for this property.
-- **get_property_error()** - If there was a business error fetching data for this property, returns the error message.
+- **hc_properties()** - An alias for the hc_objects() method.
 
 ###### Example:
 ```python
