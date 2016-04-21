@@ -15,7 +15,7 @@ pip install hc-api-python
 ```python   
 import housecanary
 client = housecanary.ApiClient("my_auth_key", "my_secret")
-result = client.property.score(("85 Clay St", "02140"))
+result = client.address.score(("85 Clay St", "02140"))
 
 # result is an instance of HouseCanaryResponse
 print result.json()
@@ -43,7 +43,7 @@ client = housecanary.ApiClient()
 ## Usage Details
 
 ### Endpoint methods
-The ApiClient class provides a `property` wrapper which contains various methods for calling the different endpoints of the HouseCanary API:
+The ApiClient class provides an `address` wrapper which contains various methods for calling the different endpoints of the HouseCanary API:
 
 - **consumer**
 - **flood**
@@ -65,7 +65,7 @@ The ApiClient class provides a `property` wrapper which contains various methods
 - **nod**
 - **census**
 
-More wrapper objects may be added to ApiClient later like "zipcode" and "lat_lng".
+More wrappers may be added to ApiClient later like "zipcode" and "lat_lng".
 
 ###### Args:
 All of the above endpoint methods take an `address_data` argument. `address_data` can be in one of two forms:
@@ -89,13 +89,13 @@ All the endpoint methods of this class return a HouseCanaryResponse object, or t
 ###### Example:
 ```python
 client = housecanary.ApiClient()
-result = client.propery.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
+result = client.address.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
 ```
 
 ### HouseCanaryResponse
 HouseCanaryResponse is a base class for encapsulating an HTTP response from the HouseCanary API.
 
-Currently, the only implemented subclass is HouseCanaryPropertyResponse, which is related to endpoints for property specific data. Other endpoints in the future may return Zipcode or LatLng specific data instead.
+Currently, the only implemented subclass is HouseCanaryAddressResponse, which is related to endpoints for address specific data. Other endpoints in the future may return Zipcode or LatLng specific data instead.
 
 ###### Properties:
 - **endpoint_name** - Gets the endpoint name of the original request
@@ -106,13 +106,14 @@ Currently, the only implemented subclass is HouseCanaryPropertyResponse, which i
 - **get_object_errors()** - Gets a list of business error message strings for each of the requested objects that had a business error. If there was no error, returns an empty list.
 - **hc_objects()** - Overriden in subclasses.
 
-### HouseCanaryPropertyResponse
+### HouseCanaryAddressResponse
 
 ###### Methods:
-- **hc_objects()** - Gets a list of HouseCanaryProperty objects for the requested properties, each containing the object's returned json data from the API.
+- **hc_objects()** - Gets a list of HouseCanaryAddress objects for the requested address, each containing the object's returned json data from the API.
+- **hc_addresses()** - An alias for the hc_objects() method.
 
 ### HouseCanaryObject
-Base class for various types of objects returned from the HouseCanary API. Currently, only the HouseCanaryProperty subclass is implemented.
+Base class for various types of objects returned from the HouseCanary API. Currently, only the HouseCanaryAddress subclass is implemented.
 
 ###### Properties:
 - **api_code**
@@ -123,8 +124,8 @@ Base class for various types of objects returned from the HouseCanary API. Curre
 - **has_error()** - Returns boolean of whether there was a business logic error fetching data for this object.
 - **get_error()** - If there was a business error fetching data for this object, returns the error message.
 
-### HouseCanaryProperty
-A subclass of HouseCanaryObject, the HouseCanaryProperty represents a single address and it's returned data.
+### HouseCanaryAddress
+A subclass of HouseCanaryObject, the HouseCanaryAddress represents a single address and it's returned data.
 
 ###### Properties:
 - **address**
@@ -139,13 +140,10 @@ A subclass of HouseCanaryObject, the HouseCanaryProperty represents a single add
 - **unit**
 - **meta**
 
-###### Methods:
-- **hc_properties()** - An alias for the hc_objects() method.
-
 ###### Example:
 ```python
-hc_response = client.property.score(("82 County Line Rd", "72173", "meta information"))
-p = result.hc_properties()[0]
+hc_response = client.address.score(("82 County Line Rd", "72173", "meta information"))
+p = result.hc_addresses()[0]
 print p.address
 # "82 County Line Rd"
 print p.zipcode

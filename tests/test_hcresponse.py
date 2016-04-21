@@ -6,9 +6,9 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 
 import unittest
 from housecanary.hcapiclient import ApiClient
-from housecanary.hcobject import HouseCanaryProperty
+from housecanary.hcobject import HouseCanaryAddress
 
-class HouseCanaryPropertyResponseTestCase(unittest.TestCase):
+class HouseCanaryAddressResponseTestCase(unittest.TestCase):
     def setUp(self):
         self.client = ApiClient()
         self.test_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
@@ -43,17 +43,17 @@ class HouseCanaryPropertyResponseTestCase(unittest.TestCase):
         response = self.client.fetch("property/score", self.test_data)
         self.assertTrue(response.has_object_error())
 
-    def test_hc_properties(self):
+    def test_hc_addresses(self):
         response = self.client.fetch("property/score", self.test_data)
-        self.assertTrue(len(response.hc_properties()), 1)
-        self.assertTrue(isinstance(response.hc_properties()[0], HouseCanaryProperty))
+        self.assertTrue(len(response.hc_addresses()), 1)
+        self.assertTrue(isinstance(response.hc_addresses()[0], HouseCanaryAddress))
 
-    def test_hc_properties_with_multiple(self):
+    def test_hc_addresses_with_multiple(self):
         self.test_data.append({"address": "85 Clay St", "zipcode": "02140"})
         response = self.client.fetch("property/score", self.test_data)
-        self.assertTrue(len(response.hc_properties()), 2)
-        self.assertTrue(isinstance(response.hc_properties()[0], HouseCanaryProperty))
-        self.assertTrue(isinstance(response.hc_properties()[1], HouseCanaryProperty))
+        self.assertTrue(len(response.hc_addresses()), 2)
+        self.assertTrue(isinstance(response.hc_addresses()[0], HouseCanaryAddress))
+        self.assertTrue(isinstance(response.hc_addresses()[1], HouseCanaryAddress))
 
 if __name__ == "__main__":
     unittest.main()

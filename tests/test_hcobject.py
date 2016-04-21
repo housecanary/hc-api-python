@@ -5,9 +5,9 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 # pylint: disable=missing-docstring
 
 import unittest
-from housecanary.hcobject import HouseCanaryProperty
+from housecanary.hcobject import HouseCanaryAddress
 
-class HouseCanaryPropertyTestCase(unittest.TestCase):
+class HouseCanaryAddressTestCase(unittest.TestCase):
     def setUp(self):
         self.test_json = {
             'property/rental_value': {
@@ -26,7 +26,7 @@ class HouseCanaryPropertyTestCase(unittest.TestCase):
             'meta': 'Test Meta'
         }
 
-        self.prop = HouseCanaryProperty.create_from_json("property/rental_value", self.test_json)
+        self.prop = HouseCanaryAddress.create_from_json("property/rental_value", self.test_json)
 
     def test_create_from_json(self):
         self.assertEqual(self.prop.address, "47 Perley Ave")
@@ -51,7 +51,7 @@ class HouseCanaryPropertyTestCase(unittest.TestCase):
 
     def test_has_error_with_error(self):
         self.test_json['property/rental_value']['api_code'] = 1001
-        prop2 = HouseCanaryProperty.create_from_json("property/rental_value", self.test_json)
+        prop2 = HouseCanaryAddress.create_from_json("property/rental_value", self.test_json)
         self.assertTrue(prop2.has_error())
 
     def test_get_error(self):

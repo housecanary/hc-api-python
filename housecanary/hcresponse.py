@@ -6,7 +6,7 @@ a response from the HouseCanary API.
 
 """
 
-from housecanary.hcobject import HouseCanaryProperty
+from housecanary.hcobject import HouseCanaryAddress
 
 class HouseCanaryResponse(object):
     """Encapsulate an http response from the HouseCanary API."""
@@ -35,7 +35,7 @@ class HouseCanaryResponse(object):
             original_response (response object) - server response returned from an http request.
         """
         # Eventually, this will check the json_body to create other types.
-        return HouseCanaryPropertyResponse(endpoint_name, json_body, original_response)
+        return HouseCanaryAddressResponse(endpoint_name, json_body, original_response)
 
     @property
     def endpoint_name(self):
@@ -97,15 +97,15 @@ class HouseCanaryResponse(object):
         """Override in subclasses"""
         raise NotImplementedError()
 
-class HouseCanaryPropertyResponse(HouseCanaryResponse):
+class HouseCanaryAddressResponse(HouseCanaryResponse):
     def hc_objects(self):
-        """Gets a list of HouseCanaryProperty objects for the requested properties,
-        each containing the property's returned json data from the API.
+        """Gets a list of HouseCanaryAddress objects for the requested properties,
+        each containing the address' returned json data from the API.
 
         Returns an empty list if the request format was PDF.
 
         Returns:
-            List of HouseCanaryProperty objects
+            List of HouseCanaryAddress objects
         """
         if not self._hc_objects:
             body = self.json()
@@ -117,12 +117,12 @@ class HouseCanaryPropertyResponse(HouseCanaryResponse):
                 return []
 
             for address in body:
-                hc_property = HouseCanaryProperty.create_from_json(self.endpoint_name, address)
-                self._hc_objects.append(hc_property)
+                hc_address = HouseCanaryAddress.create_from_json(self.endpoint_name, address)
+                self._hc_objects.append(hc_address)
 
         return self._hc_objects
 
-    def hc_properties(self):
+    def hc_addresses(self):
         """Alias method for hc_objects."""
         return self.hc_objects()
 
