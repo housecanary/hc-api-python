@@ -11,6 +11,7 @@ from housecanary.hcrequests import HouseCanaryRequestClient
 import housecanary.exceptions
 import housecanary.constants as hcconstants
 
+
 class ApiClient(object):
     """The base class for making API calls"""
 
@@ -69,8 +70,8 @@ class ApiClient(object):
                              be in one of these forms:
 
                             - A Json formatted list like:
-                            [{"address":"82 County Line Rd", 
-                              "zipcode":"72173", 
+                            [{"address":"82 County Line Rd",
+                              "zipcode":"72173",
                               "meta":"extra info"}]
 
                             - A list of (address, zipcode, meta) tuples like:
@@ -139,7 +140,9 @@ class ApiClient(object):
 
     @property
     def address(self):
+        """Wrapper for address specific endpoints."""
         return self._address_wrapper
+
 
 class AddressEndpointWrapper(object):
     """A class for encapsulating Address specific endpoints of the HouseCanary API

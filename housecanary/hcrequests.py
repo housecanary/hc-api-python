@@ -8,6 +8,7 @@ and an implementation specific to the HouseCanary API.
 
 import requests
 
+
 class HouseCanaryRequestClient(object):
     """Base class for making http requests with the 'requests' lib."""
 

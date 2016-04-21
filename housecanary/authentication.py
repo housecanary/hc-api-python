@@ -19,6 +19,7 @@ except ImportError:
 
 import requests
 
+
 class HCAuthV1(requests.auth.AuthBase):
     """ HouseCanary API V2 Authentication handler for Requests."""
 

@@ -8,6 +8,7 @@ a response from the HouseCanary API.
 
 from housecanary.hcobject import HouseCanaryAddress
 
+
 class HouseCanaryResponse(object):
     """Encapsulate an http response from the HouseCanary API."""
 
@@ -73,8 +74,8 @@ class HouseCanaryResponse(object):
         """
         if self._object_errors is None:
             self._object_errors = [{str(o): o.get_error()}
-                                             for o in self.hc_objects()
-                                             if o.has_error()]
+                                   for o in self.hc_objects()
+                                   if o.has_error()]
 
         return self._object_errors
 
@@ -97,7 +98,10 @@ class HouseCanaryResponse(object):
         """Override in subclasses"""
         raise NotImplementedError()
 
+
 class HouseCanaryAddressResponse(HouseCanaryResponse):
+    """Represents a single address and it's data returned from the API."""
+
     def hc_objects(self):
         """Gets a list of HouseCanaryAddress objects for the requested properties,
         each containing the address' returned json data from the API.
@@ -126,9 +130,11 @@ class HouseCanaryAddressResponse(HouseCanaryResponse):
         """Alias method for hc_objects."""
         return self.hc_objects()
 
+
 class HouseCanaryZipcodeResponse(HouseCanaryResponse):
     """To be implemented later."""
     pass
+
 
 class HouseCanaryLatLngResponse(HouseCanaryResponse):
     """To be implemented later."""

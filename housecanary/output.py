@@ -23,12 +23,14 @@ from housecanary.hcresponse import HouseCanaryResponse
 import housecanary.exceptions
 import housecanary.constants as hcconstants
 
+
 class OutputGenerator(object):
     """Base class of an OutputGenerator. This base class just returns the given response."""
 
     def process_response(self, response):
         """Simply returns the response passed in."""
         return response
+
 
 class JsonOutputGenerator(OutputGenerator):
     """An implementation of OutputGenerator that simply returns the JSON body of the response
@@ -40,6 +42,7 @@ class JsonOutputGenerator(OutputGenerator):
     def process_response(self, response):
         """Return the result of calling the json method on response"""
         return response.json()
+
 
 class HCResponseOutputGenerator(OutputGenerator):
     """An implementation of OutputGenerator that serializes the response

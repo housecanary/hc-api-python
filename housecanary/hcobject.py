@@ -8,6 +8,7 @@ Currently, only the HouseCanaryAddress subclass is implemented.
 
 import housecanary.constants as hcconstants
 
+
 class HouseCanaryObject(object):
     """Base class that for various types of objects returned from the HouseCanary API."""
 
@@ -45,10 +46,11 @@ class HouseCanaryObject(object):
     def __str__(self):
         return "HouseCanaryObject"
 
+
 class HouseCanaryAddress(HouseCanaryObject):
     """Encapsulate the representation of a single address"""
 
-    def __init__(self, address=None, zipcode=None, data=None, 
+    def __init__(self, address=None, zipcode=None, data=None,
                  api_code=0, api_code_description=None):
         """Initialize the HouseCanaryAddress object
 
@@ -58,11 +60,11 @@ class HouseCanaryAddress(HouseCanaryObject):
             data (optional) -- The data returned from the API for this address.
             api_code (optional) -- The HouseCanary business logic
                 error code reflecting any error with this address.
-            api_code_description (optional) -- The HouseCanary business logic 
+            api_code_description (optional) -- The HouseCanary business logic
                 error description.
         """
         super(HouseCanaryAddress, self).__init__(data, api_code, api_code_description)
-        
+
         self.address = str(address)
         self.zipcode = str(zipcode)
         self.zipcode_plus4 = None
@@ -113,8 +115,10 @@ class HouseCanaryAddress(HouseCanaryObject):
     def __str__(self):
         return self.address
 
+
 class HouseCanaryZipcode(HouseCanaryObject):
     pass
+
 
 class HouseCanaryLatLng(HouseCanaryObject):
     pass
