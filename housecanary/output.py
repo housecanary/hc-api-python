@@ -68,7 +68,7 @@ class HCResponseOutputGenerator(OutputGenerator):
 
         endpoint_name = self._parse_endpoint_name_from_url(request_url)
 
-        return HouseCanaryResponse(endpoint_name, response_json, response)
+        return HouseCanaryResponse.create(endpoint_name, response_json, response)
 
     @staticmethod
     def _parse_endpoint_name_from_url(request_url):

@@ -22,9 +22,20 @@ class HouseCanaryResponse(object):
         self._endpoint_name = endpoint_name
         self._json_body = json_body
         self._response = original_response
-        self._hc_properties = []
-        self._has_property_error = None
-        self._property_errors = None
+        self._hc_objects = []
+        self._has_object_error = None
+        self._object_errors = None
+
+    @classmethod
+    def create(cls, endpoint_name, json_body, original_response):
+        """Factory method for creating the correct type of HouseCanaryResponse based on the data.
+        Args:
+            endpoint_name (str) - The endpoint of the request, such as "property/value"
+            json_body - The response body in json format.
+            original_response (response object) - server response returned from an http request.
+        """
+        # Eventually, this will check the json_body to create other types.
+        return HouseCanaryPropertyResponse(endpoint_name, json_body, original_response)
 
     @property
     def endpoint_name(self):
@@ -52,37 +63,42 @@ class HouseCanaryResponse(object):
         """
         return self._json_body
 
-    def get_property_errors(self):
+    def get_object_errors(self):
         """Gets a list of business error message strings
-        for each of the requested properties that had a business error.
+        for each of the requested objects that had a business error.
         If there was no error, returns an empty list
 
         Returns:
             List of strings
         """
-        if self._property_errors is None:
-            self._property_errors = [{p.address: p.get_property_error()}
-                                             for p in self.hc_properties()
-                                             if p.has_property_error()]
+        if self._object_errors is None:
+            self._object_errors = [{str(o): o.get_error()}
+                                             for o in self.hc_objects()
+                                             if o.has_error()]
 
-        return self._property_errors
+        return self._object_errors
 
-    def has_property_error(self):
-        """Returns true if any requested address had a business logic error,
+    def has_object_error(self):
+        """Returns true if any requested object had a business logic error,
         otherwise returns false
 
         Returns:
             boolean
         """
-        if self._has_property_error is None:
-            # scan the hc_properties for any business error codes
-            self._has_property_error = next(
-                (True for p in self.hc_properties()
-                 if p.has_property_error()),
+        if self._has_object_error is None:
+            # scan the hc_objects for any business error codes
+            self._has_object_error = next(
+                (True for o in self.hc_objects()
+                 if o.has_error()),
                 False)
-        return self._has_property_error
+        return self._has_object_error
 
-    def hc_properties(self):
+    def hc_objects(self):
+        """Override in subclasses"""
+        raise NotImplementedError()
+
+class HouseCanaryPropertyResponse(HouseCanaryResponse):
+    def hc_objects(self):
         """Gets a list of HouseCanaryProperty objects for the requested properties,
         each containing the property's returned json data from the API.
 
@@ -91,10 +107,10 @@ class HouseCanaryResponse(object):
         Returns:
             List of HouseCanaryProperty objects
         """
-        if not self._hc_properties:
+        if not self._hc_objects:
             body = self.json()
 
-            self._hc_properties = []
+            self._hc_objects = []
 
             if not isinstance(body, list):
                 # The API always returns a list in the body. This could maybe raise exception.
@@ -102,6 +118,18 @@ class HouseCanaryResponse(object):
 
             for address in body:
                 hc_property = HouseCanaryProperty.create_from_json(self.endpoint_name, address)
-                self._hc_properties.append(hc_property)
+                self._hc_objects.append(hc_property)
 
-        return self._hc_properties
+        return self._hc_objects
+
+    def hc_properties(self):
+        """Alias method for hc_objects."""
+        return self.hc_objects()
+
+class HouseCanaryZipcodeResponse(HouseCanaryResponse):
+    """To be implemented later."""
+    pass
+
+class HouseCanaryLatLngResponse(HouseCanaryResponse):
+    """To be implemented later."""
+    pass

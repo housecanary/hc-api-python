@@ -46,16 +46,16 @@ class HouseCanaryPropertyTestCase(unittest.TestCase):
             'price_pr': 2938.0, 'price_lwr': 2160.0, 'price_mean': 2296.0, 'fsd': 0.17
         })
 
-    def test_has_property_error(self):
-        self.assertFalse(self.prop.has_property_error())
+    def test_has_error(self):
+        self.assertFalse(self.prop.has_error())
 
-    def test_has_property_error_with_error(self):
+    def test_has_error_with_error(self):
         self.test_json['property/rental_value']['api_code'] = 1001
         prop2 = HouseCanaryProperty.create_from_json("property/rental_value", self.test_json)
-        self.assertTrue(prop2.has_property_error())
+        self.assertTrue(prop2.has_error())
 
-    def test_get_property_error(self):
-        self.assertEqual(self.prop.get_property_error(), 'ok')
+    def test_get_error(self):
+        self.assertEqual(self.prop.get_error(), 'ok')
 
 if __name__ == "__main__":
     unittest.main()

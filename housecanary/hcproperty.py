@@ -7,10 +7,48 @@ an address and its associated data from the HouseCanary API.
 
 import housecanary.constants as hcconstants
 
-class HouseCanaryProperty(object):
+class HouseCanaryObject(object):
+    """Base class that for various types of objects returned from the HouseCanary API."""
+
+    def __init__(self, data, api_code, api_code_description):
+        """Constructor
+
+        Args:
+            data - Json data returned from the API for this object.
+            api_code - The HouseCanary business logic error code.
+            api_code_description - The HouseCanary business logic error description.
+        """
+        self.api_code = api_code
+        self.api_code_description = api_code_description
+        self.json_results = data
+
+    def has_error(self):
+        """Returns whether there was a business logic error fetching data
+        for this property.
+
+        Returns:
+            boolean
+        """
+        return self.api_code > hcconstants.HC_BIZ_CODE_OK
+
+    def get_error(self):
+        """If there was a business error fetching data for this property,
+        returns the error message.
+
+        Returns:
+            string - the error message, or None if there was no error.
+
+        """
+        return self.api_code_description
+
+    def __str__(self):
+        return "HouseCanaryObject"
+
+class HouseCanaryProperty(HouseCanaryObject):
     """Encapsulate the representation of a single address"""
 
-    def __init__(self, address=None, zipcode=None, data=None, api_code=0):
+    def __init__(self, address=None, zipcode=None, data=None, 
+                 api_code=0, api_code_description=None):
         """Initialize the HouseCanaryProperty object
 
         Args:
@@ -19,13 +57,13 @@ class HouseCanaryProperty(object):
             data (optional) -- The data returned from the API for this property.
             api_code (optional) -- The HouseCanary business logic
                 error code reflecting any error with this property.
+            api_code_description (optional) -- The HouseCanary business logic 
+                error description.
         """
-
+        super(HouseCanaryProperty, self).__init__(data, api_code, api_code_description)
+        
         self.address = str(address)
         self.zipcode = str(zipcode)
-        self.json_results = data
-        self.api_code = int(api_code)
-
         self.zipcode_plus4 = None
         self.address_full = None
         self.city = None
@@ -35,7 +73,6 @@ class HouseCanaryProperty(object):
         self.state = None
         self.unit = None
         self.meta = None
-        self.api_code_description = None
 
     @classmethod
     def create_from_json(cls, endpoint_name, json_data):
@@ -72,21 +109,11 @@ class HouseCanaryProperty(object):
 
         return hc_property
 
-    def has_property_error(self):
-        """Returns whether there was a business logic error fetching data
-        for this property.
+    def __str__(self):
+        return self.address
 
-        Returns:
-            boolean
-        """
-        return self.api_code > hcconstants.HC_BIZ_CODE_OK
+class HouseCanaryZipcode(HouseCanaryObject):
+    pass
 
-    def get_property_error(self):
-        """If there was a business error fetching data for this property,
-        returns the error message.
-
-        Returns:
-            string - the error message, or None if there was no error.
-
-        """
-        return self.api_code_description
+class HouseCanaryLatLng(HouseCanaryObject):
+    pass

@@ -8,7 +8,7 @@ import unittest
 from housecanary.hcapiclient import ApiClient
 from housecanary.hcproperty import HouseCanaryProperty
 
-class HouseCanaryResponseTestCase(unittest.TestCase):
+class HouseCanaryPropertyResponseTestCase(unittest.TestCase):
     def setUp(self):
         self.client = ApiClient()
         self.test_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
@@ -25,23 +25,23 @@ class HouseCanaryResponseTestCase(unittest.TestCase):
         response = self.client.fetch("property/score", self.test_data)
         self.assertIsNotNone(response.response)
 
-    def test_get_property_errors(self):
+    def test_get_object_errors(self):
         response = self.client.fetch("property/score", self.test_data)
-        self.assertEqual(response.get_property_errors(), [])
+        self.assertEqual(response.get_object_errors(), [])
 
-    def test_get_property_errors_with_error(self):
+    def test_get_object_errors_with_error(self):
         self.test_data[0]["zipcode"] = "00000"
         response = self.client.fetch("property/score", self.test_data)
-        self.assertEqual(len(response.get_property_errors()), 1)
+        self.assertEqual(len(response.get_object_errors()), 1)
 
-    def test_has_property_error(self):
+    def test_has_object_error(self):
         response = self.client.fetch("property/score", self.test_data)
-        self.assertFalse(response.has_property_error())
+        self.assertFalse(response.has_object_error())
 
-    def test_has_property_error_with_error(self):
+    def test_has_object_error_with_error(self):
         self.test_data[0]["zipcode"] = "00000"
         response = self.client.fetch("property/score", self.test_data)
-        self.assertTrue(response.has_property_error())
+        self.assertTrue(response.has_object_error())
 
     def test_hc_properties(self):
         response = self.client.fetch("property/score", self.test_data)
