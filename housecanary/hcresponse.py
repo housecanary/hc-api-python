@@ -6,7 +6,7 @@ a response from the HouseCanary API.
 
 """
 
-from housecanary.hcproperty import HouseCanaryProperty
+from housecanary.hcobject import HouseCanaryProperty
 
 class HouseCanaryResponse(object):
     """Encapsulate an http response from the HouseCanary API."""

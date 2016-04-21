@@ -1,8 +1,9 @@
 """
-housecanary.hcproperty
+housecanary.hcobject
 
-This module provides a HouseCanaryProperty class which encapsulates
-an address and its associated data from the HouseCanary API.
+This module provides a HouseCanaryObject class which encapsulates
+an object and its associated data from the HouseCanary API.
+Currently, only the HouseCanaryProperty subclass is implemented.
 """
 
 import housecanary.constants as hcconstants

@@ -5,7 +5,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 # pylint: disable=missing-docstring
 
 import unittest
-from housecanary.hcproperty import HouseCanaryProperty
+from housecanary.hcobject import HouseCanaryProperty
 
 class HouseCanaryPropertyTestCase(unittest.TestCase):
     def setUp(self):
