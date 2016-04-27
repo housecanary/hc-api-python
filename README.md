@@ -89,7 +89,7 @@ All the endpoint methods of this class return a HouseCanaryResponse object, or t
 ###### Example:
 ```python
 client = housecanary.ApiClient()
-result = client.propery.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
+result = client.property.value([("85 Clay St", "02140"), ("82 County Line Rd", "72173")])
 ```
 
 ### HouseCanaryResponse
