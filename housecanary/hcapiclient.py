@@ -58,7 +58,7 @@ class ApiClient(object):
             _auth = auth or HCAuthV1(self._auth_key, self._auth_secret)
             self._request_client = HouseCanaryRequestClient(_output_generator, _auth)
 
-        self._address_wrapper = AddressEndpointWrapper(self)
+        self._property_wrapper = PropertyEndpointWrapper(self)
 
     def fetch(self, endpoint_name, address_data):
         """Calls this instance's request_client's post method with the
@@ -74,13 +74,13 @@ class ApiClient(object):
                               "zipcode":"72173",
                               "meta":"extra info"}]
 
-                            - A list of (address, zipcode, meta) tuples like:
-                            [("82 County Line Rd", "72173", "extra info")]
+                                - A list of (address, zipcode, meta) tuples like:
+                                [("82 County Line Rd", "72173", "extra info")]
 
-                            - A single address tuple:
-                            ("82 County Line Rd", "72173", "extra_info")
+                                - A single address tuple:
+                                ("82 County Line Rd", "72173", "extra_info")
 
-                            The "meta" field is optional.
+                                The "meta" field is optional.
 
         Returns:
             A HouseCanaryResponse object, or the output of a custom OutputGenerator
@@ -139,13 +139,12 @@ class ApiClient(object):
         raise housecanary.exceptions.InvalidInputException((msg))
 
     @property
-    def address(self):
-        """Wrapper for address specific endpoints."""
-        return self._address_wrapper
+    def property(self):
+        """Wrapper for property specific endpoints."""
+        return self._property_wrapper
 
-
-class AddressEndpointWrapper(object):
-    """A class for encapsulating Address specific endpoints of the HouseCanary API
+class PropertyEndpointWrapper(object):
+    """A class for encapsulating Property specific endpoints of the HouseCanary API
 
     All the endpoint methods of this class take address data as parameter. Address data can
     be in one of two forms:
