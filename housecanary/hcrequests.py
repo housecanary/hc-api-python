@@ -1,9 +1,5 @@
 """
-housecanary.hcrequests
-
-This module provides a base client for making API requests
-and an implementation specific to the HouseCanary API.
-
+Provides a base client for making API requests.
 """
 
 import requests
@@ -13,8 +9,7 @@ class HouseCanaryRequestClient(object):
     """Base class for making http requests with the 'requests' lib."""
 
     def __init__(self, output_generator=None, authenticator=None):
-        """Constructor.
-
+        """
         Args:
             output_generator - Optional. An instance of an OutputGenerator that implements
                                a `process_response` method. Can be used to implement custom

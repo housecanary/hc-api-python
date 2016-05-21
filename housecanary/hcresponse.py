@@ -1,20 +1,15 @@
 """
-housecanary.output
-
-This module provides the HouseCanaryResponse object, which encapsulates
-a response from the HouseCanary API.
-
+Provides HouseCanaryResponse to encapsulate API responses.
 """
 
 from housecanary.hcobject import HouseCanaryProperty
 
 
 class HouseCanaryResponse(object):
-    """Encapsulate an http response from the HouseCanary API."""
+    """Encapsulate an API reponse."""
 
     def __init__(self, endpoint_name, json_body, original_response):
-        """ Initialize the response object's data.
-
+        """
         Args:
             endpoint_name (str) - The endpoint of the request, such as "property/value"
             json_body - The response body in json format.
@@ -29,7 +24,7 @@ class HouseCanaryResponse(object):
 
     @classmethod
     def create(cls, endpoint_name, json_body, original_response):
-        """Factory method for creating the correct type of HouseCanaryResponse based on the data.
+        """Factory for creating the correct type of HouseCanaryResponse based on the data.
         Args:
             endpoint_name (str) - The endpoint of the request, such as "property/value"
             json_body - The response body in json format.

@@ -1,8 +1,6 @@
 """
-housecanary.hcobject
-
-This module provides a HouseCanaryObject class which encapsulates
-an object and its associated data from the HouseCanary API.
+Provides a HouseCanaryObject class which encapsulates
+an object and its associated data.
 Currently, only the HouseCanaryProperty subclass is implemented.
 """
 
@@ -10,11 +8,10 @@ import housecanary.constants as hcconstants
 
 
 class HouseCanaryObject(object):
-    """Base class that for various types of objects returned from the HouseCanary API."""
+    """Base class for returned API objects."""
 
     def __init__(self, data, api_code, api_code_description):
-        """Constructor
-
+        """
         Args:
             data - Json data returned from the API for this object.
             api_code - The HouseCanary business logic error code.
@@ -47,23 +44,22 @@ class HouseCanaryObject(object):
         return "HouseCanaryObject"
 
 class HouseCanaryProperty(HouseCanaryObject):
-    """Encapsulate the representation of a single address"""
+    """A single address"""
 
     def __init__(self, address=None, zipcode=None, data=None,
                  api_code=0, api_code_description=None):
-        """Initialize the HouseCanaryProperty object
-
+        """
         Args:
             address (required) -- Building number, street name and unit number.
             zipcode (required) -- Zipcode that matches the address.
             data (optional) -- The data returned from the API for this property.
             api_code (optional) -- The HouseCanary business logic
                 error code reflecting any error with this property.
-            api_code_description (optional) -- The HouseCanary business logic 
+            api_code_description (optional) -- The HouseCanary business logic
                 error description.
         """
         super(HouseCanaryProperty, self).__init__(data, api_code, api_code_description)
-        
+
         self.address = str(address)
         self.zipcode = str(zipcode)
         self.zipcode_plus4 = None

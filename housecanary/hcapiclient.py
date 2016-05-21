@@ -1,9 +1,3 @@
-"""
-housecanary.hcapiclient
-
-This module provides the main classes for HouseCanary API access.
-"""
-
 import os
 from housecanary.output import HCResponseOutputGenerator
 from housecanary.hcrequests import HouseCanaryRequestClient
@@ -13,12 +7,11 @@ from requests.auth import HTTPBasicAuth
 
 
 class ApiClient(object):
-    """The base class for making API calls"""
+    """Base class for making API calls"""
 
     def __init__(self, auth_key=None, auth_secret=None, version=None, request_client=None,
                  output_generator=None, auth=None):
-        """Constructor
-
+        """
         auth_key and auth_secret can be passed in as parameters or
         pulled automatically from the following environment variables:
             HC_API_KEY -- Your HouseCanary API auth key
@@ -144,7 +137,7 @@ class ApiClient(object):
         return self._property_wrapper
 
 class PropertyEndpointWrapper(object):
-    """A class for encapsulating Property specific endpoints of the HouseCanary API
+    """Property specific endpoints
 
     All the endpoint methods of this class take address data as parameter. Address data can
     be in one of two forms:
@@ -162,8 +155,7 @@ class PropertyEndpointWrapper(object):
     """
 
     def __init__(self, api_client=None):
-        """Constructor.
-
+        """
         Args:
             - api_client - An instances of ApiClient
         """

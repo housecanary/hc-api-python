@@ -1,6 +1,4 @@
 """
-housecanary.authentication
-
 This module provides an authentication implementation for requests to the HouseCanary API.
 """
 

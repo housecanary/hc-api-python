@@ -1,10 +1,3 @@
-"""
-housecanary.exceptions
-
-Custom exceptions for the HouseCanary API client.
-"""
-
-
 class RequestException(Exception):
     """Exception representing an error due to an incorrect request structure
     or missing required fields."""

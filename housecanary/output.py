@@ -1,15 +1,11 @@
 """
-housecanary.output
-
 This module provides a base class and two implementations of OutputGenerator,
-which is responsible for processing a response from the HouseCanary API
-before returning a result to the caller.
+which is responsible for processing a response before returning a result to the caller.
 
 An OutputGenerator must implement a `process_response` method
 which takes an input (usually a server's response to an HTTP request)
 and returns something useful to the caller. This is a good place to do
 custom serialization of an API response.
-
 """
 
 try:
@@ -33,7 +29,7 @@ class OutputGenerator(object):
 
 
 class JsonOutputGenerator(OutputGenerator):
-    """An implementation of OutputGenerator that simply returns the JSON body of the response
+    """Returns the JSON body of the response
 
     Expects the given response to implement a `json` method,
     like the response from the requests library.
@@ -45,8 +41,7 @@ class JsonOutputGenerator(OutputGenerator):
 
 
 class HCResponseOutputGenerator(OutputGenerator):
-    """An implementation of OutputGenerator that serializes the response
-    into an instance of HouseCanaryResponse.
+    """Serializes the response into an instance of HouseCanaryResponse.
 
     Expects the given response to be a response from the requests library.
     """
