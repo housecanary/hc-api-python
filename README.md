@@ -106,7 +106,7 @@ Currently, the only implemented subclass is HouseCanaryPropertyResponse, which i
 - **json()** - Gets the body of the response from the API as json.
 - **has_object_error()** - Returns true if any requested objects had a business logic error, otherwise returns false.
 - **get_object_errors()** - Gets a list of business error message strings for each of the requested objects that had a business error. If there was no error, returns an empty list.
-- **hc_objects()** - Overriden in subclasses.
+- **hc_objects()** - Overridden in subclasses.
 
 ### HouseCanaryPropertyResponse
 
