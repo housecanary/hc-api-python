@@ -188,7 +188,11 @@ HouseCanary API.
            
 
 -  **endpoint\_name** - Gets the endpoint name of the original request
--  **response** - Gets the underlying response object. ###### Methods:
+-  **response** - Gets the underlying response object.
+
+**Methods:**
+
+
 -  **json()** - Gets the body of the response from the API as json.
 -  **has\_object\_error()** - Returns true if any requested objects had
    a business logic error, otherwise returns false.
@@ -294,6 +298,16 @@ returns the JSON data of the Value Report.
 
     result = client.property.value_report("123 Main St", "01234")
     print result.json()
+
+Command Line CSV Tool
+---------------------------
+When you install this package, a command line tool called **hc-api-to-csv** is included and installed on your PATH. It allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates a new CSV file containing the API data attached to the addresses.
+
+To use the command line tool and see its usage instructions:
+
+.. code:: bash
+
+    > hc-api-to-csv
 
 License
 -------

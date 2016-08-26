@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""hc-api-to-csv - Takes a CSV file containing addresses and zipcodes and calls
+                the specified HouseCanary API endpoints to retrieve data
+                for the addresses and output the data to a CSV file.
+
+Usage: hc-api-to-csv (<input> <endpoints>) [-o=FILE] [-H]
+
+Options:
+    input                     An input CSV file containing addresses and zipcodes
+    endpoints                 A comma separated list of endpoints to call like:
+                              'property/value,property/school'
+    -o FILE --output=FILE     A file path to output CSV results to
+    -H --header               Indicates that the input file has a header row that should be ignored
+    -h --help                 Show usage
+"""
+
+
+import sys
+import csv
+import json
+from docopt import docopt
+import housecanary
+
+
+def main(docopt_args):
+    input_file_name = docopt_args['<input>']
+    output_file_name = docopt_args['--output'] or 'output.csv'
+    endpoints = docopt_args['<endpoints>'].split(',')
+    has_header = docopt_args['--header']
+
+    addresses = _get_addresses_from_input_file(input_file_name)
+
+    if len(addresses) == 0:
+        _print_no_addresses()
+        sys.exit(2)
+
+    # skip first row if caller indicated there is a header
+    if has_header:
+        addresses.pop(0)
+
+    api_result = _get_results_from_api(addresses, endpoints)
+
+    # add a header row for the results, including a column for each endpoint
+    header_row = ['Address', 'Zipcode']
+    header_row.extend(endpoints)
+    
+    result_csv = [header_row]
+
+    # Create a csv row for each address
+    for prop in api_result.properties():
+        property_row = [prop.address, prop.zipcode]
+
+        # Get this property's json data for each requested endpoint,
+        # keeping the same column ordering for each property row.
+        for endpoint in endpoints:
+            endpoint_data = _get_endpoint_data_from_property(prop, endpoint)
+
+            property_row.append(endpoint_data)
+
+        result_csv.append(property_row)
+
+    # write the output csv
+    _write_to_output_file(output_file_name, result_csv)
+
+
+def _get_addresses_from_input_file(input_file_name):
+    # Read addresses from input file into list
+    with open(input_file_name, 'rb') as input_file:
+        reader = csv.reader(input_file, delimiter=',', quotechar='"')
+        addresses = map(tuple, reader)
+        return addresses
+
+
+"""Use the HouseCanary API Python Client to access the API"""
+def _get_results_from_api(addresses, endpoints):
+    client = housecanary.ApiClient()
+
+    if len(endpoints) > 1:
+        # use component_mget to request multiple endpoints in one call
+        return client.property.component_mget(addresses, endpoints)
+    else:
+        return client.property.fetch_property_component(endpoints[0], addresses)
+
+
+"""Attempts to pull out json data from a Property object
+   returned by the API Client
+"""
+def _get_endpoint_data_from_property(prop, endpoint):
+    endpoint_result = next(
+                            (cr
+                            for cr in prop.component_results
+                            if cr.component_name == endpoint), None)
+
+    if endpoint_result is None:
+        return "Failed to get data"
+    
+    if endpoint_result.has_error():
+        return endpoint_result.api_code_description
+
+    return json.dumps(endpoint_result.json_data)
+
+
+"""Writes the result_csv to a csv file specified by output_file_name"""
+def _write_to_output_file(output_file_name, result_csv):
+    with open(output_file_name, 'wb') as output_file:
+        writer = csv.writer(output_file,
+                            delimiter=',',
+                            quotechar='"',
+                            quoting=csv.QUOTE_MINIMAL,
+                            dialect='excel')
+
+        for item in result_csv:
+            writer.writerow(item)
+
+
+def _print_no_addresses():
+    print('No addresses were found in the input file')
+
+
+if __name__ == '__main__':
+   args = docopt(__doc__)
+   main(args)
