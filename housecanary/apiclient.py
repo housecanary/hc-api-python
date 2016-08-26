@@ -130,7 +130,7 @@ class PropertyComponentWrapper(object):
         """
         self._api_client = api_client
 
-    def _fetch_property_component(self, endpoint_name, address_data, query_params=None):
+    def fetch_property_component(self, endpoint_name, address_data, query_params=None):
         """common method for handling parameters before passing to api_client"""
 
         if query_params is None:
@@ -142,67 +142,67 @@ class PropertyComponentWrapper(object):
 
     def census(self, address_data):
         """Call the census endpoint"""
-        return self._fetch_property_component("property/census", address_data)
+        return self.fetch_property_component("property/census", address_data)
 
     def details(self, address_data):
         """Call the details endpoint"""
-        return self._fetch_property_component("property/details", address_data)
+        return self.fetch_property_component("property/details", address_data)
 
     def flood(self, address_data):
         """Call the flood endpoint"""
-        return self._fetch_property_component("property/flood", address_data)
+        return self.fetch_property_component("property/flood", address_data)
 
     def mortgage_lien(self, address_data):
         """Call the mortgage_lien endpoint"""
-        return self._fetch_property_component("property/mortgage_lien", address_data)
+        return self.fetch_property_component("property/mortgage_lien", address_data)
 
     def msa_details(self, address_data):
         """Call the msa_details endpoint"""
-        return self._fetch_property_component("property/msa_details", address_data)
+        return self.fetch_property_component("property/msa_details", address_data)
 
     def nod(self, address_data):
         """Call the nod endpoint"""
-        return self._fetch_property_component("property/nod", address_data)
+        return self.fetch_property_component("property/nod", address_data)
 
     def owner_occupied(self, address_data):
         """Call the owner_occupied endpoint"""
-        return self._fetch_property_component("property/owner_occupied", address_data)
+        return self.fetch_property_component("property/owner_occupied", address_data)
 
     def rental_value(self, address_data):
         """Call the rental_value endpoint"""
-        return self._fetch_property_component("property/rental_value", address_data)
+        return self.fetch_property_component("property/rental_value", address_data)
 
     def sales_history(self, address_data):
         """Call the sales_history endpoint"""
-        return self._fetch_property_component("property/sales_history", address_data)
+        return self.fetch_property_component("property/sales_history", address_data)
 
     def school(self, address_data):
         """Call the school endpoint"""
-        return self._fetch_property_component("property/school", address_data)
+        return self.fetch_property_component("property/school", address_data)
 
     def value(self, address_data):
         """Call the value endpoint"""
-        return self._fetch_property_component("property/value", address_data)
+        return self.fetch_property_component("property/value", address_data)
 
     def value_forecast(self, address_data):
         """Call the value_forecast endpoint"""
-        return self._fetch_property_component("property/value_forecast", address_data)
+        return self.fetch_property_component("property/value_forecast", address_data)
 
     def zip_details(self, address_data):
         """Call the zip_details endpoint"""
-        return self._fetch_property_component("property/zip_details", address_data)
+        return self.fetch_property_component("property/zip_details", address_data)
 
     def zip_hpi_forecast(self, address_data):
         """Call the zip_hpi_forecast endpoint"""
-        return self._fetch_property_component("property/zip_hpi_forecast", address_data)
+        return self.fetch_property_component("property/zip_hpi_forecast", address_data)
 
     def zip_hpi_historical(self, address_data):
         """Call the zip_hpi_historical endpoint"""
-        return self._fetch_property_component("property/zip_hpi_historical", address_data)
+        return self.fetch_property_component("property/zip_hpi_historical", address_data)
 
     def zip_volatility(self, address_data):
         """Call the zip_volatility endpoint"""
-        return self._fetch_property_component("property/zip_volatility", address_data)
+        return self.fetch_property_component("property/zip_volatility", address_data)
 
     def component_mget(self, address_data, components):
         """Call the component_mget endpoint
@@ -214,7 +214,7 @@ class PropertyComponentWrapper(object):
         """
         query_params = {"components": ",".join(components)}
 
-        return self._fetch_property_component("property/component_mget", address_data, query_params)
+        return self.fetch_property_component("property/component_mget", address_data, query_params)
 
     def value_report(self, address, zipcode, report_type="full", format_type="all"):
         """Call the value_report component
