@@ -12,9 +12,9 @@
 Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?]
 
 Examples:
-    hc_api_export sample_input.csv property/* -t excel -o output.xlsx
+    hc_api_export bin/sample_input.csv property/* -t excel -o output.xlsx -H
 
-    hc_api_export sample_input.csv property/value,property/school -t csv -p /home/my_output
+    hc_api_export bin/sample_input.csv property/value,property/school -t csv -p /home/my_output -H
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
