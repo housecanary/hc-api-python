@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""hc_api_export - Takes a CSV file containing rows of addresses and zipcodes, calls
+                the specified HouseCanary API endpoints to retrieve data
+                for the addresses and outputs the data to Excel or CSV.
+
+                If exporting to Excel, this creates a single Excel file
+                with a worksheet per endpoint.
+
+                If exporting to CSV, this creates a single CSV file per endpoint.
+
+Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?]
+
+Examples:
+    hc_api_export sample_input.csv property/* -t excel -o output.xlsx
+
+    hc_api_export sample_input.csv property/value,property/school -t csv -p /home/my_output
+
+Options:
+    input                     Required. An input CSV file containing addresses and zipcodes
+
+    endpoints                 Required. A comma separated list of endpoints to call like:
+                              'property/value,property/school'
+                              To call all endpoints, use 'property/*'
+
+    -t TYPE --type=TYPE       Optional. An output type of 'excel' or 'csv'. Default is 'excel'
+
+    -o FILE --output=FILE     Optional. A file name to output Excel results to.
+                              Only used when -t is 'excel'.
+                              Defaults to 'housecanary_output.xlsx'
+
+    -p PATH --path=PATH       Optional. A path to output CSV files to.
+                              Only used when -t is 'csv'.
+                              Defaults to 'housecanary_csv'
+
+    -H --header               Optional. Indicates that the input file has a header row that
+                              should be ignored
+
+    -k KEY --key=KEY          Optional API Key. Alternatively, you can use the HC_API_KEY
+                              environment variable
+
+    -s SECRET --secret=SECRET Optional API Secret. Alternatively, you can use the HC_API_SECRET
+                              environment variable
+
+    -h -? --help              Show usage
+"""
+
+
+import sys
+import csv
+from docopt import docopt
+import housecanary
+
+
+def main(docopt_args):
+    input_file_name = docopt_args['<input>']
+    output_type = docopt_args['--type'] or 'excel'
+    output_file_name = docopt_args['--output'] or 'housecanary_output.xlsx'
+    output_csv_path = docopt_args['--path'] or 'housecanary_csv'
+    endpoints = docopt_args['<endpoints>']
+    has_header = docopt_args['--header']
+    api_key = docopt_args['--key'] or None
+    api_secret = docopt_args['--secret'] or None
+
+    addresses = _get_addresses_from_input_file(input_file_name)
+
+    if len(addresses) == 0:
+        _print_no_addresses()
+        sys.exit(2)
+
+    # skip first row if caller indicated there is a header
+    if has_header:
+        addresses.pop(0)
+
+
+    if endpoints == 'property/*':
+        endpoints = ['property/census', 'property/details', 'property/flood',
+                     'property/mortgage_lien', 'property/msa_details', 'property/nod',
+                     'property/owner_occupied', 'property/rental_value', 'property/sales_history',
+                     'property/school', 'property/value', 'property/value_forecast',
+                     'property/zip_details', 'property/zip_hpi_forecast',
+                     'property/zip_hpi_historical']
+    else:
+        endpoints = endpoints.split(",")
+
+    if 'property/value_report' in endpoints:
+        print(("property/value_report is not allowed for export to Excel. "
+               "Please use the Value Report application to get Excel outputs of Value Reports."))
+        return
+
+    api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
+
+    all_data = api_result.json()
+
+    if output_type.lower() == 'csv':
+        housecanary.export_analytics_data_to_csv(all_data, output_csv_path)
+    else:
+        housecanary.export_analytics_data_to_excel(all_data, output_file_name)
+
+
+def _get_addresses_from_input_file(input_file_name):
+    # Read addresses from input file into list
+    with open(input_file_name, 'rb') as input_file:
+        reader = csv.reader(input_file, delimiter=',', quotechar='"')
+        addresses = map(tuple, reader)
+        return addresses
+
+
+def _get_results_from_api(addresses, endpoints, api_key, api_secret):
+    """Use the HouseCanary API Python Client to access the API"""
+
+    if api_key is not None and api_secret is not None:
+        client = housecanary.ApiClient(api_key, api_secret)
+    else:
+        client = housecanary.ApiClient()
+
+    if len(endpoints) > 1:
+        # use component_mget to request multiple endpoints in one call
+        return client.property.component_mget(addresses, endpoints)
+    else:
+        return client.property.fetch_property_component(endpoints[0], addresses)
+
+
+def _print_no_addresses():
+    print 'No addresses were found in the input file'
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__)
+    main(args)

@@ -299,15 +299,15 @@ returns the JSON data of the Value Report.
     result = client.property.value_report("123 Main St", "01234")
     print result.json()
 
-Command Line CSV Tool
+Command Line Export Tool
 ---------------------------
-When you install this package, a command line tool called **hc-api-to-csv** is included and installed on your PATH. It allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates a new CSV file containing the API data attached to the addresses.
+When you install this package, a command line tool called **hc_api_export** is included and installed on your PATH. It allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates an export of the Analytics API data in Excel or CSV format.
 
 To use the command line tool and see its usage instructions:
 
 .. code:: bash
 
-    > hc-api-to-csv
+    > hc_api_export -?
 
 License
 -------
