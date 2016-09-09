@@ -12,9 +12,9 @@
 Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?]
 
 Examples:
-    hc_api_export bin/sample_input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export bin/sample-input.csv property/* -t excel -o output.xlsx -H
 
-    hc_api_export bin/sample_input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
@@ -88,7 +88,16 @@ def main(docopt_args):
                "Please use the Value Report application to get Excel outputs of Value Reports."))
         return
 
-    api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
+    api_result = None
+    try:
+        api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
+    except housecanary.exceptions.RateLimitException as e:
+        print "You have hit the API rate limit"
+        print "Rate limit period: ", e.rate_limits[0]["period"]
+        print "Request limit: ", e.rate_limits[0]["limit"]
+        print "Requests remaining: ", e.rate_limits[0]["remaining"]
+        print "Rate limit resets at: ", e.rate_limits[0]["reset"]
+        sys.exit(2)
 
     all_data = api_result.json()
 
