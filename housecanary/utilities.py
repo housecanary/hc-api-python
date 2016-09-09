@@ -4,10 +4,11 @@ from datetime import datetime
 
 def get_readable_time_string(seconds):
     """Returns human readable string from number of seconds"""
-    minutes = int(seconds) / 60
+    seconds = int(seconds)
+    minutes = seconds / 60
+    seconds = seconds % 60
     hours = minutes / 60
     minutes = minutes % 60
-
     days = hours / 24
     hours = hours % 24
 
@@ -18,13 +19,15 @@ def get_readable_time_string(seconds):
         result += "%d %s " % (hours, "Hour" if (hours == 1) else "Hours")
     if minutes > 0:
         result += "%d %s " % (minutes, "Minute" if (minutes == 1) else "Minutes")
+    if seconds > 0:
+        result += "%d %s " % (seconds, "Second" if (seconds == 1) else "Seconds")
 
     return result.strip()
 
 
 def get_datetime_from_timestamp(timestamp):
-    """Converts unix timestamp to a more readable datetime format"""
-    return datetime.fromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
+    """Return datetime from unix timestamp"""
+    return datetime.fromtimestamp(int(timestamp))
 
 
 def get_rate_limits(response):
@@ -40,9 +43,16 @@ def get_rate_limits(response):
         rate_limit = {}
         limit_period = get_readable_time_string(period)
         rate_limit["period"] = limit_period
-        rate_limit["limit"] = limits[idx]
-        rate_limit["remaining"] = remaining[idx]
-        rate_limit["reset"] = get_datetime_from_timestamp(reset[idx])
+        rate_limit["period_seconds"] = period
+        rate_limit["request_limit"] = limits[idx]
+        rate_limit["requests_remaining"] = remaining[idx]
+        
+        reset_datetime = get_datetime_from_timestamp(reset[idx])
+        rate_limit["reset"] = reset_datetime
+
+        seconds_remaining = (reset_datetime - datetime.now()).seconds
+        rate_limit["reset_in_seconds"] = seconds_remaining
+        rate_limit["time_to_reset"] = get_readable_time_string(seconds_remaining)
         rate_limits.append(rate_limit)
 
     return rate_limits
