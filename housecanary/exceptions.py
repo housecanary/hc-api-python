@@ -14,6 +14,8 @@ class RequestException(Exception):
 
 
 class RateLimitException(RequestException):
+    """Exception for 429 rate limit exceeded"""
+
     def __init__(self, status_code, message, response):
         RequestException.__init__(self, status_code, message)
         self._response = response
@@ -25,6 +27,7 @@ class RateLimitException(RequestException):
 
     @property
     def rate_limits(self):
+        """Returns list of rate limit information from the response"""
         if not self._rate_limits:
             self._rate_limits = utilities.get_rate_limits(self._response)
         return self._rate_limits

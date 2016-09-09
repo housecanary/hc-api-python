@@ -200,6 +200,7 @@ HouseCanary API.
    strings for each of the requested objects that had a business error.
    If there was no error, returns an empty list.
 -  **objects()** - Overridden in subclasses.
+-  **rate_limits** - Returns a list of rate limit information
 
 PropertyResponse
 ~~~~~~~~~~~~~~~~

@@ -79,7 +79,7 @@ class ApiClient(object):
             A Response object, or the output of a custom OutputGenerator
             if one was specified in the constructor.
         """
-        
+
         endpoint_url = constants.URL_PREFIX + "/" + self._version + "/" + endpoint_name
 
         if query_params is None:
@@ -88,7 +88,7 @@ class ApiClient(object):
         if len(post_data) == 1:
             # If only one address specified, use a GET request
             query_params.update(post_data[0])
-            return self._request_client.get(endpoint_url, query_params) 
+            return self._request_client.get(endpoint_url, query_params)
 
         # when more than one address, use a POST request
         return self._request_client.post(endpoint_url, post_data, query_params)

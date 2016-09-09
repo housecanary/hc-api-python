@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-def get_readable_string_from_seconds(seconds):
+def get_readable_time_string(seconds):
     """Returns human readable string from number of seconds"""
     minutes = int(seconds) / 60
     hours = minutes / 60
@@ -28,7 +28,7 @@ def get_datetime_from_timestamp(timestamp):
 
 
 def get_rate_limits(response):
-    """Returns a dict of rate limit information from a given response's headers."""
+    """Returns a list of rate limit information from a given response's headers."""
     rate_limits = []
 
     periods = response.headers['X-RateLimit-Period'].split(',')
@@ -38,7 +38,7 @@ def get_rate_limits(response):
 
     for idx, period in enumerate(periods):
         rate_limit = {}
-        limit_period = get_readable_string_from_seconds(period)
+        limit_period = get_readable_time_string(period)
         rate_limit["period"] = limit_period
         rate_limit["limit"] = limits[idx]
         rate_limit["remaining"] = remaining[idx]
