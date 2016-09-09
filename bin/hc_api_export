@@ -9,7 +9,7 @@
 
                 If exporting to CSV, this creates a single CSV file per endpoint.
 
-Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?]
+Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?] [-r]
 
 Examples:
     hc_api_export bin/sample-input.csv property/* -t excel -o output.xlsx -H
@@ -42,12 +42,19 @@ Options:
     -s SECRET --secret=SECRET Optional API Secret. Alternatively, you can use the HC_API_SECRET
                               environment variable
 
+    -r --retry                Optional. When specified, if the API call fails due to exceeding
+                              the rate limit, the command will wait and retry once the limit
+                              has reset. However, if the rate limit will take more than 5 minutes
+                              to reset, the retry flag is ignored and the command will exit.
+
     -h -? --help              Show usage
 """
 
 
 import sys
 import csv
+import time
+from datetime import datetime
 from docopt import docopt
 import housecanary
 
@@ -61,6 +68,7 @@ def main(docopt_args):
     has_header = docopt_args['--header']
     api_key = docopt_args['--key'] or None
     api_secret = docopt_args['--secret'] or None
+    retry = docopt_args['--retry'] or False
 
     addresses = _get_addresses_from_input_file(input_file_name)
 
@@ -88,16 +96,16 @@ def main(docopt_args):
                "Please use the Value Report application to get Excel outputs of Value Reports."))
         return
 
-    api_result = None
-    try:
-        api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
-    except housecanary.exceptions.RateLimitException as e:
-        print "You have hit the API rate limit"
-        print "Rate limit period: ", e.rate_limits[0]["period"]
-        print "Request limit: ", e.rate_limits[0]["limit"]
-        print "Requests remaining: ", e.rate_limits[0]["remaining"]
-        print "Rate limit resets at: ", e.rate_limits[0]["reset"]
-        sys.exit(2)
+    if retry:
+        # If rate limit exceeded, enter retry process
+        api_result = __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret)
+    else:
+        # Just try once and exit if rate limit exceeded
+        try:
+            api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
+        except housecanary.exceptions.RateLimitException as e:
+            _print_rate_limit_error(e.rate_limits[0])
+            sys.exit(2)
 
     all_data = api_result.json()
 
@@ -113,6 +121,18 @@ def _get_addresses_from_input_file(input_file_name):
         reader = csv.reader(input_file, delimiter=',', quotechar='"')
         addresses = map(tuple, reader)
         return addresses
+
+
+def __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret):
+    api_result = None
+    while True:
+        try:
+            return _get_results_from_api(addresses, endpoints, api_key, api_secret)
+        except housecanary.exceptions.RateLimitException as e:
+            rate_limit = e.rate_limits[0]
+            _print_rate_limit_error(rate_limit)
+            print "Will retry once rate limit resets..."
+            time.sleep(rate_limit["reset_in_seconds"])
 
 
 def _get_results_from_api(addresses, endpoints, api_key, api_secret):
@@ -132,6 +152,15 @@ def _get_results_from_api(addresses, endpoints, api_key, api_secret):
 
 def _print_no_addresses():
     print 'No addresses were found in the input file'
+
+
+def _print_rate_limit_error(rate_limit):    
+    print "You have hit the API rate limit"
+    print "Rate limit period: ", rate_limit["period"]
+    print "Request limit: ", rate_limit["request_limit"]
+    print "Requests remaining: ", rate_limit["requests_remaining"]
+    print "Rate limit resets at: ", rate_limit["reset"]
+    print "Time until rate limit resets: ", rate_limit["time_to_reset"]
 
 
 if __name__ == '__main__':
