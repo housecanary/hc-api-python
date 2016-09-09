@@ -3,6 +3,7 @@ Provides Response to encapsulate API responses.
 """
 
 from housecanary.object import Property
+from . import utilities
 
 
 class Response(object):
@@ -21,6 +22,7 @@ class Response(object):
         self._objects = []
         self._has_object_error = None
         self._object_errors = None
+        self._rate_limits = None
 
     @classmethod
     def create(cls, endpoint_name, json_body, original_response):
@@ -95,6 +97,16 @@ class Response(object):
     def objects(self):
         """Override in subclasses"""
         raise NotImplementedError()
+
+    @property
+    def rate_limits(self):
+        """Returns a dict of rate limit details."""
+        if not self._rate_limits:
+            self._rate_limits = {}
+            
+            self._rate_limits = utilities.get_rate_limits(self.response)
+
+        return self._rate_limits
 
 
 class PropertyResponse(Response):

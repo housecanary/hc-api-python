@@ -77,6 +77,8 @@ class ResponseOutputGenerator(OutputGenerator):
 
             if code == constants.HTTP_FORBIDDEN:
                 raise housecanary.exceptions.UnauthorizedException(code, message)
+            if code == constants.HTTP_TOO_MANY_REQUESTS:
+                raise housecanary.exceptions.RateLimitException(code, message, response)
             else:
                 raise housecanary.exceptions.RequestException(code, message)
 

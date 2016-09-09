@@ -55,5 +55,11 @@ class PropertyResponseTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response.properties()[0], Property))
         self.assertTrue(isinstance(response.properties()[1], Property))
 
+    def test_response_rate_limits(self):
+        response = self.client.fetch("property/value", self.test_data)
+        self.assertTrue(isinstance(response.rate_limits, list))
+        self.assertTrue(isinstance(response.rate_limits[0]['period'], str))
+
+
 if __name__ == "__main__":
     unittest.main()
