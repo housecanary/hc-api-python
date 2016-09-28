@@ -27,6 +27,9 @@ def get_readable_time_string(seconds):
 
 def get_datetime_from_timestamp(timestamp):
     """Return datetime from unix timestamp"""
+    if timestamp is None:
+        return None
+
     return datetime.fromtimestamp(int(timestamp))
 
 
@@ -50,8 +53,12 @@ def get_rate_limits(response):
         reset_datetime = get_datetime_from_timestamp(reset[idx])
         rate_limit["reset"] = reset_datetime
 
-        seconds_remaining = (reset_datetime - datetime.now()).seconds
+        if reset_datetime is not None:
+            seconds_remaining = (reset_datetime - datetime.now()).seconds
+        else:
+            seconds_remaining = 0
         rate_limit["reset_in_seconds"] = seconds_remaining
+
         rate_limit["time_to_reset"] = get_readable_time_string(seconds_remaining)
         rate_limits.append(rate_limit)
 
