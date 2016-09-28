@@ -216,7 +216,7 @@ class PropertyComponentWrapper(object):
 
         return self.fetch_property_component("property/component_mget", address_data, query_params)
 
-    def value_report(self, address, zipcode, report_type="full", format_type="all"):
+    def value_report(self, address, zipcode, report_type="full", format_type="json"):
         """Call the value_report component
 
         Value Report only supports a single address.
