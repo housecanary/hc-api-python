@@ -212,6 +212,10 @@ class PropertyComponentWrapper(object):
             - components - A list of strings for each component to include in the request.
                 Example: ["property/details", "property/flood", "property/value"]
         """
+        if not isinstance(components, list):
+            print "Components param must be a list"
+            return
+
         query_params = {"components": ",".join(components)}
 
         return self.fetch_property_component("property/component_mget", address_data, query_params)
