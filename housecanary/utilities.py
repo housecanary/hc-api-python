@@ -27,10 +27,10 @@ def get_readable_time_string(seconds):
 
 def get_datetime_from_timestamp(timestamp):
     """Return datetime from unix timestamp"""
-    if timestamp is None:
+    try:
+        return datetime.fromtimestamp(int(timestamp))
+    except:
         return None
-
-    return datetime.fromtimestamp(int(timestamp))
 
 
 def get_rate_limits(response):
