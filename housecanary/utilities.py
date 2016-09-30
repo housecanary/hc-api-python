@@ -35,9 +35,13 @@ def get_datetime_from_timestamp(timestamp):
 
 def get_rate_limits(response):
     """Returns a list of rate limit information from a given response's headers."""
+    periods = response.headers['X-RateLimit-Period']
+    if not periods:
+        return []
+
     rate_limits = []
 
-    periods = response.headers['X-RateLimit-Period'].split(',')
+    periods = periods.split(',')
     limits = response.headers['X-RateLimit-Limit'].split(',')
     remaining = response.headers['X-RateLimit-Remaining'].split(',')
     reset = response.headers['X-RateLimit-Reset'].split(',')
