@@ -217,7 +217,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
 
         expected_params = {
             "report_type": "full",
-            "format": "all",
+            "format": "json",
             "address": "47 Perley Ave",
             "zipcode": "01960"
         }
