@@ -128,6 +128,16 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/flood"])
 
+    def test_ltv(self):
+        response = self.client.property.ltv(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/ltv"])
+
+    def test_ltv_forecast(self):
+        response = self.client.property.ltv_forecast(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/ltv_forecast"])
+
     def test_mortgage_lien(self):
         response = self.client.property.mortgage_lien(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
