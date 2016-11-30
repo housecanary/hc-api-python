@@ -242,6 +242,25 @@ class PropertyComponentWrapper(object):
 
         return self._api_client.fetch_synchronous("property/value_report", query_params)
 
+    def rental_report(self, address, zipcode):
+        """Call the rental_report component
+
+        Rental Report only supports a single address.
+
+        Args:
+            - address
+            - zipcode
+        """
+
+        # only json is supported by rental report.
+        query_params = {
+            "format": "json",
+            "address": address,
+            "zipcode": zipcode
+        }
+
+        return self._api_client.fetch_synchronous("property/rental_report", query_params)
+
 
 def get_post_data(address_data):
     """Convert the various formats of input address_data into

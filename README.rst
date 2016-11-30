@@ -63,7 +63,7 @@ Endpoint methods
 ~~~~~~~~~~~~~~~~
 
 The ApiClient class provides a ``property`` wrapper which contains
-various methods for calling the endpoints of the Value Report and Analytics APIs:
+various methods for calling the endpoints of the Value Report, Rental Report and Analytics APIs:
 
 Analytics API Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -90,6 +90,11 @@ Value Report API Endpoint:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - **value_report**
+
+Rental Report API Endpoint:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- **rental_report**
 
 More wrapper objects may be added to ApiClient later like “zipcode” and
 “lat\_lng”.
@@ -160,6 +165,14 @@ Kwargs:
     # get Value Report in PDF format with "full" report_type.
     result = client.property.value_report("10216 N Willow Ave", "64157", format_type="pdf")
     # result is binary data of the PDF.
+
+**Rental Report**
+
+The ``rental_report`` method is for calling the Rental Report API. It only supports one address at a time.
+
+Args:
+    - *address* (str)
+    - *zipcode* (str)
 
 Learn more about the various endpoints in the `API docs. <https://api-docs.housecanary.com/#endpoints>`_
 
