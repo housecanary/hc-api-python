@@ -231,7 +231,7 @@ class PropertyComponentWrapper(object):
 
         Kwargs:
             - report_type - "full" or "summary". Default is "full".
-            - format_type - "json", "pdf" or "all". Default is "json".
+            - format_type - "json", "pdf", "xlsx" or "all". Default is "json".
         """
         query_params = {
             "report_type": report_type,
@@ -242,7 +242,7 @@ class PropertyComponentWrapper(object):
 
         return self._api_client.fetch_synchronous("property/value_report", query_params)
 
-    def rental_report(self, address, zipcode):
+    def rental_report(self, address, zipcode, format_type="json"):
         """Call the rental_report component
 
         Rental Report only supports a single address.
@@ -250,11 +250,14 @@ class PropertyComponentWrapper(object):
         Args:
             - address
             - zipcode
+
+        Kwargs:
+            - format_type - "json", "xlsx" or "all". Default is "json".
         """
 
         # only json is supported by rental report.
         query_params = {
-            "format": "json",
+            "format": format_type,
             "address": address,
             "zipcode": zipcode
         }
