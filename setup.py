@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='housecanary',
-      version='0.6',
+      version='0.6.1',
       description='Client Wrapper for the HouseCanary API',
       long_description=readme(),
       url='http://github.com/housecanary/hc-api-python',

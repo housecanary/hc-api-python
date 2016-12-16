@@ -149,7 +149,7 @@ Args:
 
 Kwargs: 
     - *report\_type* - “full” or “summary”. Optional. Default is "full"
-    - *format\_type* - "json", "pdf" or "all". Optional. Default is "json"
+    - *format\_type* - "json", "pdf", "xlsx" or "all". Optional. Default is "json"
 
 **Example:**
         
@@ -173,6 +173,9 @@ The ``rental_report`` method is for calling the Rental Report API. It only suppo
 Args:
     - *address* (str)
     - *zipcode* (str)
+
+Kwargs: 
+    - *format\_type* - "json", "xlsx" or "all". Optional. Default is "json"
 
 Learn more about the various endpoints in the `API docs. <https://api-docs.housecanary.com/#endpoints>`_
 
