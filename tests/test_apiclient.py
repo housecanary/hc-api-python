@@ -213,6 +213,18 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         }
         self.client.fetch_synchronous.assert_called_with("property/value_report", expected_params)
 
+    def test_rental_report(self):
+        self.client.fetch_synchronous = mock.MagicMock()
+
+        self.client.property.rental_report("47 Perley Ave", "01960")
+
+        expected_params = {
+            "format": "json",
+            "address": "47 Perley Ave",
+            "zipcode": "01960"
+        }
+        self.client.fetch_synchronous.assert_called_with("property/rental_report", expected_params)
+
 
 if __name__ == "__main__":
     unittest.main()
