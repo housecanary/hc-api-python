@@ -1,6 +1,7 @@
 """Utility functions for the housecanary.excel package"""
 
 import json
+import csv
 
 ADDRESS_T = '{street_address} {city} {state} {zipcode}'
 
@@ -49,3 +50,24 @@ def convert_snake_to_title_case(key):
 def convert_title_to_snake_case(key):
     """Converts title-cased key to snake-cased key."""
     return '_'.join(w.lower() for w in key.split(' '))
+
+
+def get_addresses_from_input_file(input_file_name):
+    # Read addresses from input file into list
+    with open(input_file_name, 'rb') as input_file:
+        reader = csv.reader(input_file, delimiter=',', quotechar='"')
+        addresses = map(tuple, reader)
+        return addresses
+
+
+def print_no_addresses():
+    print 'No addresses were found in the input file'
+
+
+def print_rate_limit_error(rate_limit):
+    print "You have hit the API rate limit"
+    print "Rate limit period: ", rate_limit["period"]
+    print "Request limit: ", rate_limit["request_limit"]
+    print "Requests remaining: ", rate_limit["requests_remaining"]
+    print "Rate limit resets at: ", rate_limit["reset"]
+    print "Time until rate limit resets: ", rate_limit["time_to_reset"]
