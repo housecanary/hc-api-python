@@ -53,14 +53,17 @@ def get_rate_limits(response):
         rate_limit["period_seconds"] = period
         rate_limit["request_limit"] = limits[idx]
         rate_limit["requests_remaining"] = remaining[idx]
-        
+
         reset_datetime = get_datetime_from_timestamp(reset[idx])
         rate_limit["reset"] = reset_datetime
 
-        if reset_datetime is not None:
-            seconds_remaining = (reset_datetime - datetime.now()).seconds
+        right_now = datetime.now()
+        if (reset_datetime is not None) and (right_now < reset_datetime):
+            # add 1 second because of rounding
+            seconds_remaining = (reset_datetime - right_now).seconds + 1
         else:
             seconds_remaining = 0
+
         rate_limit["reset_in_seconds"] = seconds_remaining
 
         rate_limit["time_to_reset"] = get_readable_time_string(seconds_remaining)

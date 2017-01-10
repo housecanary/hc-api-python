@@ -17,4 +17,4 @@ setup(name='housecanary',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose', 'mock'],
-      scripts=['bin/hc_api_export'])
+      scripts=['bin/hc_api_export', 'bin/hc_value_report_concat'])

@@ -53,7 +53,7 @@ def convert_title_to_snake_case(key):
 
 
 def get_addresses_from_input_file(input_file_name):
-    # Read addresses from input file into list
+    """Read addresses from input file into list of tuples."""
     with open(input_file_name, 'rb') as input_file:
         reader = csv.reader(input_file, delimiter=',', quotechar='"')
         addresses = map(tuple, reader)

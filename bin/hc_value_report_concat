@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""hc_value_report_concat - Takes a CSV file containing rows of addresses and zipcodes,
+                calls the specified HouseCanary Value Report API to retrieve Excel output
+                for the addresses and combines the results into a single Excel file.
+
+Usage: hc_value_report_concat (<input>) [-o FILE] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+
+Examples:
+    hc_value_report_concat bin/sample-input.csv property/* -t excel -o output.xlsx -H
+
+    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+
+Options:
+    input                     Required. An input CSV file containing addresses and zipcodes
+
+    -o FILE --output=FILE     Optional. A file name for the Excel output.
+                              Defaults to 'value_report_output.xlsx'
+
+    -H --header               Optional. Indicates that the input file has a header row that
+                              should be ignored
+
+    -k KEY --key=KEY          Optional API Key. Alternatively, you can use the HC_API_KEY
+                              environment variable
+
+    -s SECRET --secret=SECRET Optional API Secret. Alternatively, you can use the HC_API_SECRET
+                              environment variable
+
+    -t TYPE --type=TYPE       Optional Report Type of 'full' or 'summary'. Default is 'full'
+
+    -r --retry                Optional. When specified, if any of the API calls fail due to
+                              exceeding the rate limit, the command will wait and retry once
+                              the limit has reset. However, if the rate limit will take more
+                              than 5 minutes to reset, the retry flag is ignored and the
+                              command will exit.
+
+    -h -? --help              Show usage
+"""
+
+
+import sys
+from docopt import docopt
+import housecanary
+
+
+def main(docopt_args):
+    input_file_name = docopt_args['<input>']
+    output_file_name = docopt_args['--output'] or 'value_report_output.xlsx'
+    has_header = docopt_args['--header']
+    api_key = docopt_args['--key'] or None
+    api_secret = docopt_args['--secret'] or None
+    report_type = docopt_args['--type'] or 'full'
+    retry = docopt_args['--retry'] or False
+
+    addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+
+    # skip first row if caller indicated there is a header
+    if has_header and len(addresses) > 0:
+        addresses.pop(0)
+
+    if len(addresses) == 0:
+        housecanary.utilities.print_no_addresses()
+        sys.exit(2)
+
+    housecanary.concat_value_reports(
+      addresses, output_file_name, report_type, retry, api_key, api_secret)
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__)
+    main(args)
