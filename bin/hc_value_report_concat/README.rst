@@ -3,14 +3,14 @@ hc_value_report_concat
 
 Allows you to call the Value Report API for multiple addresses by passing in a CSV file containing addresses and zip codes.
 
-Each row in the input CSV file should be in the format of `address,zipcode`.
+Each row in the input CSV file should be in the format of ``address,zipcode``.
 
 It generates a single .xlsx file which combines the Value Report Excel output of each address.
 
 Installation
 ------------
 
-`hc_value_report_concat` is installed as part of the HouseCanary client. If you haven't installed that yet, you can do so with `pip`:
+``hc_value_report_concat`` is installed as part of the HouseCanary client. If you haven't installed that yet, you can do so with ``pip``:
 
 ::
 
@@ -28,7 +28,7 @@ Usage instructions:
 **Example:**
 ::
 
-    hc_value_report_concat bin/sample-input.csv property/* -H
+    hc_value_report_concat bin/sample-input.csv property/* -o vr_output.xlsx -H
 
 **Options:**
 
@@ -38,7 +38,7 @@ Usage instructions:
 
 - -o FILE --output=FILE
 
-    Optional. A file name for the Excel output. Defaults to 'value_report_output.xlsx'
+    Optional. A file name for the Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``value_report_output.xlsx``
 
 - -H --header
 
@@ -54,7 +54,7 @@ Usage instructions:
 
 - -t TYPE --type=TYPE
 
-    Optional Report Type of 'full' or 'summary'. Default is 'full'
+    Optional Report Type of ``full`` or ``summary``. Default is ``full``
 
 - -r --retry
 

@@ -1,7 +1,7 @@
 hc_api_export
 =============================
 
-Allows you to call API endpoints with a CSV file containing addresses and zip codes.  Each row in the input CSV file should be in the format of `address,zipcode`.
+Allows you to call API endpoints with a CSV file containing addresses and zip codes.  Each row in the input CSV file should be in the format of ``address,zipcode``.
 
 It generates an export of the Analytics API data in Excel or CSV format.
 
@@ -12,7 +12,7 @@ If exporting to CSV, this creates a single CSV file per endpoint.
 Installation
 ------------
 
-`hc_api_export` is installed as part of the HouseCanary client. If you haven't installed that yet, you can do so with `pip`:
+``hc_api_export`` is installed as part of the HouseCanary client. If you haven't installed that yet, you can do so with ``pip``:
 
 ::
 
@@ -43,21 +43,21 @@ Usage instructions
 
 - endpoints
 
-    Required. A comma separated list of endpoints to call like: 'property/value,property/school'
+    Required. A comma separated list of endpoints to call like: ``property/value,property/school``
 
-    To call all endpoints, use 'property/\*'
+    To call all endpoints, use ``property/\*``
 
 - -t TYPE --type=TYPE
 
-    Optional. An output type of 'excel' or 'csv'. Default is 'excel'
+    Optional. An output type of ``excel`` or ``csv``. Default is ``excel``
 
 - -o FILE --output=FILE
 
-    Optional. A file name to output Excel results to. Only used when -t is 'excel'. Defaults to 'housecanary_output.xlsx'
+    Optional. A file name to output Excel results to. Only used when -t is ``excel``. Defaults to ``housecanary_output.xlsx``
 
 - -p PATH --path=PATH
 
-    Optional. A path to output CSV files to. Only used when -t is 'csv'. Defaults to 'housecanary_csv'
+    Optional. A path to output CSV files to. Only used when -t is ``csv``. Defaults to ``housecanary_csv``
 
 - -H --header
 
