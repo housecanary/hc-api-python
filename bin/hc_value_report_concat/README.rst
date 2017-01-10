@@ -1,7 +1,8 @@
-hc_value_report_concat
+HouseCanary Value Report Concat
 =============================
 
-Allows you to call the Value Report API for multiple addresses by passing in a CSV file containing addresses and zip codes.
+HouseCanary Value Report Concat is a command line tool that allows you to call the
+Value Report API for multiple addresses by passing in a CSV file containing addresses and zip codes.
 
 Each row in the input CSV file should be in the format of ``address,zipcode``.
 See an example input `here <../sample-input.csv>`_.

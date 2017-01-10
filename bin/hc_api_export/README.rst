@@ -1,7 +1,8 @@
-hc_api_export
+HouseCanary Analytics API Export
 =============================
 
-Allows you to call API endpoints with a CSV file containing addresses and zip codes.
+HouseCanary Analytics API Export is a command line tool that allows you to call API endpoints
+with a CSV file containing addresses and zip codes.
 Each row in the input CSV file should be in the format of ``address,zipcode``. 
 See an example input `here <../sample-input.csv>`_.
 

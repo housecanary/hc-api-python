@@ -61,7 +61,7 @@ def main(docopt_args):
         sys.exit(2)
 
     housecanary.concat_value_reports(
-      addresses, output_file_name, report_type, retry, api_key, api_secret)
+        addresses, output_file_name, report_type, retry, api_key, api_secret)
 
 
 if __name__ == '__main__':

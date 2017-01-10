@@ -320,8 +320,8 @@ Command Line Tools
 ---------------------------
 When you install this package, a couple command line tools are included and installed on your PATH.
 
-- `hc_api_export <bin/hc_api_export>`_
-- `hc_value_report_concat <bin/hc_value_report_concat>`_
+- `HouseCanary Analytics API Export <bin/hc_api_export>`_
+- `HouseCanary Value Report Concat <bin/hc_value_report_concat>`_
 
 License
 -------
