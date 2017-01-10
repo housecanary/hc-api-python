@@ -140,19 +140,21 @@ def _get_value_report(client, address, zipcode, report_type, retry, api_key, api
                 rate_limit = e.rate_limits[0]
                 utilities.print_rate_limit_error(rate_limit)
 
-                if rate_limit['reset_in_seconds'] < 300:
-                    print 'Will retry once rate limit resets...'
-                    time.sleep(rate_limit['reset_in_seconds'])
-                else:
+                if rate_limit['reset_in_seconds'] >= 300:
                     # Rate limit will take more than 5 minutes to reset, so just fail
                     return {'success': False, 'content': str(e)}
+
+                print 'Will retry once rate limit resets...'
+                time.sleep(rate_limit['reset_in_seconds'])
+
             except exceptions.RequestException as e:
                 return {'success': False, 'content': str(e)}
-    else:
-        try:
-            return _make_value_report_request(client, address, zipcode, report_type)
-        except exceptions.RateLimitException as e:
-            return {'success': False, 'content': str(e)}
+
+    # otherwise just try once.
+    try:
+        return _make_value_report_request(client, address, zipcode, report_type)
+    except exceptions.RateLimitException as e:
+        return {'success': False, 'content': str(e)}
 
 
 def _make_value_report_request(client, address, zipcode, report_type):
