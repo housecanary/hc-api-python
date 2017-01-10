@@ -1,4 +1,4 @@
-"""Module for creating exports of Analytics API data"""
+"""Module for creating Excel exports of HouseCanary API data"""
 
 import os
 import csv
