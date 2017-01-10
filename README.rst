@@ -320,25 +320,8 @@ Command Line Tools
 ---------------------------
 When you install this package, a couple command line tools are included and installed on your PATH.
 
-**hc_api_export**
-
-Allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates an export of the Analytics API data in Excel or CSV format.
-
-Usage instructions:
-
-.. code:: bash
-
-    > hc_api_export -?
-
-**hc_value_report_concat**
-
-Allows you to call the Value Report API for multiple addresses by passing in a CSV file containing addresses and zip codes. It generates a single .xlsx file which combines the Value Report Excel output of each address.
-
-Usage instructions:
-
-.. code:: bash
-
-    > hc_value_report_concat -?
+- `hc_api_export <bin/hc_api_export>`_
+- `hc_value_report_concat <bin/hc_value_report_concat>`_
 
 License
 -------

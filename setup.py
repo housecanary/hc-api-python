@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
@@ -17,4 +18,7 @@ setup(name='housecanary',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose', 'mock'],
-      scripts=['bin/hc_api_export', 'bin/hc_value_report_concat'])
+      scripts=[
+          'bin/hc_api_export/hc_api_export',
+          'bin/hc_value_report_concat/hc_value_report_concat'
+      ])
