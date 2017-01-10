@@ -119,8 +119,12 @@ def __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
             rate_limit = e.rate_limits[0]
             housecanary.utilities.print_rate_limit_error(rate_limit)
-            print "Will retry once rate limit resets..."
-            time.sleep(rate_limit["reset_in_seconds"])
+            if rate_limit["reset_in_seconds"] < 300:
+                print "Will retry once rate limit resets..."
+                time.sleep(rate_limit["reset_in_seconds"])
+            else:
+                # Rate limit will take more than 5 minutes to reset, so just exit
+                sys.exit(2)
 
 
 def _get_results_from_api(addresses, endpoints, api_key, api_secret):
