@@ -72,13 +72,21 @@ def concat_value_reports(addresses, output_file_name, report_type, retry, api_ke
     else:
         client = ApiClient()
 
+    errors = []
+
     # for each address, call VR API and load the xlsx content in a workbook.
     for index, addr in enumerate(addresses):
         print 'Processing {}'.format(addr[0])
-        xlsx_content = _get_value_report(
+        result = _get_value_report(
             client, addr[0], addr[1], report_type, retry, api_key, api_secret)
 
-        orig_wb = openpyxl.load_workbook(filename=BytesIO(xlsx_content))
+        if not result['success']:
+            print 'Error retrieving Value Report for {}'.format(addr[0])
+            print result['content']
+            errors.append({'address': addr[0], 'message': result['content']})
+            continue
+
+        orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
 
         # for each worksheet for this address
         for sheet_name in orig_wb.get_sheet_names():
@@ -110,6 +118,13 @@ def concat_value_reports(addresses, output_file_name, report_type, retry, api_ke
     # remove the first sheet which will be empty
     master_workbook.remove(master_workbook.worksheets[0])
 
+    # if any errors occurred, write them to an "Errors" worksheet
+    if len(errors) > 0:
+        errors_sheet = master_workbook.create_sheet('Errors')
+        for error_idx, error in enumerate(errors):
+            errors_sheet.cell(row=error_idx+1, column=1, value=error['address'])
+            errors_sheet.cell(row=error_idx+1, column=2, value=error['message'])
+
     # save the master workbook to output_file_name
     master_workbook.save(output_file_name)
     print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
@@ -123,15 +138,20 @@ def _get_value_report(client, address, zipcode, report_type, retry, api_key, api
             except exceptions.RateLimitException as e:
                 rate_limit = e.rate_limits[0]
                 utilities.print_rate_limit_error(rate_limit)
-                print "Will retry once rate limit resets..."
-                time.sleep(rate_limit["reset_in_seconds"])
+                print 'Will retry once rate limit resets...'
+                time.sleep(rate_limit['reset_in_seconds'])
+            except exceptions.RequestException as e:
+                return {'success': False, 'content': str(e)}
     else:
-        return _make_value_report_request(client, address, zipcode, report_type)
+        try:
+            return _make_value_report_request(client, address, zipcode, report_type)
+        except exceptions.RateLimitException as e:
+            return {'success': False, 'content': str(e)}
 
 
 def _make_value_report_request(client, address, zipcode, report_type):
-    response = client.property.value_report(address, zipcode, report_type, "xlsx")
-    return response.content
+    response = client.property.value_report(address, zipcode, report_type, 'xlsx')
+    return {'success': True, 'content': response.content}
 
 
 def create_excel_workbook(data):
