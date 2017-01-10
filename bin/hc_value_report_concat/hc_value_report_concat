@@ -7,9 +7,7 @@
 Usage: hc_value_report_concat (<input>) [-o FILE] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
 
 Examples:
-    hc_value_report_concat bin/sample-input.csv property/* -t excel -o output.xlsx -H
-
-    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_value_report_concat bin/sample-input.csv property/* -H
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
