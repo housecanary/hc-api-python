@@ -60,9 +60,10 @@ def concat_value_reports(addresses, output_file_name, report_type, retry, api_ke
     Args:
         addresses: A list of (address, zipcode) tuples
         output_file_name: A file name for the Excel output.
+        report_type: One of 'full' or 'summary'
+        retry: optional boolean to retry if rate limit is reached
         api_key: optional API Key
         api_secret: optional API Secret
-        retry: optional boolean to retry if rate limit is reached
     """
     # create the master workbook to output
     master_workbook = openpyxl.Workbook()
