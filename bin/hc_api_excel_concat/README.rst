@@ -1,18 +1,20 @@
-HouseCanary Value Report Concat
+HouseCanary API Excel Concat
 =============================
 
-HouseCanary Value Report Concat is a command line tool that allows you to call the
-Value Report API for multiple addresses by passing in a CSV file containing addresses and zip codes.
+HouseCanary API Excel Concat is a command line tool that allows you to call the
+Value Report or Rental Report API for multiple addresses by passing in a CSV file
+containing addresses and zip codes.
 
 Each row in the input CSV file should be in the format of ``address,zipcode``.
 See an example input `here <../sample-input.csv>`_.
 
-It generates a single .xlsx file which combines the Value Report Excel output of each address.
+It generates a single .xlsx file which combines the Excel output of each address.
 
 Installation
 ------------
 
-``hc_value_report_concat`` is installed as part of the HouseCanary client. If you haven't installed that yet, you can do so with ``pip``:
+``hc_api_excel_concat`` is installed as part of the HouseCanary client.
+If you haven't installed that yet, you can do so with ``pip``:
 
 ::
 
@@ -25,12 +27,14 @@ Usage instructions:
 **Usage:**
 ::
 
-    hc_value_report_concat (<input>) [-o FILE] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+    hc_api_excel_concat (<input>) [-o FILE] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
 
 **Example:**
 ::
 
-    hc_value_report_concat bin/sample-input.csv property/* -o vr_output.xlsx -H
+    hc_api_excel_concat bin/sample-input.csv -o vr_output.xlsx -e value_report -H
+
+    hc_api_excel_concat bin/sample-input.csv -o rr_output.xlsx -e rental_report -H
 
 **Options:**
 
@@ -40,7 +44,11 @@ Usage instructions:
 
 - -o FILE --output=FILE
 
-    Optional. A file name for the Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``value_report_output.xlsx``
+    Optional. A file name for the Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``output.xlsx``
+
+- -e ENDPOINT --endpoint=ENDPOINT
+
+    Optional. One of 'value_report' or 'rental_report' to determine which API endpoint to call. Defaults to 'value_report'
 
 - -H --header
 

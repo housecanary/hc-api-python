@@ -53,13 +53,15 @@ def export_analytics_data_to_csv(data, output_folder):
     print 'Saved CSV files to {}'.format(output_folder)
 
 
-def concat_value_reports(addresses, output_file_name, report_type, retry, api_key, api_secret):
-    """Creates an Excel file made up of combining the Value Report Excel
+def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
+                         retry, api_key, api_secret):
+    """Creates an Excel file made up of combining the Value Report or Rental Report Excel
        output for the provided addresses.
 
     Args:
         addresses: A list of (address, zipcode) tuples
-        output_file_name: A file name for the Excel output.
+        output_file_name: A file name for the Excel output
+        endpoint: One of 'value_report' or 'rental_report'
         report_type: One of 'full' or 'summary'
         retry: optional boolean to retry if rate limit is reached
         api_key: optional API Key
@@ -75,14 +77,14 @@ def concat_value_reports(addresses, output_file_name, report_type, retry, api_ke
 
     errors = []
 
-    # for each address, call VR API and load the xlsx content in a workbook.
+    # for each address, call the API and load the xlsx content in a workbook.
     for index, addr in enumerate(addresses):
         print 'Processing {}'.format(addr[0])
-        result = _get_value_report(
-            client, addr[0], addr[1], report_type, retry, api_key, api_secret)
+        result = _get_excel_report(
+            client, endpoint, addr[0], addr[1], report_type, retry, api_key, api_secret)
 
         if not result['success']:
-            print 'Error retrieving Value Report for {}'.format(addr[0])
+            print 'Error retrieving report for {}'.format(addr[0])
             print result['content']
             errors.append({'address': addr[0], 'message': result['content']})
             continue
@@ -131,11 +133,11 @@ def concat_value_reports(addresses, output_file_name, report_type, retry, api_ke
     print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
 
 
-def _get_value_report(client, address, zipcode, report_type, retry, api_key, api_secret):
+def _get_excel_report(client, endpoint, address, zipcode, report_type, retry, api_key, api_secret):
     if retry:
         while True:
             try:
-                return _make_value_report_request(client, address, zipcode, report_type)
+                return _make_report_request(client, endpoint, address, zipcode, report_type)
             except exceptions.RateLimitException as e:
                 rate_limit = e.rate_limits[0]
                 utilities.print_rate_limit_error(rate_limit)
@@ -146,19 +148,21 @@ def _get_value_report(client, address, zipcode, report_type, retry, api_key, api
 
                 print 'Will retry once rate limit resets...'
                 time.sleep(rate_limit['reset_in_seconds'])
-
             except exceptions.RequestException as e:
                 return {'success': False, 'content': str(e)}
 
     # otherwise just try once.
     try:
-        return _make_value_report_request(client, address, zipcode, report_type)
-    except exceptions.RateLimitException as e:
+        return _make_report_request(client, endpoint, address, zipcode, report_type)
+    except exceptions.RequestException as e:
         return {'success': False, 'content': str(e)}
 
 
-def _make_value_report_request(client, address, zipcode, report_type):
-    response = client.property.value_report(address, zipcode, report_type, 'xlsx')
+def _make_report_request(client, endpoint, address, zipcode, report_type):
+    if endpoint == 'rental_report':
+        response = client.property.rental_report(address, zipcode, 'xlsx')
+    else:
+        response = client.property.value_report(address, zipcode, report_type, 'xlsx')
     return {'success': True, 'content': response.content}
 
 

@@ -20,5 +20,5 @@ setup(name='housecanary',
       tests_require=['nose', 'mock'],
       scripts=[
           'bin/hc_api_export/hc_api_export',
-          'bin/hc_value_report_concat/hc_value_report_concat'
+          'bin/hc_api_excel_concat/hc_api_excel_concat'
       ])
