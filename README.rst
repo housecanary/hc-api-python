@@ -316,15 +316,12 @@ returns the JSON data of the Value Report.
     result = client.property.value_report("123 Main St", "01234")
     print result.json()
 
-Command Line Export Tool
+Command Line Tools
 ---------------------------
-When you install this package, a command line tool called **hc_api_export** is included and installed on your PATH. It allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates an export of the Analytics API data in Excel or CSV format.
+When you install this package, a couple command line tools are included and installed on your PATH.
 
-To use the command line tool and see its usage instructions:
-
-.. code:: bash
-
-    > hc_api_export -?
+- `HouseCanary Analytics API Export <housecanary/hc_api_export>`_
+- `HouseCanary API Excel Concat <housecanary/hc_api_excel_concat>`_
 
 License
 -------

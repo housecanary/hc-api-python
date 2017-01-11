@@ -1,11 +1,12 @@
 from setuptools import setup
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
 
 setup(name='housecanary',
-      version='0.6.1',
+      version='0.6.2',
       description='Client Wrapper for the HouseCanary API',
       long_description=readme(),
       url='http://github.com/housecanary/hc-api-python',
@@ -17,4 +18,9 @@ setup(name='housecanary',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose', 'mock'],
-      scripts=['bin/hc_api_export'])
+      entry_points={
+        'console_scripts': [
+            'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
+            'hc_api_export=housecanary.hc_api_export.hc_api_export:main'
+        ]
+      })
