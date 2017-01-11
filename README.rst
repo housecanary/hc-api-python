@@ -320,8 +320,8 @@ Command Line Tools
 ---------------------------
 When you install this package, a couple command line tools are included and installed on your PATH.
 
-- `HouseCanary Analytics API Export <bin/hc_api_export>`_
-- `HouseCanary API Excel Concat <bin/hc_api_excel_concat>`_
+- `HouseCanary Analytics API Export <housecanary/hc_api_export>`_
+- `HouseCanary API Excel Concat <housecanary/hc_api_excel_concat>`_
 
 License
 -------

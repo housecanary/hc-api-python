@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """hc_api_export - Takes a CSV file containing rows of addresses and zipcodes, calls
                 the specified HouseCanary API endpoints to retrieve data
                 for the addresses and outputs the data to Excel or CSV.
@@ -57,7 +55,7 @@ from docopt import docopt
 import housecanary
 
 
-def main(docopt_args):
+def hc_api_export(docopt_args):
     input_file_name = docopt_args['<input>']
     output_type = docopt_args['--type'] or 'excel'
     output_file_name = docopt_args['--output'] or 'housecanary_output.xlsx'
@@ -142,6 +140,6 @@ def _get_results_from_api(addresses, endpoints, api_key, api_secret):
         return client.property.fetch_property_component(endpoints[0], addresses)
 
 
-if __name__ == '__main__':
+def main():
     args = docopt(__doc__)
-    main(args)
+    hc_api_export(args)

@@ -18,7 +18,9 @@ setup(name='housecanary',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose', 'mock'],
-      scripts=[
-          'bin/hc_api_export/hc_api_export',
-          'bin/hc_api_excel_concat/hc_api_excel_concat'
-      ])
+      entry_points={
+        'console_scripts': [
+            'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
+            'hc_api_export=housecanary.hc_api_export.hc_api_export:main'
+        ]
+      })

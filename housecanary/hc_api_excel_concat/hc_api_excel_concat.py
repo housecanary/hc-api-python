@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """hc_api_excel_concat - Takes a CSV file containing rows of addresses and zipcodes,
                 calls the HouseCanary Value Report or Rental Report API to retrieve Excel output
                 for the addresses and combines the results into a single Excel file.
@@ -47,7 +45,7 @@ from docopt import docopt
 import housecanary
 
 
-def main(docopt_args):
+def hc_api_excel_concat(docopt_args):
     input_file_name = docopt_args['<input>']
     output_file_name = docopt_args['--output'] or 'output.xlsx'
     endpoint = docopt_args['--endpoint'] or 'value_report'
@@ -76,6 +74,6 @@ You can omit the endpoint param to default to 'value_report'""".format(endpoint)
         addresses, output_file_name, endpoint, report_type, retry, api_key, api_secret)
 
 
-if __name__ == '__main__':
+def main():
     args = docopt(__doc__)
-    main(args)
+    hc_api_excel_concat(args)
