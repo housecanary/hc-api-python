@@ -32,9 +32,9 @@ Usage instructions:
 **Example:**
 ::
 
-    hc_api_excel_concat bin/sample-input.csv -o vr_output.xlsx -e value_report -H
+    hc_api_excel_concat sample-input.csv -o vr_output.xlsx -e value_report -H
 
-    hc_api_excel_concat bin/sample-input.csv -o rr_output.xlsx -e rental_report -H
+    hc_api_excel_concat sample-input.csv -o rr_output.xlsx -e rental_report -H
 
 **Options:**
 

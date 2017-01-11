@@ -34,9 +34,9 @@ Usage instructions
 
 ::
 
-    hc_api_export bin/sample-input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export sample-input.csv property/* -t excel -o output.xlsx -H
 
-    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output -H
 
 **Options:**
 
