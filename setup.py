@@ -2,8 +2,8 @@ from setuptools import setup
 
 
 def readme():
-    with open('README.rst') as f:
-        return f.read()
+    with open('README.rst', 'rb') as f:
+        return f.read().decode('UTF-8')
 
 setup(name='housecanary',
       version='0.6.2',
