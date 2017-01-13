@@ -125,6 +125,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             errors_sheet.cell(row=error_idx+1, column=2, value=error['message'])
 
     # save the master workbook to output_file_name
+    adjust_column_width_workbook(master_workbook)
     master_workbook.save(output_file_name)
     print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
 
