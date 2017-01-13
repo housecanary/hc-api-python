@@ -155,12 +155,7 @@ def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
 
         # copy over the address sheet's cells
         # starting at the row we left off at and two columns over
-        for orig_cell_idx, orig_cell in enumerate(orig_row):
-            master_ws.cell(
-                row=next_row + orig_row_idx,
-                column=orig_cell_idx + 3,
-                value=orig_cell.value
-            )
+        _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx)
 
 
 def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
@@ -178,12 +173,16 @@ def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
     for orig_row_idx, orig_row in enumerate(orig_rows):
         # copy over the address sheet's cells
         # starting at the row we left off at and two columns over
-        for orig_cell_idx, orig_cell in enumerate(orig_row):
-            master_ws.cell(
-                row=next_row + orig_row_idx,
-                column=orig_cell_idx + 3,
-                value=orig_cell.value
-            )
+        _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx)
+
+
+def _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx):
+    for orig_cell_idx, orig_cell in enumerate(orig_row):
+        master_ws.cell(
+            row=next_row + orig_row_idx,
+            column=orig_cell_idx + 3,
+            value=orig_cell.value
+        )
 
 
 def _get_excel_report(client, endpoint, address, zipcode, report_type, retry):
