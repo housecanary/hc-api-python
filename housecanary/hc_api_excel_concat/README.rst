@@ -27,7 +27,7 @@ Usage instructions:
 **Usage:**
 ::
 
-    hc_api_excel_concat (<input>) [-o FILE] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+    hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
 
 **Example:**
 ::
@@ -45,6 +45,10 @@ Usage instructions:
 - -o FILE --output=FILE
 
     Optional. A file name for the Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``output.xlsx``
+
+- -f PATH --files=PATH
+
+    Optional. A path to save the individual Excel files for each address. If not specified, the individual files are not saved.
 
 - -e ENDPOINT --endpoint=ENDPOINT
 

@@ -2,7 +2,7 @@
                 calls the HouseCanary Value Report or Rental Report API to retrieve Excel output
                 for the addresses and combines the results into a single Excel file.
 
-Usage: hc_api_excel_concat (<input>) [-o FILE] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+Usage: hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
 
 Examples:
     hc_api_excel_concat bin/sample-input.csv -o vr_output.xlsx -e value_report -H
@@ -14,6 +14,9 @@ Options:
 
     -o FILE --output=FILE     Optional. A file name for the Excel output.
                               Defaults to 'output.xlsx'
+
+    -f PATH --files=PATH      Optional. A path to save the individual Excel files for each address.
+                              If not specified, the individual files are not saved.
 
     -e ENDPOINT --endpoint=ENDPOINT Optional. One of 'value_report' or 'rental_report'
                                     to determine which API endpoint to call.
@@ -54,6 +57,7 @@ def hc_api_excel_concat(docopt_args):
     api_secret = docopt_args['--secret'] or None
     report_type = docopt_args['--type'] or 'full'
     retry = docopt_args['--retry'] or False
+    files_path = docopt_args['--files'] or None
 
     addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
 
@@ -71,7 +75,7 @@ You can omit the endpoint param to default to 'value_report'""".format(endpoint)
         sys.exit(2)
 
     housecanary.concat_excel_reports(
-        addresses, output_file_name, endpoint, report_type, retry, api_key, api_secret)
+        addresses, output_file_name, endpoint, report_type, retry, api_key, api_secret, files_path)
 
 
 def main():

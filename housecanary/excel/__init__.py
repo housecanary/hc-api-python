@@ -54,7 +54,7 @@ def export_analytics_data_to_csv(data, output_folder):
 
 
 def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
-                         retry, api_key, api_secret):
+                         retry, api_key, api_secret, files_path):
     """Creates an Excel file made up of combining the Value Report or Rental Report Excel
        output for the provided addresses.
 
@@ -66,6 +66,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
         retry: optional boolean to retry if rate limit is reached
         api_key: optional API Key
         api_secret: optional API Secret
+        files_path: Path to save individual files. If None, don't save files
     """
     # create the master workbook to output
     master_workbook = openpyxl.Workbook()
@@ -90,6 +91,11 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             continue
 
         orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
+
+        if files_path:
+            if not os.path.exists(files_path):
+                os.makedirs(files_path)
+            orig_wb.save(os.path.join(files_path, '{}.xlsx'.format(addr[0])))
 
         # for each worksheet for this address
         for sheet_name in orig_wb.get_sheet_names():
