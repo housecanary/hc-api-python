@@ -134,8 +134,8 @@ def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
     # if this is the first address, add headers for address and zipcode
     # in the first two columns of the first row of the master worksheet
     if address_index == 0:
-        master_ws.cell(row=1, column=1, value='address')
-        master_ws.cell(row=1, column=2, value='zipcode')
+        master_ws.cell(row=1, column=1, value='Address')
+        master_ws.cell(row=1, column=2, value='Zipcode')
 
     # get the next row in the master worksheet to start writing to.
     # this actually sets the next row to the last row with values in it,
