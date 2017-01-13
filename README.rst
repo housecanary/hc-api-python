@@ -96,8 +96,8 @@ Rental Report API Endpoint:
 
 - **rental_report**
 
-More wrapper objects may be added to ApiClient later like “zipcode” and
-“lat\_lng”.
+More wrapper objects may be added to ApiClient later like "zipcode" and
+"lat\_lng".
 
 **Args:**
      
@@ -117,8 +117,8 @@ Or, a list of (address, zipcode, meta) tuples like:
 
     [("82 County Line Rd", "72173", "extra info")]
 
-The “meta” field is optional. If you’re only providing one address, you
-can provide a tuple on it’s own:
+The "meta" field is optional. If you're only providing one address, you
+can provide a tuple on it's own:
 
 .. code:: python
 
@@ -148,7 +148,7 @@ Args:
     - *zipcode* (str)
 
 Kwargs: 
-    - *report\_type* - “full” or “summary”. Optional. Default is "full"
+    - *report\_type* - "full" or "summary". Optional. Default is "full"
     - *format\_type* - "json", "pdf", "xlsx" or "all". Optional. Default is "json"
 
 **Example:**
@@ -228,7 +228,7 @@ except for ``value_report``.
         
 
 -  **objects()** - Gets a list of Property objects for the requested
-   properties, each containing the object’s returned json data from the
+   properties, each containing the object's returned json data from the
    API.
 -  **properties()** - An alias for the objects() method.
 
@@ -257,7 +257,7 @@ Property
 ~~~~~~~~
 
 A subclass of HouseCanaryObject, the Property represents a single
-address and it’s returned data.
+address and it's returned data.
 
 **Properties:**
            
@@ -305,7 +305,7 @@ ValueReportResponse
 ~~~~~~~~~~~~~~~~~~~
 
 A subclass of Response, this is the object returned for the
-``value_report`` endpoint when “json” format\_type is used. It simply
+``value_report`` endpoint when "json" format\_type is used. It simply
 returns the JSON data of the Value Report.
 
 **Example:**
@@ -334,7 +334,7 @@ Copyright (c) 2016 HouseCanary, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-“Software”), to deal in the Software without restriction, including
+"Software"), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -343,7 +343,7 @@ the following conditions:
 The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
@@ -352,6 +352,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 For the avoidance of doubt, the above license does not apply to
-HouseCanary’s proprietary software code or APIs, or to any data,
+HouseCanary's proprietary software code or APIs, or to any data,
 analytics or reports made available by HouseCanary from time to time,
 all of which may be licensed pursuant to a separate written agreement
