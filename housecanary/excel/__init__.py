@@ -141,7 +141,7 @@ def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
     # this actually sets the next row to the last row with values in it,
     # but that's good because the first row of the next address sheet
     # is skipped in order to skip the header.
-    next_row = 1 if address_index == 0 else master_ws.max_row
+    next_row_idx = 1 if address_index == 0 else master_ws.max_row
 
     # go through the rows from the address worksheet
     for orig_row_idx, orig_row in enumerate(orig_rows):
@@ -150,12 +150,12 @@ def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
             continue
         # write the address and zipcode columns
         if orig_row_idx > 0:
-            master_ws.cell(row=next_row + orig_row_idx, column=1, value=addr[0])
-            master_ws.cell(row=next_row + orig_row_idx, column=2, value=addr[1])
+            master_ws.cell(row=next_row_idx + orig_row_idx, column=1, value=addr[0])
+            master_ws.cell(row=next_row_idx + orig_row_idx, column=2, value=addr[1])
 
         # copy over the address sheet's cells
         # starting at the row we left off at and two columns over
-        _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx)
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
 
 
 def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
@@ -164,22 +164,22 @@ def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
 
     # first, let's get the next row to write to,
     # leaving a space between the data from the previous address
-    next_row = 1 if address_index == 0 else master_ws.max_row + 2
+    next_row_idx = 1 if address_index == 0 else master_ws.max_row + 2
 
     # write the address and zipcode
-    master_ws.cell(row=next_row, column=1, value=addr[0])
-    master_ws.cell(row=next_row, column=2, value=addr[1])
+    master_ws.cell(row=next_row_idx, column=1, value=addr[0])
+    master_ws.cell(row=next_row_idx, column=2, value=addr[1])
 
     for orig_row_idx, orig_row in enumerate(orig_rows):
         # copy over the address sheet's cells
         # starting at the row we left off at and two columns over
-        _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx)
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
 
 
-def _copy_row_to_worksheet(master_ws, orig_row, next_row, orig_row_idx):
+def _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx):
     for orig_cell_idx, orig_cell in enumerate(orig_row):
         master_ws.cell(
-            row=next_row + orig_row_idx,
+            row=next_row_idx + orig_row_idx,
             column=orig_cell_idx + 3,
             value=orig_cell.value
         )
