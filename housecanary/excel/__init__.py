@@ -109,39 +109,10 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             orig_rows = orig_wb.get_sheet_by_name(sheet_name).rows
 
             if sheet_name == 'Summary' or sheet_name == 'Chart Data':
-                _process_summary_sheet(master_ws, orig_rows, addr, index)
+                _process_non_standard_sheet(master_ws, orig_rows, addr, index)
                 continue
 
-            # if this is the first address, add headers for address and zipcode
-            # in the first two columns of the first row of the master worksheet
-            if index == 0:
-                master_ws.cell(row=1, column=1, value='address')
-                master_ws.cell(row=1, column=2, value='zipcode')
-
-            # get the next row in the master worksheet to start writing to.
-            # this actually sets the next row to the last row with values in it,
-            # but that's good because the first row of the next address sheet
-            # is skipped in order to skip the header.
-            next_row = 1 if index == 0 else master_ws.max_row
-
-            # go through the rows from the address worksheet
-            for orig_row_idx, orig_row in enumerate(orig_rows):
-                if index > 0 and orig_row_idx == 0:
-                    # after the first address, skip the header rows
-                    continue
-                # write the address and zipcode columns
-                if orig_row_idx > 0:
-                    master_ws.cell(row=next_row + orig_row_idx, column=1, value=addr[0])
-                    master_ws.cell(row=next_row + orig_row_idx, column=2, value=addr[1])
-
-                # copy over the address sheet's cells
-                # starting at the row we left off at and two columns over
-                for orig_cell_idx, orig_cell in enumerate(orig_row):
-                    master_ws.cell(
-                        row=next_row + orig_row_idx,
-                        column=orig_cell_idx + 3,
-                        value=orig_cell.value
-                    )
+            _process_standard_sheet(master_ws, orig_rows, addr, index)
 
     # remove the first sheet which will be empty
     master_workbook.remove(master_workbook.worksheets[0])
@@ -158,7 +129,40 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
     print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
 
 
-def _process_summary_sheet(master_ws, orig_rows, addr, address_index):
+def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
+    # if this is the first address, add headers for address and zipcode
+    # in the first two columns of the first row of the master worksheet
+    if address_index == 0:
+        master_ws.cell(row=1, column=1, value='address')
+        master_ws.cell(row=1, column=2, value='zipcode')
+
+    # get the next row in the master worksheet to start writing to.
+    # this actually sets the next row to the last row with values in it,
+    # but that's good because the first row of the next address sheet
+    # is skipped in order to skip the header.
+    next_row = 1 if address_index == 0 else master_ws.max_row
+
+    # go through the rows from the address worksheet
+    for orig_row_idx, orig_row in enumerate(orig_rows):
+        if address_index > 0 and orig_row_idx == 0:
+            # after the first address, skip the header rows
+            continue
+        # write the address and zipcode columns
+        if orig_row_idx > 0:
+            master_ws.cell(row=next_row + orig_row_idx, column=1, value=addr[0])
+            master_ws.cell(row=next_row + orig_row_idx, column=2, value=addr[1])
+
+        # copy over the address sheet's cells
+        # starting at the row we left off at and two columns over
+        for orig_cell_idx, orig_cell in enumerate(orig_row):
+            master_ws.cell(
+                row=next_row + orig_row_idx,
+                column=orig_cell_idx + 3,
+                value=orig_cell.value
+            )
+
+
+def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
     # for the Summary sheet, there are multiple rows with different data,
     # so we'll simply copy the rows as they are
 
