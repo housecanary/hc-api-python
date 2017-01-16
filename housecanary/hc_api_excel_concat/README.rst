@@ -5,7 +5,8 @@ HouseCanary API Excel Concat is a command line tool that allows you to call the
 Value Report or Rental Report API for multiple addresses by passing in a CSV file
 containing addresses and zip codes.
 
-Each row in the input CSV file should be in the format of ``address,zipcode``.
+The input CSV file must contain a header row with columns for ``address`` and ``zipcode``.
+Other columns can be included but will be ignored.
 See an example input `here <../../sample_input/sample-input.csv>`_.
 
 It generates a single .xlsx file which combines the Excel output of each address.

@@ -55,7 +55,11 @@ def hc_api_excel_concat(docopt_args):
     retry = docopt_args['--retry'] or False
     files_path = docopt_args['--files'] or None
 
-    addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+    try:
+        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+    except Exception as ex:
+        print ex.message
+        sys.exit(2)
 
     if len(addresses) == 0:
         housecanary.utilities.print_no_addresses()

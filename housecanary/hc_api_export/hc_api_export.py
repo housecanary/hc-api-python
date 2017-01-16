@@ -62,7 +62,11 @@ def hc_api_export(docopt_args):
     api_secret = docopt_args['--secret'] or None
     retry = docopt_args['--retry'] or False
 
-    addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+    try:
+        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+    except Exception as ex:
+        print ex.message
+        sys.exit(2)
 
     if len(addresses) == 0:
         housecanary.utilities.print_no_addresses()
