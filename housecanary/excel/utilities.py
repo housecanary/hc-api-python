@@ -57,6 +57,11 @@ def get_addresses_from_input_file(input_file_name):
     with open(input_file_name, 'rb') as input_file:
         reader = csv.reader(input_file, delimiter=',', quotechar='"')
         addresses = map(tuple, reader)
+
+        # skip the header row
+        if len(addresses) > 0:
+            addresses.pop(0)
+
         return addresses
 
 

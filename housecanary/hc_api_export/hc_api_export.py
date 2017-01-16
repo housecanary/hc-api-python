@@ -64,10 +64,6 @@ def hc_api_export(docopt_args):
 
     addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
 
-    # skip the header row
-    if len(addresses) > 0:
-        addresses.pop(0)
-
     if len(addresses) == 0:
         housecanary.utilities.print_no_addresses()
         sys.exit(2)
