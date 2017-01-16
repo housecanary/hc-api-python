@@ -7,12 +7,12 @@
 
                 If exporting to CSV, this creates a single CSV file per endpoint.
 
-Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?] [-r]
+Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-h?] [-r]
 
 Examples:
-    hc_api_export bin/sample-input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export sample_input/sample-input.csv property/* -t excel -o output.xlsx
 
-    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export sample_input/sample-input.csv property/value,property/school -t csv -p /home/my_output
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
@@ -30,9 +30,6 @@ Options:
     -p PATH --path=PATH       Optional. A path to output CSV files to.
                               Only used when -t is 'csv'.
                               Defaults to 'housecanary_csv'
-
-    -H --header               Optional. Indicates that the input file has a header row that
-                              should be ignored
 
     -k KEY --key=KEY          Optional API Key. Alternatively, you can use the HC_API_KEY
                               environment variable
@@ -61,15 +58,14 @@ def hc_api_export(docopt_args):
     output_file_name = docopt_args['--output'] or 'housecanary_output.xlsx'
     output_csv_path = docopt_args['--path'] or 'housecanary_csv'
     endpoints = docopt_args['<endpoints>']
-    has_header = docopt_args['--header']
     api_key = docopt_args['--key'] or None
     api_secret = docopt_args['--secret'] or None
     retry = docopt_args['--retry'] or False
 
     addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
 
-    # skip first row if caller indicated there is a header
-    if has_header and len(addresses) > 0:
+    # skip the header row
+    if len(addresses) > 0:
         addresses.pop(0)
 
     if len(addresses) == 0:

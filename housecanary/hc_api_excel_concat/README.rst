@@ -27,14 +27,14 @@ Usage instructions:
 **Usage:**
 ::
 
-    hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+    hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-h?] [-r]
 
 **Example:**
 ::
 
-    hc_api_excel_concat sample-input.csv -o vr_output.xlsx -e value_report -H
+    hc_api_excel_concat sample-input.csv -o vr_output.xlsx -e value_report
 
-    hc_api_excel_concat sample-input.csv -o rr_output.xlsx -e rental_report -H
+    hc_api_excel_concat sample-input.csv -o rr_output.xlsx -e rental_report
 
 **Options:**
 
@@ -53,10 +53,6 @@ Usage instructions:
 - -e ENDPOINT --endpoint=ENDPOINT
 
     Optional. One of 'value_report' or 'rental_report' to determine which API endpoint to call. Defaults to 'value_report'
-
-- -H --header
-
-    Optional. Indicates that the input file has a header row that should be ignored
 
 - -k KEY --key=KEY
     

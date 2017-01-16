@@ -28,15 +28,15 @@ Usage instructions
 
 ::
 
-    hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?] [-r]
+    hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-h?] [-r]
 
 **Examples:**
 
 ::
 
-    hc_api_export sample-input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export sample-input.csv property/* -t excel -o output.xlsx
 
-    hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output
 
 **Options:**
 
@@ -61,10 +61,6 @@ Usage instructions
 - -p PATH --path=PATH
 
     Optional. A path to output CSV files to. Only used when -t is ``csv``. Defaults to ``housecanary_csv``
-
-- -H --header
-
-    Optional. Indicates that the input file has a header row that should be ignored
 
 - -k KEY --key=KEY
 

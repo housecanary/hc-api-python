@@ -2,12 +2,12 @@
                 calls the HouseCanary Value Report or Rental Report API to retrieve Excel output
                 for the addresses and combines the results into a single Excel file.
 
-Usage: hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-H] [-h?] [-r]
+Usage: hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-h?] [-r]
 
 Examples:
-    hc_api_excel_concat bin/sample-input.csv -o vr_output.xlsx -e value_report -H
+    hc_api_excel_concat sample_input/sample-input.csv -o vr_output.xlsx -e value_report
 
-    hc_api_excel_concat bin/sample-input.csv -o rr_output.xlsx -e rental_report -H
+    hc_api_excel_concat sample_input/sample-input.csv -o rr_output.xlsx -e rental_report
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
@@ -21,9 +21,6 @@ Options:
     -e ENDPOINT --endpoint=ENDPOINT Optional. One of 'value_report' or 'rental_report'
                                     to determine which API endpoint to call.
                                     Defaults to 'value_report'
-
-    -H --header               Optional. Indicates that the input file has a header row that
-                              should be ignored
 
     -k KEY --key=KEY          Optional API Key. Alternatively, you can use the HC_API_KEY
                               environment variable
@@ -52,7 +49,6 @@ def hc_api_excel_concat(docopt_args):
     input_file_name = docopt_args['<input>']
     output_file_name = docopt_args['--output'] or 'output.xlsx'
     endpoint = docopt_args['--endpoint'] or 'value_report'
-    has_header = docopt_args['--header']
     api_key = docopt_args['--key'] or None
     api_secret = docopt_args['--secret'] or None
     report_type = docopt_args['--type'] or 'full'
@@ -61,8 +57,8 @@ def hc_api_excel_concat(docopt_args):
 
     addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
 
-    # skip first row if caller indicated there is a header
-    if has_header and len(addresses) > 0:
+    # skip the header row
+    if len(addresses) > 0:
         addresses.pop(0)
 
     if len(addresses) == 0:
