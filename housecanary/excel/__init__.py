@@ -92,10 +92,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
         orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
 
-        if files_path:
-            if not os.path.exists(files_path):
-                os.makedirs(files_path)
-            orig_wb.save(os.path.join(files_path, '{}.xlsx'.format(addr[0])))
+        _save_individual_file(orig_wb, files_path, addr[0])
 
         # for each worksheet for this address
         for sheet_name in orig_wb.get_sheet_names():
@@ -126,8 +123,9 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
     # save the master workbook to output_file_name
     adjust_column_width_workbook(master_workbook)
-    master_workbook.save(output_file_name)
-    print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
+    output_file_path = os.path.join(files_path, output_file_name)
+    master_workbook.save(output_file_path)
+    print 'Saved output to {}'.format(output_file_path)
 
 
 def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
@@ -216,6 +214,15 @@ def _make_report_request(client, endpoint, address, zipcode, report_type):
     else:
         response = client.property.value_report(address, zipcode, report_type, 'xlsx')
     return {'success': True, 'content': response.content}
+
+
+def _save_individual_file(workbook, files_path, addr):
+    if not os.path.exists(files_path):
+        os.makedirs(files_path)
+
+    file_path = os.path.join(files_path, '{}-{}.xlsx'.format(addr, time.time()))
+    workbook.save(file_path)
+    print 'Saved output to {}'.format(file_path)
 
 
 def create_excel_workbook(data):

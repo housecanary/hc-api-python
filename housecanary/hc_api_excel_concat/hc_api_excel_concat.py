@@ -5,9 +5,9 @@
 Usage: hc_api_excel_concat (<input>) [-o FILE] [-f PATH] [-e ENDPOINT] [-k KEY] [-s SECRET] [-t TYPE] [-h?] [-r]
 
 Examples:
-    hc_api_excel_concat sample_input/sample-input.csv -o vr_output.xlsx -e value_report
+    hc_api_excel_concat sample_input/sample-input.csv -o vr_output.xlsx -f output_files -e value_report
 
-    hc_api_excel_concat sample_input/sample-input.csv -o rr_output.xlsx -e rental_report
+    hc_api_excel_concat sample_input/sample-input.csv -o rr_output.xlsx -f output_files -e rental_report
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
@@ -16,7 +16,7 @@ Options:
                               Defaults to 'output.xlsx'
 
     -f PATH --files=PATH      Optional. A path to save the individual Excel files for each address.
-                              If not specified, the individual files are not saved.
+                              Defaults to 'output_files'.
 
     -e ENDPOINT --endpoint=ENDPOINT Optional. One of 'value_report' or 'rental_report'
                                     to determine which API endpoint to call.
@@ -53,12 +53,12 @@ def hc_api_excel_concat(docopt_args):
     api_secret = docopt_args['--secret'] or None
     report_type = docopt_args['--type'] or 'full'
     retry = docopt_args['--retry'] or False
-    files_path = docopt_args['--files'] or None
+    files_path = docopt_args['--files'] or 'output_files'
 
     try:
         addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
     except Exception as ex:
-        print ex.message
+        print str(ex)
         sys.exit(2)
 
     if len(addresses) == 0:

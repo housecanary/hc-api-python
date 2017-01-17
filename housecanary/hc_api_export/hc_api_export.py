@@ -65,7 +65,7 @@ def hc_api_export(docopt_args):
     try:
         addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
     except Exception as ex:
-        print ex.message
+        print str(ex)
         sys.exit(2)
 
     if len(addresses) == 0:

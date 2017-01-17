@@ -33,9 +33,9 @@ Usage instructions:
 **Example:**
 ::
 
-    hc_api_excel_concat sample-input.csv -o vr_output.xlsx -e value_report
+    hc_api_excel_concat sample-input.csv -o vr_output.xlsx -f vr_files -e value_report
 
-    hc_api_excel_concat sample-input.csv -o rr_output.xlsx -e rental_report
+    hc_api_excel_concat sample-input.csv -o rr_output.xlsx -f rr_files -e rental_report
 
 **Options:**
 
@@ -45,11 +45,11 @@ Usage instructions:
 
 - -o FILE --output=FILE
 
-    Optional. A file name for the Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``output.xlsx``
+    Optional. A file name for the combined Excel output. The file name you specify should have the ``.xlsx`` extension. Defaults to ``output.xlsx``
 
 - -f PATH --files=PATH
 
-    Optional. A path to save the individual Excel files for each address. If not specified, the individual files are not saved.
+    Optional. A path to save the individual Excel files for each address. Defaults to 'output_files'.
 
 - -e ENDPOINT --endpoint=ENDPOINT
 
