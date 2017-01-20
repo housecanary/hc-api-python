@@ -4,6 +4,10 @@ Provides a base client for making API requests.
 
 import requests
 
+import housecanary
+
+USER_AGENT = 'hc-client-python/%s %s' % (housecanary.__version__, requests.utils.default_user_agent())
+
 
 class RequestClient(object):
     """Base class for making http requests with the 'requests' lib."""
@@ -40,7 +44,8 @@ class RequestClient(object):
         """
 
         response = requests.request(http_method, url, params=query_params,
-                                    auth=self._auth, json=post_data)
+                                    auth=self._auth, json=post_data,
+                                    headers={'User-Agent': USER_AGENT})
 
         if isinstance(self._output_generator, str) and self._output_generator.lower() == "json":
             # shortcut for just getting json back
