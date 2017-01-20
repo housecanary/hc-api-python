@@ -5,6 +5,7 @@ import csv
 import time
 from io import BytesIO
 import openpyxl
+from slugify import slugify
 from . import analytics_data_excel
 from . import utilities
 from .. import ApiClient
@@ -220,7 +221,9 @@ def _save_individual_file(workbook, files_path, addr):
     if not os.path.exists(files_path):
         os.makedirs(files_path)
 
-    file_path = os.path.join(files_path, '{}-{}.xlsx'.format(addr, time.time()))
+    file_path = os.path.join(files_path, slugify(
+        '{}-{}.xlsx'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S'))))
+
     workbook.save(file_path)
     print 'Saved output to {}'.format(file_path)
 
