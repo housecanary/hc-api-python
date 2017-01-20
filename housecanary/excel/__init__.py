@@ -5,6 +5,7 @@ import csv
 import time
 from io import BytesIO
 import openpyxl
+from slugify import slugify
 from . import analytics_data_excel
 from . import utilities
 from .. import ApiClient
@@ -54,7 +55,7 @@ def export_analytics_data_to_csv(data, output_folder):
 
 
 def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
-                         retry, api_key, api_secret):
+                         retry, api_key, api_secret, files_path):
     """Creates an Excel file made up of combining the Value Report or Rental Report Excel
        output for the provided addresses.
 
@@ -66,6 +67,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
         retry: optional boolean to retry if rate limit is reached
         api_key: optional API Key
         api_secret: optional API Secret
+        files_path: Path to save individual files. If None, don't save files
     """
     # create the master workbook to output
     master_workbook = openpyxl.Workbook()
@@ -81,7 +83,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
     for index, addr in enumerate(addresses):
         print 'Processing {}'.format(addr[0])
         result = _get_excel_report(
-            client, endpoint, addr[0], addr[1], report_type, retry, api_key, api_secret)
+            client, endpoint, addr[0], addr[1], report_type, retry)
 
         if not result['success']:
             print 'Error retrieving report for {}'.format(addr[0])
@@ -91,6 +93,8 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
         orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
 
+        _save_individual_file(orig_wb, files_path, addr[0])
+
         # for each worksheet for this address
         for sheet_name in orig_wb.get_sheet_names():
             # if worksheet doesn't exist in master workbook, create it
@@ -99,24 +103,14 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             else:
                 master_ws = master_workbook.create_sheet(sheet_name)
 
-            # in the master work sheet,
-            # write this address in the first column of the first available row
-            # worksheet rows are 1-based.
-            # if this isn't the first address, add an extra row for padding.
-            next_row = 1 if index == 0 else master_ws.max_row + 2
-            master_ws.cell(row=next_row, column=1, value=addr[0])
-
+            # get all the rows in the address worksheet
             orig_rows = orig_wb.get_sheet_by_name(sheet_name).rows
 
-            # copy over the rest of the sheet's cells
-            # starting at the row we left off at and one column over
-            for orig_row_idx, orig_row in enumerate(orig_rows):
-                for orig_cell_idx, orig_cell in enumerate(orig_row):
-                    master_ws.cell(
-                        row=next_row + orig_row_idx,
-                        column=orig_cell_idx + 2,
-                        value=orig_cell.value
-                    )
+            if sheet_name == 'Summary' or sheet_name == 'Chart Data':
+                _process_non_standard_sheet(master_ws, orig_rows, addr, index)
+                continue
+
+            _process_standard_sheet(master_ws, orig_rows, addr, index)
 
     # remove the first sheet which will be empty
     master_workbook.remove(master_workbook.worksheets[0])
@@ -129,11 +123,68 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             errors_sheet.cell(row=error_idx+1, column=2, value=error['message'])
 
     # save the master workbook to output_file_name
-    master_workbook.save(output_file_name)
-    print 'Saved output to {}'.format(os.path.join(os.getcwd(), output_file_name))
+    adjust_column_width_workbook(master_workbook)
+    output_file_path = os.path.join(files_path, output_file_name)
+    master_workbook.save(output_file_path)
+    print 'Saved output to {}'.format(output_file_path)
 
 
-def _get_excel_report(client, endpoint, address, zipcode, report_type, retry, api_key, api_secret):
+def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
+    # if this is the first address, add headers for address and zipcode
+    # in the first two columns of the first row of the master worksheet
+    if address_index == 0:
+        master_ws.cell(row=1, column=1, value='Address')
+        master_ws.cell(row=1, column=2, value='Zipcode')
+
+    # get the next row in the master worksheet to start writing to.
+    # this actually sets the next row to the last row with values in it,
+    # but that's good because the first row of the next address sheet
+    # is skipped in order to skip the header.
+    next_row_idx = 1 if address_index == 0 else master_ws.max_row
+
+    # go through the rows from the address worksheet
+    for orig_row_idx, orig_row in enumerate(orig_rows):
+        if address_index > 0 and orig_row_idx == 0:
+            # after the first address, skip the header rows
+            continue
+        # write the address and zipcode columns
+        if orig_row_idx > 0:
+            master_ws.cell(row=next_row_idx + orig_row_idx, column=1, value=addr[0])
+            master_ws.cell(row=next_row_idx + orig_row_idx, column=2, value=addr[1])
+
+        # copy over the address sheet's cells
+        # starting at the row we left off at and two columns over
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
+
+
+def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
+    # for the Summary sheet, there are multiple rows with different data,
+    # so we'll simply copy the rows as they are
+
+    # first, let's get the next row to write to,
+    # leaving a space between the data from the previous address
+    next_row_idx = 1 if address_index == 0 else master_ws.max_row + 2
+
+    # write the address and zipcode
+    master_ws.cell(row=next_row_idx, column=1, value=addr[0])
+    master_ws.cell(row=next_row_idx, column=2, value=addr[1])
+
+    for orig_row_idx, orig_row in enumerate(orig_rows):
+        # copy over the address sheet's cells
+        # starting at the row we left off at and two columns over
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
+
+
+def _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx):
+    for orig_cell_idx, orig_cell in enumerate(orig_row):
+        master_ws.cell(
+            row=next_row_idx + orig_row_idx,
+            column=orig_cell_idx + 3,
+            value=orig_cell.value
+        )
+
+
+def _get_excel_report(client, endpoint, address, zipcode, report_type, retry):
     if retry:
         while True:
             try:
@@ -164,6 +215,17 @@ def _make_report_request(client, endpoint, address, zipcode, report_type):
     else:
         response = client.property.value_report(address, zipcode, report_type, 'xlsx')
     return {'success': True, 'content': response.content}
+
+
+def _save_individual_file(workbook, files_path, addr):
+    if not os.path.exists(files_path):
+        os.makedirs(files_path)
+
+    file_path = os.path.join(files_path, slugify(
+        '{}-{}.xlsx'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S'))))
+
+    workbook.save(file_path)
+    print 'Saved output to {}'.format(file_path)
 
 
 def create_excel_workbook(data):

@@ -3,7 +3,9 @@ HouseCanary Analytics API Export
 
 HouseCanary Analytics API Export is a command line tool that allows you to call API endpoints
 with a CSV file containing addresses and zip codes.
-Each row in the input CSV file should be in the format of ``address,zipcode``. 
+
+The input CSV file must contain a header row with columns for ``address`` and ``zipcode``.
+Other columns can be included but will be ignored.
 See an example input `here <../../sample_input/sample-input.csv>`_.
 
 It generates an export of the Analytics API data in Excel or CSV format.
@@ -28,15 +30,15 @@ Usage instructions
 
 ::
 
-    hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?] [-r]
+    hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-h?] [-r]
 
 **Examples:**
 
 ::
 
-    hc_api_export sample-input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export sample-input.csv property/* -t excel -o output.xlsx
 
-    hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output
 
 **Options:**
 
@@ -61,10 +63,6 @@ Usage instructions
 - -p PATH --path=PATH
 
     Optional. A path to output CSV files to. Only used when -t is ``csv``. Defaults to ``housecanary_csv``
-
-- -H --header
-
-    Optional. Indicates that the input file has a header row that should be ignored
 
 - -k KEY --key=KEY
 
