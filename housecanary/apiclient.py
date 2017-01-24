@@ -156,9 +156,9 @@ class PropertyComponentWrapper(object):
         """Call the ltv endpoint"""
         return self.fetch_property_component("property/ltv", address_data)
 
-    def ltv_forecast(self, address_data):
-        """Call the ltv_forecast endpoint"""
-        return self.fetch_property_component("property/ltv_forecast", address_data)
+    def ltv_details(self, address_data):
+        """Call the ltv_details endpoint"""
+        return self.fetch_property_component("property/ltv_details", address_data)
 
     def mortgage_lien(self, address_data):
         """Call the mortgage_lien endpoint"""

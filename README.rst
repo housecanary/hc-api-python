@@ -72,7 +72,7 @@ Analytics API Endpoints:
 -  **details**
 -  **flood**
 -  **ltv**
--  **ltv_forecast**
+-  **ltv_details**
 -  **mortgage_lien**
 -  **msa_details**
 -  **nod**
