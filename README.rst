@@ -63,7 +63,7 @@ Endpoint methods
 ~~~~~~~~~~~~~~~~
 
 The ApiClient class provides a ``property`` wrapper which contains
-various methods for calling the endpoints of the Value Report and Analytics APIs:
+various methods for calling the endpoints of the Value Report, Rental Report and Analytics APIs:
 
 Analytics API Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -93,8 +93,13 @@ Value Report API Endpoint:
 
 - **value_report**
 
-More wrapper objects may be added to ApiClient later like “zipcode” and
-“lat\_lng”.
+Rental Report API Endpoint:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- **rental_report**
+
+More wrapper objects may be added to ApiClient later like "zipcode" and
+"lat\_lng".
 
 **Args:**
      
@@ -114,8 +119,8 @@ Or, a list of (address, zipcode, meta) tuples like:
 
     [("82 County Line Rd", "72173", "extra info")]
 
-The “meta” field is optional. If you’re only providing one address, you
-can provide a tuple on it’s own:
+The "meta" field is optional. If you're only providing one address, you
+can provide a tuple on it's own:
 
 .. code:: python
 
@@ -145,8 +150,8 @@ Args:
     - *zipcode* (str)
 
 Kwargs: 
-    - *report\_type* - “full” or “summary”. Optional. Default is "full"
-    - *format\_type* - "json", "pdf" or "all". Optional. Default is "json"
+    - *report\_type* - "full" or "summary". Optional. Default is "full"
+    - *format\_type* - "json", "pdf", "xlsx" or "all". Optional. Default is "json"
 
 **Example:**
         
@@ -162,6 +167,17 @@ Kwargs:
     # get Value Report in PDF format with "full" report_type.
     result = client.property.value_report("10216 N Willow Ave", "64157", format_type="pdf")
     # result is binary data of the PDF.
+
+**Rental Report**
+
+The ``rental_report`` method is for calling the Rental Report API. It only supports one address at a time.
+
+Args:
+    - *address* (str)
+    - *zipcode* (str)
+
+Kwargs: 
+    - *format\_type* - "json", "xlsx" or "all". Optional. Default is "json"
 
 Learn more about the various endpoints in the `API docs. <https://api-docs.housecanary.com/#endpoints>`_
 
@@ -214,7 +230,7 @@ except for ``value_report``.
         
 
 -  **objects()** - Gets a list of Property objects for the requested
-   properties, each containing the object’s returned json data from the
+   properties, each containing the object's returned json data from the
    API.
 -  **properties()** - An alias for the objects() method.
 
@@ -243,7 +259,7 @@ Property
 ~~~~~~~~
 
 A subclass of HouseCanaryObject, the Property represents a single
-address and it’s returned data.
+address and it's returned data.
 
 **Properties:**
            
@@ -291,7 +307,7 @@ ValueReportResponse
 ~~~~~~~~~~~~~~~~~~~
 
 A subclass of Response, this is the object returned for the
-``value_report`` endpoint when “json” format\_type is used. It simply
+``value_report`` endpoint when "json" format\_type is used. It simply
 returns the JSON data of the Value Report.
 
 **Example:**
@@ -302,15 +318,12 @@ returns the JSON data of the Value Report.
     result = client.property.value_report("123 Main St", "01234")
     print result.json()
 
-Command Line Export Tool
+Command Line Tools
 ---------------------------
-When you install this package, a command line tool called **hc_api_export** is included and installed on your PATH. It allows you to call API endpoints with a CSV file containing addresses and zip codes. It generates an export of the Analytics API data in Excel or CSV format.
+When you install this package, a couple command line tools are included and installed on your PATH.
 
-To use the command line tool and see its usage instructions:
-
-.. code:: bash
-
-    > hc_api_export -?
+- `HouseCanary Analytics API Export <housecanary/hc_api_export>`_
+- `HouseCanary API Excel Concat <housecanary/hc_api_excel_concat>`_
 
 License
 -------
@@ -323,7 +336,7 @@ Copyright (c) 2016 HouseCanary, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-“Software”), to deal in the Software without restriction, including
+"Software"), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -332,7 +345,7 @@ the following conditions:
 The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
@@ -341,6 +354,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 For the avoidance of doubt, the above license does not apply to
-HouseCanary’s proprietary software code or APIs, or to any data,
+HouseCanary's proprietary software code or APIs, or to any data,
 analytics or reports made available by HouseCanary from time to time,
 all of which may be licensed pursuant to a separate written agreement

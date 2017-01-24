@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """hc_api_export - Takes a CSV file containing rows of addresses and zipcodes, calls
                 the specified HouseCanary API endpoints to retrieve data
                 for the addresses and outputs the data to Excel or CSV.
@@ -9,12 +7,12 @@
 
                 If exporting to CSV, this creates a single CSV file per endpoint.
 
-Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-H] [-h?] [-r]
+Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-h?] [-r]
 
 Examples:
-    hc_api_export bin/sample-input.csv property/* -t excel -o output.xlsx -H
+    hc_api_export sample_input/sample-input.csv property/* -t excel -o output.xlsx
 
-    hc_api_export bin/sample-input.csv property/value,property/school -t csv -p /home/my_output -H
+    hc_api_export sample_input/sample-input.csv property/value,property/school -t csv -p /home/my_output
 
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
@@ -33,9 +31,6 @@ Options:
                               Only used when -t is 'csv'.
                               Defaults to 'housecanary_csv'
 
-    -H --header               Optional. Indicates that the input file has a header row that
-                              should be ignored
-
     -k KEY --key=KEY          Optional API Key. Alternatively, you can use the HC_API_KEY
                               environment variable
 
@@ -52,34 +47,30 @@ Options:
 
 
 import sys
-import csv
 import time
-from datetime import datetime
 from docopt import docopt
 import housecanary
 
 
-def main(docopt_args):
+def hc_api_export(docopt_args):
     input_file_name = docopt_args['<input>']
     output_type = docopt_args['--type'] or 'excel'
     output_file_name = docopt_args['--output'] or 'housecanary_output.xlsx'
     output_csv_path = docopt_args['--path'] or 'housecanary_csv'
     endpoints = docopt_args['<endpoints>']
-    has_header = docopt_args['--header']
     api_key = docopt_args['--key'] or None
     api_secret = docopt_args['--secret'] or None
     retry = docopt_args['--retry'] or False
 
-    addresses = _get_addresses_from_input_file(input_file_name)
-
-    if len(addresses) == 0:
-        _print_no_addresses()
+    try:
+        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+    except Exception as ex:
+        print str(ex)
         sys.exit(2)
 
-    # skip first row if caller indicated there is a header
-    if has_header:
-        addresses.pop(0)
-
+    if len(addresses) == 0:
+        housecanary.utilities.print_no_addresses()
+        sys.exit(2)
 
     if endpoints == 'property/*':
         endpoints = ['property/census', 'property/details', 'property/flood',
@@ -104,7 +95,7 @@ def main(docopt_args):
         try:
             api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
-            _print_rate_limit_error(e.rate_limits[0])
+            housecanary.utilities.print_rate_limit_error(e.rate_limits[0])
             sys.exit(2)
 
     all_data = api_result.json()
@@ -115,24 +106,19 @@ def main(docopt_args):
         housecanary.export_analytics_data_to_excel(all_data, output_file_name)
 
 
-def _get_addresses_from_input_file(input_file_name):
-    # Read addresses from input file into list
-    with open(input_file_name, 'rb') as input_file:
-        reader = csv.reader(input_file, delimiter=',', quotechar='"')
-        addresses = map(tuple, reader)
-        return addresses
-
-
 def __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret):
-    api_result = None
     while True:
         try:
             return _get_results_from_api(addresses, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
             rate_limit = e.rate_limits[0]
-            _print_rate_limit_error(rate_limit)
-            print "Will retry once rate limit resets..."
-            time.sleep(rate_limit["reset_in_seconds"])
+            housecanary.utilities.print_rate_limit_error(rate_limit)
+            if rate_limit["reset_in_seconds"] < 300:
+                print "Will retry once rate limit resets..."
+                time.sleep(rate_limit["reset_in_seconds"])
+            else:
+                # Rate limit will take more than 5 minutes to reset, so just exit
+                sys.exit(2)
 
 
 def _get_results_from_api(addresses, endpoints, api_key, api_secret):
@@ -150,19 +136,6 @@ def _get_results_from_api(addresses, endpoints, api_key, api_secret):
         return client.property.fetch_property_component(endpoints[0], addresses)
 
 
-def _print_no_addresses():
-    print 'No addresses were found in the input file'
-
-
-def _print_rate_limit_error(rate_limit):    
-    print "You have hit the API rate limit"
-    print "Rate limit period: ", rate_limit["period"]
-    print "Request limit: ", rate_limit["request_limit"]
-    print "Requests remaining: ", rate_limit["requests_remaining"]
-    print "Rate limit resets at: ", rate_limit["reset"]
-    print "Time until rate limit resets: ", rate_limit["time_to_reset"]
-
-
-if __name__ == '__main__':
+def main():
     args = docopt(__doc__)
-    main(args)
+    hc_api_export(args)
