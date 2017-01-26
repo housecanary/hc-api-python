@@ -152,6 +152,14 @@ class PropertyComponentWrapper(object):
         """Call the flood endpoint"""
         return self.fetch_property_component("property/flood", address_data)
 
+    def ltv(self, address_data):
+        """Call the ltv endpoint"""
+        return self.fetch_property_component("property/ltv", address_data)
+
+    def ltv_details(self, address_data):
+        """Call the ltv_details endpoint"""
+        return self.fetch_property_component("property/ltv_details", address_data)
+
     def mortgage_lien(self, address_data):
         """Call the mortgage_lien endpoint"""
         return self.fetch_property_component("property/mortgage_lien", address_data)
