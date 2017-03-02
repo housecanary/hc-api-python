@@ -122,6 +122,62 @@ class Property(HouseCanaryObject):
         return self.address or self.meta or "PropertyObject"
 
 
+class Block(HouseCanaryObject):
+    """A single block"""
+
+    def __init__(self, block_id=None):
+        """
+        Args:
+            block_id (required) -- Block ID.
+            data (optional) -- The data returned from the API for this block.
+            api_code (optional) -- The HouseCanary business logic
+                error code reflecting any error with this block.
+            api_code_description (optional) -- The HouseCanary business logic error description.
+        """
+        super(Block, self).__init__()
+
+        self.block_id = str(block_id)
+        self.num_bins = None
+        self.property_type = None
+        self.meta = None
+
+    @classmethod
+    def create_from_json(cls, json_data):
+        """Deserialize block json data into a Block object
+
+        Args:
+            json_data (dict): The json data for this block
+
+        Returns:
+            Block object
+
+        """
+        block = Block()
+        block_info = json_data["block_info"]
+        block.block_id = block_info["block_id"]
+        block.num_bins = block_info["num_bins"] if "num_bins" in block_info else None
+        block.property_type = block_info["property_type"] if "property_type" in block_info else None
+        block.meta = json_data["meta"] if "meta" in json_data else None
+
+        # create a ComponentResult from each returned component's data
+        # and append to this block's component_results list.
+        for key, value in json_data.iteritems():
+            if key not in ["block_info", "meta"]:
+                component_result = ComponentResult(
+                    key,
+                    value["result"],
+                    value["api_code"],
+                    value["api_code_description"]
+                )
+
+                block.component_results.append(component_result)
+
+        return block
+
+    def __str__(self):
+        return self.block_id or self.meta or "BlockObject"
+
+
 class Zipcode(HouseCanaryObject):
     pass
 

@@ -7,6 +7,7 @@ import unittest
 import mock
 from housecanary.apiclient import ApiClient
 from housecanary.response import PropertyResponse
+from housecanary.response import BlockResponse
 from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
 import housecanary.exceptions
@@ -296,6 +297,117 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.value(test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/value"])
+
+
+class BlockComponentWrapperTestCase(unittest.TestCase):
+    """Tests for the BlockComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data_num_bins = [{"block_id": "060750615003005", "num_bins": "5",
+                                    "meta": "block1"}]
+        self.test_data_prop_type = [{"block_id": "060750615003005", "meta": "block1",
+                                     "property_type": "SFD"}]
+
+    def test_get_block_input_with_single_block_string(self):
+        block_data = "060750615003005"
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual([{"block_id": "060750615003005"}], identifier_input)
+
+    def test_get_block_input_with_list_of_block_strings(self):
+        block_data = ["060750615003005", "012345678901234"]
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual([{"block_id": "060750615003005"}, {"block_id": "012345678901234"}],
+                         identifier_input)
+
+    def test_get_block_input_with_dict(self):
+        block_data = {"block_id": "060750615003005", "meta": "someId"}
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual([block_data], identifier_input)
+
+    def test_get_block_input_with_dict_num_bins(self):
+        block_data = {"block_id": "060750615003005", "num_bins": 5}
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual([block_data], identifier_input)
+
+    def test_get_block_input_with_dict_property_type(self):
+        block_data = {"block_id": "060750615003005", "property_type": "SFD"}
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual([block_data],
+                         identifier_input)
+
+    def test_get_block_input_with_list_of_dicts(self):
+        block_data = [{"block_id": "060750615003005", "meta": "someId"},
+                      {"block_id": "012345678901234", "meta": "someId2"}]
+        identifier_input = self.client.block.get_block_input(block_data)
+        self.assertEqual(block_data, identifier_input)
+
+    def test_get_block_input_dict_with_invalid_key(self):
+        block_data = {"block_id": "060750615003005", "color": "green"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.block.get_block_input(block_data)
+
+    def test_get_block_input_dict_missing_block_id(self):
+        block_data = {"num_bins": 5}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.block.get_block_input(block_data)
+
+    def test_histogram_baths(self):
+        response = self.client.block.histogram_baths(self.test_data_num_bins)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/histogram_baths"])
+
+    def test_histogram_beds(self):
+        response = self.client.block.histogram_beds(self.test_data_num_bins)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/histogram_beds"])
+
+    def test_histogram_building_area(self):
+        response = self.client.block.histogram_building_area(self.test_data_num_bins)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/histogram_building_area"])
+
+    def test_histogram_value(self):
+        response = self.client.block.histogram_value(self.test_data_num_bins)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/histogram_value"])
+
+    def test_histogram_value_sqft(self):
+        response = self.client.block.histogram_value_sqft(self.test_data_num_bins)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/histogram_value_sqft"])
+
+    def test_rental_value_distribution(self):
+        response = self.client.block.rental_value_distribution(self.test_data_prop_type)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/rental_value_distribution"])
+
+    def test_value_distribution(self):
+        response = self.client.block.value_distribution(self.test_data_prop_type)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/value_distribution"])
+
+    def test_value_ts(self):
+        response = self.client.block.value_ts(self.test_data_prop_type)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/value_ts"])
+
+    def test_value_ts_forecast(self):
+        response = self.client.block.value_ts_forecast(self.test_data_prop_type)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/value_ts_forecast"])
+
+    def test_value_ts_historical(self):
+        response = self.client.block.value_ts_historical(self.test_data_prop_type)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/value_ts_historical"])
+
+    def test_component_mget(self):
+        components = ["block/value_ts", "block/value_distribution"]
+        response = self.client.block.component_mget(self.test_data_prop_type, components)
+        self.assertTrue(isinstance(response, BlockResponse))
+        self.assertIsNotNone(response.json()[0]["block/value_ts"])
+        self.assertIsNotNone(response.json()[0]["block/value_distribution"])
 
 
 if __name__ == "__main__":

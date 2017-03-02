@@ -52,6 +52,7 @@ class ApiClient(object):
             self._request_client = RequestClient(_output_generator, _auth)
 
         self.property = PropertyComponentWrapper(self)
+        self.block = BlockComponentWrapper(self)
 
     def fetch(self, endpoint_name, identifier_input, query_params=None):
         """Calls this instance's request_client's post method with the
@@ -75,6 +76,21 @@ class ApiClient(object):
                       These are obtained from HouseCanary.
 
                       Ex: [{"slug": "123-Example-St-San-Francisco-CA-94105"}]
+
+                - A list of dicts representing a block:
+                  - A block identifier dict can contain the following keys:
+                      (block_id, num_bins, property_type, meta).
+                      'block_id' is required.
+
+                  Ex: [{"block_id": "060750615003005", "meta": "some ID"}]
+
+                - A list of dicts representing a zipcode:
+
+                  Ex: [{"zipcode": "90274", "meta": "some ID"}]
+
+                - A list of dicts representing an MSA:
+
+                  Ex: [{"msa": "41860", "meta": "some ID"}]
 
                 The "meta" field is always optional.
 
@@ -151,14 +167,15 @@ class PropertyComponentWrapper(object):
             - client_value (optional, for "value_within_block" and "rental_value_within_block")
             - client_value_sqft (optional, for "value_within_block" and "rental_value_within_block")
 
-    All the component methods of this class return a Response object,
+    All the component methods of this class return a PropertyResponse object,
+    (or ValueReportResponse or RentalReportResponse)
     or the output of a custom OutputGenerator if one was specified in the constructor.
     """
 
     def __init__(self, api_client=None):
         """
         Args:
-            - api_client - An instances of ApiClient
+            - api_client - An instance of ApiClient
         """
         self._api_client = api_client
 
@@ -169,8 +186,6 @@ class PropertyComponentWrapper(object):
             query_params = {}
 
         property_input = self.get_property_input(address_data)
-
-        print property_input
 
         return self._api_client.fetch(endpoint_name, property_input, query_params)
 
@@ -331,24 +346,21 @@ class PropertyComponentWrapper(object):
         return property_input
 
     def _convert_to_property_json(self, address_data):
-        """Convert input address tuples into json format"""
+        """Convert input address data into json format"""
 
         if address_data and isinstance(address_data, str):
             # allow just passing a slug string.
-            address_json = {}
-            address_json["slug"] = address_data
-            return address_json
+            return {"slug": address_data}
 
         if isinstance(address_data, tuple) and len(address_data) > 0:
-            address_json = {}
-            address_json["address"] = address_data[0]
+            address_json = {"address": address_data[0]}
             if len(address_data) > 1:
                 address_json["zipcode"] = address_data[1]
             if len(address_data) > 2:
                 address_json["meta"] = address_data[2]
             return address_json
 
-        elif isinstance(address_data, dict):
+        if isinstance(address_data, dict):
             allowed_keys = ["address", "zipcode", "unit", "city", "state", "slug", "meta",
                             "client_value", "client_value_sqft"]
 
@@ -363,6 +375,150 @@ class PropertyComponentWrapper(object):
                 return address_data
 
         # if we made it here, the input was not valid.
-        msg = ("Input is invalid. Must be a list of (address, zipcode) tuples, or a JSON formatted"
-               " item or list with each item containing at least an 'address' or 'slug' key.")
+        msg = ("Input is invalid. Must be a list of (address, zipcode) tuples, or a dict or list"
+               " of dicts with each item containing at least an 'address' or 'slug' key.")
         raise housecanary.exceptions.InvalidInputException((msg))
+
+
+class BlockComponentWrapper(object):
+    """Block specific components
+
+    All the component methods of this class
+    take block_data as a parameter. block_data can be in the following forms:
+
+    - A dict with a ``block_id`` like:
+        {"block_id": "060750615003005", "meta": "someId"}
+
+    - For histogram endpoints you can include the ``num_bins`` key:
+        {"block_id": "060750615003005", "num_bins": 5, "meta": "someId"}
+
+    - For time series and distribution endpoints you can include the ``property_type`` key:
+        {"block_id": "060750615003005", "property_type": "SFD", "meta": "someId"}
+
+    - A list of dicts as specified above:
+        [{"block_id": "012345678901234", "meta": "someId"},
+         {"block_id": "012345678901234", "meta": "someId2}]
+
+    - A single string representing a ``block_id``:
+        "012345678901234"
+
+    - A list of ``block_id`` strings:
+        ["012345678901234", "060750615003005"]
+
+    The "meta" field is always optional.
+
+    All the component methods of this class return a BlockResponse object,
+    or the output of a custom OutputGenerator if one was specified in the constructor.
+    """
+
+    def __init__(self, api_client=None):
+        """
+        Args:
+            - api_client - An instance of ApiClient
+        """
+        self._api_client = api_client
+
+    def fetch_block_component(self, endpoint_name, block_data, query_params=None):
+        """common method for handling parameters before passing to api_client"""
+
+        if query_params is None:
+            query_params = {}
+
+        block_input = self.get_block_input(block_data)
+
+        return self._api_client.fetch(endpoint_name, block_input, query_params)
+
+    def get_block_input(self, block_data):
+        """Convert the various formats of input block_Data into
+        the proper json format expected by the API."""
+
+        block_input = []
+
+        if isinstance(block_data, list) and len(block_data) > 0:
+            # if list, convert each block data in the list to json
+            for block in block_data:
+                block_input.append(self._convert_to_block_json(block))
+        else:
+            block_input.append(self._convert_to_block_json(block_data))
+
+        return block_input
+
+    def _convert_to_block_json(self, block_data):
+        if block_data and isinstance(block_data, str):
+            # allow just passing a block_id string.
+            return {"block_id": block_data}
+
+        if isinstance(block_data, dict):
+            allowed_keys = ["block_id", "num_bins", "property_type", "meta"]
+
+            # ensure the dict does not contain any unallowed keys
+            for key in block_data:
+                if key not in allowed_keys:
+                    msg = "Key in block input not allowed: " + key
+                    raise housecanary.exceptions.InvalidInputException(msg)
+
+            # ensure it contains a "block_id" key
+            if "block_id" in block_data:
+                return block_data
+
+        # if we made it here, the input was not valid.
+        msg = ("Input is invalid. Must be a dict or list of dicts"
+               " with each item containing at least 'block_id' key.")
+        raise housecanary.exceptions.InvalidInputException((msg))
+
+    def histogram_baths(self, block_data):
+        """Call the histogram_baths endpoint"""
+        return self.fetch_block_component("block/histogram_baths", block_data)
+
+    def histogram_beds(self, block_data):
+        """Call the histogram_beds endpoint"""
+        return self.fetch_block_component("block/histogram_beds", block_data)
+
+    def histogram_building_area(self, block_data):
+        """Call the histogram_building_area endpoint"""
+        return self.fetch_block_component("block/histogram_building_area", block_data)
+
+    def histogram_value(self, block_data):
+        """Call the histogram_value endpoint"""
+        return self.fetch_block_component("block/histogram_value", block_data)
+
+    def histogram_value_sqft(self, block_data):
+        """Call the histogram_value_sqft endpoint"""
+        return self.fetch_block_component("block/histogram_value_sqft", block_data)
+
+    def rental_value_distribution(self, block_data):
+        """Call the rental_value_distribution endpoint"""
+        return self.fetch_block_component("block/rental_value_distribution", block_data)
+
+    def value_distribution(self, block_data):
+        """Call the value_distribution endpoint"""
+        return self.fetch_block_component("block/value_distribution", block_data)
+
+    def value_ts(self, block_data):
+        """Call the value_ts endpoint"""
+        return self.fetch_block_component("block/value_ts", block_data)
+
+    def value_ts_forecast(self, block_data):
+        """Call the value_ts_forecast endpoint"""
+        return self.fetch_block_component("block/value_ts_forecast", block_data)
+
+    def value_ts_historical(self, block_data):
+        """Call the value_ts_historical endpoint"""
+        return self.fetch_block_component("block/value_ts_historical", block_data)
+
+    def component_mget(self, block_data, components):
+        """Call the block component_mget endpoint
+
+        Args:
+            - block_data - As described in the class docstring.
+            - components - A list of strings for each component to include in the request.
+                Example: ["block/value_ts", "block/value_distribution"]
+        """
+        if not isinstance(components, list):
+            print "Components param must be a list"
+            return
+
+        query_params = {"components": ",".join(components)}
+
+        return self.fetch_block_component(
+            "block/component_mget", block_data, query_params)

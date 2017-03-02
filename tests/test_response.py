@@ -7,6 +7,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 import unittest
 from housecanary.apiclient import ApiClient
 from housecanary.object import Property
+from housecanary.object import Block
 
 
 class PropertyResponseTestCase(unittest.TestCase):
@@ -60,6 +61,24 @@ class PropertyResponseTestCase(unittest.TestCase):
         response = self.client.fetch("property/value", self.test_data)
         self.assertTrue(isinstance(response.rate_limits, list))
         self.assertTrue(isinstance(response.rate_limits[0]['period'], str))
+
+
+class BlockResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"block_id": "060376703241005"}]
+
+    def test_blocks(self):
+        response = self.client.fetch("block/value_ts", self.test_data)
+        self.assertTrue(len(response.blocks()), 1)
+        self.assertTrue(isinstance(response.blocks()[0], Block))
+
+    def test_blocks_with_multiple(self):
+        self.test_data.append({"block_id": "160376703241005"})
+        response = self.client.fetch("block/value_ts", self.test_data)
+        self.assertTrue(len(response.blocks()), 2)
+        self.assertTrue(isinstance(response.blocks()[0], Block))
+        self.assertTrue(isinstance(response.blocks()[1], Block))
 
 
 if __name__ == "__main__":

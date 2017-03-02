@@ -3,6 +3,7 @@ Provides Response to encapsulate API responses.
 """
 
 from housecanary.object import Property
+from housecanary.object import Block
 from . import utilities
 
 
@@ -38,6 +39,11 @@ class Response(object):
 
         if endpoint_name == "property/rental_report":
             return RentalReportResponse(endpoint_name, json_body, original_response)
+
+        prefix = endpoint_name.split("/")[0]
+
+        if prefix == "block":
+            return BlockResponse(endpoint_name, json_body, original_response)
 
         return PropertyResponse(endpoint_name, json_body, original_response)
 
@@ -111,7 +117,8 @@ class Response(object):
 
 
 class PropertyResponse(Response):
-    """Represents a single property and its data returned from the API."""
+    """Represents the data returned from an Analytics API property endpoint."""
+
     def objects(self):
         """Gets a list of Property objects for the requested properties,
         each containing the property's returned json data from the API.
@@ -138,6 +145,37 @@ class PropertyResponse(Response):
         return self._objects
 
     def properties(self):
+        """Alias method for objects."""
+        return self.objects()
+
+
+class BlockResponse(Response):
+    """Represents the data returned from an Analytics API block endpoint."""
+
+    def objects(self):
+        """Gets a list of Block objects for the requested blocks,
+        each containing the block's returned json data from the API.
+
+        Returns:
+            List of Block objects
+        """
+        if not self._objects:
+            body = self.json()
+
+            self._objects = []
+
+            if not isinstance(body, list):
+                # The block endpoints return a list in the body.
+                # This could maybe raise an exception.
+                return []
+
+            for block in body:
+                prop = Block.create_from_json(block)
+                self._objects.append(prop)
+
+        return self._objects
+
+    def blocks(self):
         """Alias method for objects."""
         return self.objects()
 
