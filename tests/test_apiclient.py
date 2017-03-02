@@ -11,29 +11,30 @@ from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
 import housecanary.exceptions
 
+
 class ApiClientTestCase(unittest.TestCase):
     """Tests for the ApiClient class"""
 
     def test_get_post_data_with_single_tuple(self):
         address_data = ("47 Perley Ave", "01960")
         post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address":"47 Perley Ave", "zipcode":"01960"}])
+        self.assertEqual(post_data, [{"address": "47 Perley Ave", "zipcode": "01960"}])
 
     def test_get_post_data_with_multiple_tuples(self):
         address_data = [("47 Perley Ave", "01960"), ("85 Clay St", "02140")]
         post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address":"47 Perley Ave", "zipcode":"01960"},
-                                     {"address":"85 Clay St", "zipcode":"02140"}])
+        self.assertEqual(post_data, [{"address": "47 Perley Ave", "zipcode": "01960"},
+                                     {"address": "85 Clay St", "zipcode": "02140"}])
 
     def test_get_post_data_with_address_string(self):
         address_data = "47 Perley Ave"
         post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address":"47 Perley Ave"}])
+        self.assertEqual(post_data, [{"address": "47 Perley Ave"}])
 
     def test_fetch(self):
         client = ApiClient()
         client._request_client.get = mock.MagicMock()
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
 
         client.fetch("property/value", post_data)
 
@@ -43,8 +44,8 @@ class ApiClientTestCase(unittest.TestCase):
     def test_fetch_with_multiple_addresses(self):
         client = ApiClient()
         client._request_client.post = mock.MagicMock()
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}, 
-                     {"address":"123 Main St", "zipcode":"01010"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"},
+                     {"address": "123 Main St", "zipcode": "01010"}]
 
         client.fetch("property/value", post_data)
 
@@ -55,7 +56,7 @@ class ApiClientTestCase(unittest.TestCase):
         custom_request_client = mock.MagicMock()
         custom_request_client.get.return_value = "Response body"
         client = ApiClient(request_client=custom_request_client)
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertEqual(response, "Response body")
 
@@ -63,36 +64,38 @@ class ApiClientTestCase(unittest.TestCase):
         custom_output_generator = mock.MagicMock()
         custom_output_generator.process_response.return_value = "Custom Response"
         client = ApiClient(output_generator=custom_output_generator)
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertEqual(response, "Custom Response")
 
     def test_fetch_with_json_output_generator(self):
         output_generator = JsonOutputGenerator()
         client = ApiClient(output_generator=output_generator)
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertTrue(isinstance(response, list))
 
     def test_fetch_with_unallowed_key(self):
         client = ApiClient()
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960", "color": "green"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960", "color": "green"}]
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             client.property.value(post_data)
 
     def test_fetch_with_custom_auth(self):
         auth = mock.MagicMock()
         auth.process.return_value = "Auth Processed"
+
         class TestRequestClient(object):
             def __init__(self, output_generator, authenticator):
                 self._output_generator = output_generator
                 self._auth = authenticator
+
             def get(self, url, post_data, query_params=None):
                 return self._auth.process()
 
         request_client = TestRequestClient(None, auth)
         client = ApiClient(request_client=request_client)
-        post_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertEqual(response, "Auth Processed")
 
@@ -111,13 +114,13 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"address":"47 Perley Ave", "zipcode":"01960"}]
+        self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
 
     def test_census(self):
         response = self.client.property.census(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/census"])
-    
+
     def test_details(self):
         response = self.client.property.details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -142,7 +145,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.mortgage_lien(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/mortgage_lien"])
-    
+
     def test_msa_details(self):
         response = self.client.property.msa_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -157,7 +160,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.owner_occupied(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/owner_occupied"])
-    
+
     def test_rental_value(self):
         response = self.client.property.rental_value(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -172,7 +175,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.school(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/school"])
-    
+
     def test_value(self):
         response = self.client.property.value(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -187,7 +190,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.zip_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/zip_details"])
-    
+
     def test_zip_hpi_forecast(self):
         response = self.client.property.zip_hpi_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))

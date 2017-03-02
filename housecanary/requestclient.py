@@ -6,7 +6,9 @@ import requests
 
 import housecanary
 
-USER_AGENT = 'hc-client-python/%s %s' % (housecanary.__version__, requests.utils.default_user_agent())
+USER_AGENT = 'hc-client-python/%s %s' % (
+    housecanary.__version__, requests.utils.default_user_agent()
+)
 
 
 class RequestClient(object):

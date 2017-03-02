@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+
 def get_readable_time_string(seconds):
     """Returns human readable string from number of seconds"""
     seconds = int(seconds)

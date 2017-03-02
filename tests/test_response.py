@@ -8,10 +8,11 @@ import unittest
 from housecanary.apiclient import ApiClient
 from housecanary.object import Property
 
+
 class PropertyResponseTestCase(unittest.TestCase):
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"address":"43 Valmonte Plaza", "zipcode":"90274"}]
+        self.test_data = [{"address": "43 Valmonte Plaza", "zipcode": "90274"}]
 
     def test_endpoint_name(self):
         response = self.client.fetch("property/value", self.test_data)

@@ -7,6 +7,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 import unittest
 from housecanary.object import Property
 
+
 class PropertyTestCase(unittest.TestCase):
     def setUp(self):
         self.test_json = {
