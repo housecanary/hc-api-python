@@ -5,7 +5,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 
 import unittest
 import mock
-from housecanary.apiclient import ApiClient, get_post_data
+from housecanary.apiclient import ApiClient
 from housecanary.response import PropertyResponse
 from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
@@ -14,22 +14,6 @@ import housecanary.exceptions
 
 class ApiClientTestCase(unittest.TestCase):
     """Tests for the ApiClient class"""
-
-    def test_get_post_data_with_single_tuple(self):
-        address_data = ("47 Perley Ave", "01960")
-        post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address": "47 Perley Ave", "zipcode": "01960"}])
-
-    def test_get_post_data_with_multiple_tuples(self):
-        address_data = [("47 Perley Ave", "01960"), ("85 Clay St", "02140")]
-        post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address": "47 Perley Ave", "zipcode": "01960"},
-                                     {"address": "85 Clay St", "zipcode": "02140"}])
-
-    def test_get_post_data_with_address_string(self):
-        address_data = "47 Perley Ave"
-        post_data = get_post_data(address_data)
-        self.assertEqual(post_data, [{"address": "47 Perley Ave"}])
 
     def test_fetch(self):
         client = ApiClient()
@@ -40,17 +24,6 @@ class ApiClientTestCase(unittest.TestCase):
 
         expected_url = constants.URL_PREFIX + "/v2/property/value"
         client._request_client.get.assert_called_with(expected_url, post_data[0])
-
-    def test_fetch_with_multiple_addresses(self):
-        client = ApiClient()
-        client._request_client.post = mock.MagicMock()
-        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"},
-                     {"address": "123 Main St", "zipcode": "01010"}]
-
-        client.fetch("property/value", post_data)
-
-        expected_url = constants.URL_PREFIX + "/v2/property/value"
-        client._request_client.post.assert_called_with(expected_url, post_data, {})
 
     def test_fetch_with_custom_request_client(self):
         custom_request_client = mock.MagicMock()
@@ -74,12 +47,6 @@ class ApiClientTestCase(unittest.TestCase):
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertTrue(isinstance(response, list))
-
-    def test_fetch_with_unallowed_key(self):
-        client = ApiClient()
-        post_data = [{"address": "47 Perley Ave", "zipcode": "01960", "color": "green"}]
-        with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            client.property.value(post_data)
 
     def test_fetch_with_custom_auth(self):
         auth = mock.MagicMock()
@@ -114,7 +81,71 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
+        self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
+
+    def test_get_property_input_with_single_tuple(self):
+        address_data = ("47 Perley Ave", "01960")
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, [{"address": "47 Perley Ave", "zipcode": "01960"}])
+
+    def test_get_property_input_with_multiple_tuples(self):
+        address_data = [("47 Perley Ave", "01960"), ("85 Clay St", "02140")]
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, [{"address": "47 Perley Ave", "zipcode": "01960"},
+                                          {"address": "85 Clay St", "zipcode": "02140"}])
+
+    def test_get_property_input_with_slug_string(self):
+        address_data = "123-Example-St-San-Francisco-CA-94105"
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, [{"slug": "123-Example-St-San-Francisco-CA-94105"}])
+
+    def test_get_property_input_with_invalid_key(self):
+        address_data = [{"address": "47 Perley Ave", "zipcode": "01960", "color": "green"}]
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.property.get_property_input(address_data)
+
+    def test_get_property_input_with_city_state_unit(self):
+        address_data = [{"address": "47 Perley Ave", "unit": "2", "city": "Peabody", "state": "MA"}]
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, address_data)
+
+    def test_get_property_input_with_slug_list(self):
+        address_data = [{"slug": "123-Example-St-San-Francisco-CA-94105"},
+                        {"slug": "345-Example-St-San-Francisco-CA-94105"}]
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, address_data)
+
+    def test_get_property_input_with_slug_dict(self):
+        address_data = {"slug": "123-Example-St-San-Francisco-CA-94105"}
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, [address_data])
+
+    def test_get_property_input_with_meta(self):
+        address_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, address_data)
+
+    def test_get_property_input_with_multiple_addresses(self):
+        address_data = [{"address": "47 Perley Ave", "zipcode": "01960"},
+                        {"address": "123 Main St", "zipcode": "01010"}]
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, address_data)
+
+    def test_get_property_input_with_single_dict(self):
+        address_data = {"address": "47 Perley Ave", "zipcode": "01960"}
+        property_input = self.client.property.get_property_input(address_data)
+        self.assertEqual(property_input, [address_data])
+
+    def test_get_property_input_dict_without_address_slug(self):
+        address_data = {"state": "CA"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.property.get_property_input(address_data)
+
+    def test_get_property_input_list_without_address_slug(self):
+        address_data = [{"state": "CA"},
+                        {"address" "43 Valmonte Plaza"}]
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.property.get_property_input(address_data)
 
     def test_census(self):
         response = self.client.property.census(self.test_data)
@@ -237,6 +268,20 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
             "zipcode": "01960"
         }
         self.client.fetch_synchronous.assert_called_with("property/rental_report", expected_params)
+
+    def test_multiple_properties(self):
+        test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"},
+                     {"address": "43 Valmonte Plaza", "zipcode": "90274", "meta": "addr2"}]
+        response = self.client.property.value(test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/value"])
+        self.assertIsNotNone(response.json()[1]["property/value"])
+
+    def test_with_city_state(self):
+        test_data = [{"address": "47 Perley Ave", "city": "Peabody", "state": "MA"}]
+        response = self.client.property.value(test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/value"])
 
 
 if __name__ == "__main__":

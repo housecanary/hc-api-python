@@ -53,27 +53,30 @@ class ApiClient(object):
 
         self.property = PropertyComponentWrapper(self)
 
-    def fetch(self, endpoint_name, post_data, query_params=None):
+    def fetch(self, endpoint_name, identifier_input, query_params=None):
         """Calls this instance's request_client's post method with the
         specified component endpoint
 
         Args:
             - endpoint_name (str) - The endpoint to call like "property/value".
-            - address_data - One or more address to request data for. Address data can
-                             be in one of these forms:
+            - identifier_input - One or more identifiers to request data for. An identifier can
+                be in one of these forms:
 
-                            - A Json formatted list like:
-                            [{"address":"82 County Line Rd",
-                              "zipcode":"72173",
-                              "meta":"extra info"}]
+                - A list of property identifier dicts:
+                    - A property identifier dict can contain the following keys:
+                      (address, zipcode, unit, city, state, slug, meta).
+                      One of 'address' or 'slug' is required.
 
-                                - A list of (address, zipcode, meta) tuples like:
-                                [("82 County Line Rd", "72173", "extra info")]
+                      Ex: [{"address": "82 County Line Rd",
+                           "zipcode": "72173",
+                           "meta": "some ID"}]
 
-                                - A single address tuple:
-                                ("82 County Line Rd", "72173", "extra_info")
+                      A slug is a URL-safe string that identifies a property.
+                      These are obtained from HouseCanary.
 
-                                The "meta" field is optional.
+                      Ex: [{"slug": "123-Example-St-San-Francisco-CA-94105"}]
+
+                The "meta" field is always optional.
 
         Returns:
             A Response object, or the output of a custom OutputGenerator
@@ -85,13 +88,13 @@ class ApiClient(object):
         if query_params is None:
             query_params = {}
 
-        if len(post_data) == 1:
-            # If only one address specified, use a GET request
-            query_params.update(post_data[0])
+        if len(identifier_input) == 1:
+            # If only one identifier specified, use a GET request
+            query_params.update(identifier_input[0])
             return self._request_client.get(endpoint_url, query_params)
 
         # when more than one address, use a POST request
-        return self._request_client.post(endpoint_url, post_data, query_params)
+        return self._request_client.post(endpoint_url, identifier_input, query_params)
 
     def fetch_synchronous(self, endpoint_name, query_params=None):
         """Calls this instance's request_client's get method with the
@@ -108,16 +111,43 @@ class ApiClient(object):
 class PropertyComponentWrapper(object):
     """Property specific components
 
-    All the component methods of this class take address data as parameter. Address data can
-    be in one of two forms:
+    All the component methods of this class (except value_report and rental_report)
+    take address_data as a parameter. address_data can be in the following forms:
 
-        - A Json formatted list like:
-        [{"address":"82 County Line Rd", "zipcode":"72173", "meta":"extra info"}]
+        - A dict like:
+          {"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"}
+          or
+          {"address": "82 County Line Rd", "city": "San Francisco", "state": "CA", "meta": "someID"}
+          or
+          {"slug": "123-Example-St-San-Francisco-CA-94105"}
+
+        - A list of dicts as specified above:
+          [{"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"},
+           {"address": "43 Valmonte Plaza", "zipcode": "90274", "meta": "someID2"}]
+
+        - A single string representing a slug:
+          "123-Example-St-San-Francisco-CA-94105"
+
+        - A tuple in the form of (address, zipcode, meta) like:
+          ("82 County Line Rd", "72173", "someID")
 
         - A list of (address, zipcode, meta) tuples like:
-        [("82 County Line Rd", "72173", "extra info")]
+          [("82 County Line Rd", "72173", "someID"),
+           ("43 Valmonte Plaza", "90274", "someID2")]
 
-        The "meta" field is optional.
+        Using a tuple only supports address, zipcode and meta. To specify city, state, unit or slug,
+        please use a dict.
+
+        The "meta" field is always optional.
+
+        The available keys in the dict are:
+            - address (required if no slug)
+            - slug (required if no address)
+            - zipcode (optional)
+            - unit (optional)
+            - city (optional)
+            - state (optional)
+            - meta (optional)
 
     All the component methods of this class return a Response object,
     or the output of a custom OutputGenerator if one was specified in the constructor.
@@ -136,9 +166,11 @@ class PropertyComponentWrapper(object):
         if query_params is None:
             query_params = {}
 
-        post_data = get_post_data(address_data)
+        property_input = self.get_property_input(address_data)
 
-        return self._api_client.fetch(endpoint_name, post_data, query_params)
+        print property_input
+
+        return self._api_client.fetch(endpoint_name, property_input, query_params)
 
     def census(self, address_data):
         """Call the census endpoint"""
@@ -226,7 +258,8 @@ class PropertyComponentWrapper(object):
 
         query_params = {"components": ",".join(components)}
 
-        return self.fetch_property_component("property/component_mget", address_data, query_params)
+        return self.fetch_property_component(
+            "property/component_mget", address_data, query_params)
 
     def value_report(self, address, zipcode, report_type="full", format_type="json"):
         """Call the value_report component
@@ -272,56 +305,53 @@ class PropertyComponentWrapper(object):
 
         return self._api_client.fetch_synchronous("property/rental_report", query_params)
 
+    def get_property_input(self, address_data):
+        """Convert the various formats of input address_data into
+        the proper json format expected by the API."""
 
-def get_post_data(address_data):
-    """Convert the various formats of input address_data into
-    the proper json format expected by the API."""
+        property_input = []
 
-    post_data = []
+        if isinstance(address_data, list) and len(address_data) > 0:
+            # if list, convert each address in the list to json
+            for address in address_data:
+                property_input.append(self._convert_to_property_json(address))
+        else:
+            property_input.append(self._convert_to_property_json(address_data))
 
-    if isinstance(address_data, list) and len(address_data) > 0:
-        # if list, convert each address in the list to json
-        for address in address_data:
-            post_data.append(convert_to_json(address))
-    else:
-        post_data.append(convert_to_json(address_data))
+        return property_input
 
-    return post_data
+    def _convert_to_property_json(self, address_data):
+        """Convert input address tuples into json format"""
 
+        if address_data and isinstance(address_data, str):
+            # allow just passing a slug string.
+            address_json = {}
+            address_json["slug"] = address_data
+            return address_json
 
-def convert_to_json(address_data):
-    """Convert input address tuples into json format"""
+        if isinstance(address_data, tuple) and len(address_data) > 0:
+            address_json = {}
+            address_json["address"] = address_data[0]
+            if len(address_data) > 1:
+                address_json["zipcode"] = address_data[1]
+            if len(address_data) > 2:
+                address_json["meta"] = address_data[2]
+            return address_json
 
-    if address_data and isinstance(address_data, str):
-        # allow just passing an address string, for future support.
-        # The api currently requires a zipcode as well, but may not in the future.
-        address_json = {}
-        address_json["address"] = address_data
-        return address_json
+        elif isinstance(address_data, dict):
+            allowed_keys = ["address", "zipcode", "unit", "city", "state", "slug", "meta"]
 
-    if isinstance(address_data, tuple) and len(address_data) > 0:
-        address_json = {}
-        address_json["address"] = address_data[0]
-        if len(address_data) > 1:
-            address_json["zipcode"] = address_data[1]
-        if len(address_data) > 2:
-            address_json["meta"] = address_data[2]
-        return address_json
+            # ensure the dict does not contain any unallowed keys
+            for key in address_data:
+                if key not in allowed_keys:
+                    msg = "Key in address input not allowed: " + key
+                    raise housecanary.exceptions.InvalidInputException(msg)
 
-    elif isinstance(address_data, dict):
-        allowed_keys = ["address", "zipcode", "meta"]
+            # ensure it contains an "address" key
+            if "address" in address_data or "slug" in address_data:
+                return address_data
 
-        # ensure the dict does not contain any unallowed keys
-        for key in address_data:
-            if key not in allowed_keys:
-                msg = "Key in address input not allowed: " + key
-                raise housecanary.exceptions.InvalidInputException(msg)
-
-        # ensure it contains an "address" key
-        if "address" in address_data:
-            return address_data
-
-    # if we made it here, the input was not valid.
-    msg = ("Input is invalid. Must be a list of (address, zipcode) tuples,"
-           " or a Json formatted list with each item containing at least an 'address' key.")
-    raise housecanary.exceptions.InvalidInputException((msg))
+        # if we made it here, the input was not valid.
+        msg = ("Input is invalid. Must be a list of (address, zipcode) tuples, or a JSON formatted"
+               " item or list with each item containing at least an 'address' or 'slug' key.")
+        raise housecanary.exceptions.InvalidInputException((msg))

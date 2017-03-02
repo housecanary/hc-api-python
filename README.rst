@@ -63,10 +63,11 @@ Endpoint methods
 ~~~~~~~~~~~~~~~~
 
 The ApiClient class provides a ``property`` wrapper which contains
-various methods for calling the endpoints of the Value Report, Rental Report and Analytics APIs:
+various methods for calling the property endpoints of the Analytics API
+as well as the Value Report, Rental Report APIs:
 
-Analytics API Endpoints:
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Analytics API Property Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  **census**
 -  **details**
@@ -98,45 +99,85 @@ Rental Report API Endpoint:
 
 - **rental_report**
 
-More wrapper objects may be added to ApiClient later like "zipcode" and
-"lat\_lng".
-
 **Args:**
      
 
-All of the Analytics API endpoint methods take an
-``address_data`` argument. ``address_data`` can be in one of two forms:
+All of the Analytics API property endpoint methods take an
+``address_data`` argument. ``address_data`` can be in the following forms:
 
-A Json formatted list like:
-
-.. code:: python
-
-    [{"address":"82 County Line Rd", "zipcode":"72173", "meta":"extra info"}]
-
-Or, a list of (address, zipcode, meta) tuples like:
+A dict like:
 
 .. code:: python
 
-    [("82 County Line Rd", "72173", "extra info")]
+    {"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"}
 
-The "meta" field is optional. If you're only providing one address, you
-can provide a tuple on it's own:
+Or
 
 .. code:: python
 
-    ("82 County Line Rd", "72173")
+    {"address": "82 County Line Rd", "city": "San Francisco", "state": "CA", "meta": "someID"}
+
+Or
+
+.. code:: python
+
+    {"slug": "123-Example-St-San-Francisco-CA-94105"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"},
+     {"address": "43 Valmonte Plaza", "zipcode": "90274", "meta": "someID2"}]
+
+A single string representing a slug:
+
+.. code:: python
+    
+    "123-Example-St-San-Francisco-CA-94105"
+
+A tuple in the form of (address, zipcode, meta) like:
+
+.. code:: python
+
+    ("82 County Line Rd", "72173", "someID")
+
+A list of (address, zipcode, meta) tuples like:
+
+.. code:: python
+
+    [("82 County Line Rd", "72173", "someID"),
+     ("43 Valmonte Plaza", "90274", "someID2")]
+
+Using a tuple only supports address, zipcode and meta. To specify city, state, unit or slug,
+please use a dict.
+
+The "meta" field is always optional.
+
+The available keys in the dict are:
+    - address (required if no slug)
+    - slug (required if no address)
+    - zipcode (optional)
+    - unit (optional)
+    - city (optional)
+    - state (optional)
+    - meta (optional)
 
 All of the endpoint methods of this class return a Response object or
 the output of a custom OutputGenerator if one was specified in the
 constructor.
 
-**Example:**
+**Examples:**
         
 
 .. code:: python
 
     client = housecanary.ApiClient()
     result = client.property.value([("10216 N Willow Ave", "64157"), ("82 County Line Rd", "72173")])
+
+    result = client.property.value({"address": "10216 N Willow Ave", "city": "San Francisco", "state": "CA"})
+
+    result = client.property.value("123-Example-St-San-Francisco-CA-94105")
 
 **Value Report:**
              
