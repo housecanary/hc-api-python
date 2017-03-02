@@ -65,16 +65,15 @@ Endpoint methods
 The ApiClient class provides a few wrappers which contain
 various methods for calling the different API endpoints.
 
-The `property wrapper`_ is used for calling the Analytics API Property endpoints as well
+The property wrapper is used for calling the Analytics API Property endpoints as well
 as the Value Report and Rental Report endpoints.
 
-The `block wrapper`_ is used for calling the Analytics API Block endpoints.
+The block wrapper is used for calling the Analytics API Block endpoints.
 
-The `zip wrapper`_ is used for calling the Analytics API Zip endpoints.
+The zip wrapper is used for calling the Analytics API Zip endpoints.
 
-The `msa_wrapper`_ is used for calling the Analytics API MSA endpoints.
+The msa wrapper is used for calling the Analytics API MSA endpoints.
 
-.. _property_wrapper:
 
 Property Endpoints
 ~~~~~~~~~~~~~~~~~~
@@ -260,8 +259,6 @@ Kwargs:
 
 Learn more about the various endpoints in the `API docs. <https://api-docs.housecanary.com/#endpoints>`_
 
-
-.. _property_wrapper:
 
 Block Endpoints
 ~~~~~~~~~~~~~~~
