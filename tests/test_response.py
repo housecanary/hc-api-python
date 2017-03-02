@@ -8,6 +8,7 @@ import unittest
 from housecanary.apiclient import ApiClient
 from housecanary.object import Property
 from housecanary.object import Block
+from housecanary.object import ZipCode
 
 
 class PropertyResponseTestCase(unittest.TestCase):
@@ -79,6 +80,24 @@ class BlockResponseTestCase(unittest.TestCase):
         self.assertTrue(len(response.blocks()), 2)
         self.assertTrue(isinstance(response.blocks()[0], Block))
         self.assertTrue(isinstance(response.blocks()[1], Block))
+
+
+class ZipCodeResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"zipcode": "90274"}]
+
+    def test_zipcodes(self):
+        response = self.client.fetch("zip/details", self.test_data)
+        self.assertTrue(len(response.zipcodes()), 1)
+        self.assertTrue(isinstance(response.zipcodes()[0], ZipCode))
+
+    def test_zipcodes_with_multiple(self):
+        self.test_data.append({"zipcode": "01960"})
+        response = self.client.fetch("zip/details", self.test_data)
+        self.assertTrue(len(response.zipcodes()), 2)
+        self.assertTrue(isinstance(response.zipcodes()[0], ZipCode))
+        self.assertTrue(isinstance(response.zipcodes()[1], ZipCode))
 
 
 if __name__ == "__main__":

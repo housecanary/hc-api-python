@@ -4,6 +4,7 @@ Provides Response to encapsulate API responses.
 
 from housecanary.object import Property
 from housecanary.object import Block
+from housecanary.object import ZipCode
 from . import utilities
 
 
@@ -44,6 +45,9 @@ class Response(object):
 
         if prefix == "block":
             return BlockResponse(endpoint_name, json_body, original_response)
+
+        if prefix == "zip":
+            return ZipCodeResponse(endpoint_name, json_body, original_response)
 
         return PropertyResponse(endpoint_name, json_body, original_response)
 
@@ -176,6 +180,37 @@ class BlockResponse(Response):
         return self._objects
 
     def blocks(self):
+        """Alias method for objects."""
+        return self.objects()
+
+
+class ZipCodeResponse(Response):
+    """Represents the data returned from an Analytics API zip endpoint."""
+
+    def objects(self):
+        """Gets a list of ZipCode objects for the requested zipcodes,
+        each containing the zipcodes's returned json data from the API.
+
+        Returns:
+            List of ZipCode objects
+        """
+        if not self._objects:
+            body = self.json()
+
+            self._objects = []
+
+            if not isinstance(body, list):
+                # The zip endpoints return a list in the body.
+                # This could maybe raise an exception.
+                return []
+
+            for zip in body:
+                prop = ZipCode.create_from_json(zip)
+                self._objects.append(prop)
+
+        return self._objects
+
+    def zipcodes(self):
         """Alias method for objects."""
         return self.objects()
 

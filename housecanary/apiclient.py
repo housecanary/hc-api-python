@@ -53,6 +53,7 @@ class ApiClient(object):
 
         self.property = PropertyComponentWrapper(self)
         self.block = BlockComponentWrapper(self)
+        self.zip = ZipComponentWrapper(self)
 
     def fetch(self, endpoint_name, identifier_input, query_params=None):
         """Calls this instance's request_client's post method with the
@@ -522,3 +523,128 @@ class BlockComponentWrapper(object):
 
         return self.fetch_block_component(
             "block/component_mget", block_data, query_params)
+
+
+class ZipComponentWrapper(object):
+    """Zip specific components
+
+    All of the Analytics API zip endpoints take a ``zip_data`` argument.
+    zip_data can be in the following forms:
+
+    - A dict with a ``zipcode`` like:
+      {"zipcode": "90274", "meta": "someId"}
+
+    - A list of dicts as specified above:
+      [{"zipcode": "90274", "meta": "someId"}, {"zipcode": "01960", "meta": "someId2}]
+
+    - A single string representing a ``zipcode``:
+      "90274"
+
+    - A list of ``zipcode`` strings:
+      ["90274", "01960"]
+
+    The "meta" field is always optional.
+
+    All of the zip endpoint methods return a ZipResponse,
+    or the output of a custom OutputGenerator if one was specified in the constructor.
+    """
+
+    def __init__(self, api_client=None):
+        """
+        Args:
+            - api_client - An instance of ApiClient
+        """
+        self._api_client = api_client
+
+    def fetch_zip_component(self, endpoint_name, zip_data, query_params=None):
+        """common method for handling parameters before passing to api_client"""
+
+        if query_params is None:
+            query_params = {}
+
+        zip_input = self.get_zip_input(zip_data)
+
+        return self._api_client.fetch(endpoint_name, zip_input, query_params)
+
+    def get_zip_input(self, zip_data):
+        """Convert the various formats of input zip_data into
+        the proper json format expected by the API."""
+
+        zip_input = []
+
+        if isinstance(zip_data, list) and len(zip_data) > 0:
+            # if list, convert each block data in the list to json
+            for block in zip_data:
+                zip_input.append(self._convert_to_zip_json(block))
+        else:
+            zip_input.append(self._convert_to_zip_json(zip_data))
+
+        return zip_input
+
+    def _convert_to_zip_json(self, zip_data):
+        if zip_data and isinstance(zip_data, str):
+            # allow just passing a zipcode string.
+            return {"zipcode": zip_data}
+
+        if isinstance(zip_data, dict):
+            allowed_keys = ["zipcode", "meta"]
+
+            # ensure the dict does not contain any unallowed keys
+            for key in zip_data:
+                if key not in allowed_keys:
+                    msg = "Key in zip input not allowed: " + key
+                    raise housecanary.exceptions.InvalidInputException(msg)
+
+            # ensure it contains a "zipcode" key
+            if "zipcode" in zip_data:
+                return zip_data
+
+        # if we made it here, the input was not valid.
+        msg = ("Input is invalid. Must be a dict or list of dicts"
+               " with each item containing at least 'zipcode' key.")
+        raise housecanary.exceptions.InvalidInputException((msg))
+
+    def details(self, zip_data):
+        """Call the details endpoint"""
+        return self.fetch_zip_component("zip/details", zip_data)
+
+    def hpi_forecast(self, zip_data):
+        """Call the hpi_forecast endpoint"""
+        return self.fetch_zip_component("zip/hpi_forecast", zip_data)
+
+    def hpi_historical(self, zip_data):
+        """Call the hpi_historical endpoint"""
+        return self.fetch_zip_component("zip/hpi_historical", zip_data)
+
+    def hpi_ts(self, zip_data):
+        """Call the hpi_ts endpoint"""
+        return self.fetch_zip_component("zip/hpi_ts", zip_data)
+
+    def hpi_ts_forecast(self, zip_data):
+        """Call the hpi_ts_forecast endpoint"""
+        return self.fetch_zip_component("zip/hpi_ts_forecast", zip_data)
+
+    def hpi_ts_historical(self, zip_data):
+        """Call the hpi_ts_historical endpoint"""
+        return self.fetch_zip_component("zip/hpi_ts_historical", zip_data)
+
+    def volatility(self, zip_data):
+        """Call the volatility endpoint"""
+        return self.fetch_zip_component("zip/volatility", zip_data)
+
+    def component_mget(self, zip_data, components):
+        """Call the zip component_mget endpoint
+
+        Args:
+            - zip_data - As described in the class docstring.
+            - components - A list of strings for each component to include in the request.
+                Example: ["zip/details", "zip/volatility"]
+        """
+        if not isinstance(components, list):
+            print "Components param must be a list"
+            return
+
+        query_params = {"components": ",".join(components)}
+
+        return self.fetch_zip_component(
+            "zip/component_mget", zip_data, query_params)

@@ -7,6 +7,7 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 import unittest
 from housecanary.object import Property
 from housecanary.object import Block
+from housecanary.object import ZipCode
 
 
 class PropertyTestCase(unittest.TestCase):
@@ -170,16 +171,16 @@ class BlockTestCase(unittest.TestCase):
 
         self.assertEqual(block2.block_id, "060376703241005")
         self.assertEqual(len(block2.component_results), 2)
-        value_result = next(
+        result1 = next(
             (cr for cr in block2.component_results if cr.component_name == "block/value_ts"),
             None
         )
-        self.assertIsNotNone(value_result)
-        census_result = next(
+        self.assertIsNotNone(result1)
+        result2 = next(
             (cr for cr in block2.component_results if cr.component_name == "block/histogram_beds"),
             None
         )
-        self.assertEqual(census_result.json_data, "dummy data")
+        self.assertEqual(result2.json_data, "dummy data")
 
     def test_has_error(self):
         self.assertFalse(self.block.has_error())
@@ -197,6 +198,81 @@ class BlockTestCase(unittest.TestCase):
         self.test_json['block/value_ts']['api_code_description'] = "test error"
         block2 = Block.create_from_json(self.test_json)
         self.assertEqual(block2.get_errors(), [{"block/value_ts": "test error"}])
+
+
+class ZipTestCase(unittest.TestCase):
+    def setUp(self):
+        self.test_json = {
+            'zip/details': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'some result'
+            },
+            'zipcode_info': {
+                'zipcode': '90274'
+            },
+            'meta': 'Test Meta'
+        }
+
+        self.zip = ZipCode.create_from_json(self.test_json)
+
+    def test_create_from_json(self):
+        self.assertEqual(self.zip.zipcode, "90274")
+        self.assertEqual(self.zip.meta, "Test Meta")
+        self.assertEqual(len(self.zip.component_results), 1)
+        self.assertEqual(self.zip.component_results[0].api_code, 0)
+        self.assertEqual(self.zip.component_results[0].api_code_description, 'ok')
+        self.assertEqual(self.zip.component_results[0].json_data, 'some result')
+
+    def test_create_from_json_with_multiple_components(self):
+        test_json2 = {
+            'zip/details': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'details result'
+            },
+            'zip/volatility': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'dummy data'
+            },
+            'zipcode_info': {
+                'zipcode': '90274',
+            },
+            'meta': 'Test Meta'
+        }
+
+        zip2 = ZipCode.create_from_json(test_json2)
+
+        self.assertEqual(zip2.zipcode, "90274")
+        self.assertEqual(len(zip2.component_results), 2)
+        result1 = next(
+            (cr for cr in zip2.component_results if cr.component_name == "zip/details"),
+            None
+        )
+        self.assertEqual(result1.json_data, "details result")
+        result2 = next(
+            (cr for cr in zip2.component_results if cr.component_name == "zip/volatility"),
+            None
+        )
+        self.assertEqual(result2.json_data, "dummy data")
+
+    def test_has_error(self):
+        self.assertFalse(self.zip.has_error())
+
+    def test_has_error_with_error(self):
+        self.test_json['zip/details']['api_code'] = 1001
+        zip2 = ZipCode.create_from_json(self.test_json)
+        self.assertTrue(zip2.has_error())
+
+    def test_get_errors(self):
+        self.assertEqual(self.zip.get_errors(), [])
+
+    def test_get_errors_with_errors(self):
+        self.test_json['zip/details']['api_code'] = 1001
+        self.test_json['zip/details']['api_code_description'] = "test error"
+        zip2 = ZipCode.create_from_json(self.test_json)
+        self.assertEqual(zip2.get_errors(), [{"zip/details": "test error"}])
 
 
 if __name__ == "__main__":

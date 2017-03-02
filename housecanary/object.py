@@ -178,8 +178,55 @@ class Block(HouseCanaryObject):
         return self.block_id or self.meta or "BlockObject"
 
 
-class Zipcode(HouseCanaryObject):
-    pass
+class ZipCode(HouseCanaryObject):
+    """A single zipcode"""
+
+    def __init__(self, zipcode=None):
+        """
+        Args:
+            zipcode (required) -- Zipcode.
+            data (optional) -- The data returned from the API for this zipcode.
+            api_code (optional) -- The HouseCanary business logic
+                error code reflecting any error with this zipcode.
+            api_code_description (optional) -- The HouseCanary business logic error description.
+        """
+        super(ZipCode, self).__init__()
+
+        self.zipcode = str(zipcode)
+        self.meta = None
+
+    @classmethod
+    def create_from_json(cls, json_data):
+        """Deserialize zipcode json data into a ZipCode object
+
+        Args:
+            json_data (dict): The json data for this zipcode
+
+        Returns:
+            Zip object
+
+        """
+        zipcode = ZipCode()
+        zipcode.zipcode = json_data["zipcode_info"]["zipcode"]
+        zipcode.meta = json_data["meta"] if "meta" in json_data else None
+
+        # create a ComponentResult from each returned component's data
+        # and append to this zipcode's component_results list.
+        for key, value in json_data.iteritems():
+            if key not in ["zipcode_info", "meta"]:
+                component_result = ComponentResult(
+                    key,
+                    value["result"],
+                    value["api_code"],
+                    value["api_code_description"]
+                )
+
+                zipcode.component_results.append(component_result)
+
+        return zipcode
+
+    def __str__(self):
+        return self.zipcode or self.meta or "ZipCodeObject"
 
 
 class LatLng(HouseCanaryObject):

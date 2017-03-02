@@ -8,6 +8,7 @@ import mock
 from housecanary.apiclient import ApiClient
 from housecanary.response import PropertyResponse
 from housecanary.response import BlockResponse
+from housecanary.response import ZipCodeResponse
 from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
 import housecanary.exceptions
@@ -408,6 +409,88 @@ class BlockComponentWrapperTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, BlockResponse))
         self.assertIsNotNone(response.json()[0]["block/value_ts"])
         self.assertIsNotNone(response.json()[0]["block/value_distribution"])
+
+
+class ZipComponentWrapperTestCase(unittest.TestCase):
+    """Tests for the ZipComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"zipcode": "90274", "meta": "block1"}]
+
+    def test_get_zip_input_with_single_zipcode_string(self):
+        zip_data = "01960"
+        identifier_input = self.client.zip.get_zip_input(zip_data)
+        self.assertEqual([{"zipcode": "01960"}], identifier_input)
+
+    def test_get_zip_input_with_list_of_zipcode_strings(self):
+        zip_data = ["01960", "01960"]
+        identifier_input = self.client.zip.get_zip_input(zip_data)
+        self.assertEqual([{"zipcode": "01960"}, {"zipcode": "01960"}],
+                         identifier_input)
+
+    def test_get_zip_input_with_dict(self):
+        zip_data = {"zipcode": "01960", "meta": "someId"}
+        identifier_input = self.client.zip.get_zip_input(zip_data)
+        self.assertEqual([zip_data], identifier_input)
+
+    def test_get_zip_input_with_list_of_dicts(self):
+        zip_data = [{"zipcode": "01960", "meta": "someId"},
+                    {"zipcode": "01960", "meta": "someId2"}]
+        identifier_input = self.client.zip.get_zip_input(zip_data)
+        self.assertEqual(zip_data, identifier_input)
+
+    def test_get_zip_input_dict_with_invalid_key(self):
+        zip_data = {"zipcode": "01960", "color": "green"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.zip.get_zip_input(zip_data)
+
+    def test_get_zip_input_dict_missing_zipcode(self):
+        zip_data = {"meta": "test"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.zip.get_zip_input(zip_data)
+
+    def test_hpi_forecast(self):
+        response = self.client.zip.hpi_forecast(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/hpi_forecast"])
+    
+    def test_hpi_historical(self):
+        response = self.client.zip.hpi_historical(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/hpi_historical"])
+
+    def test_volatility(self):
+        response = self.client.zip.volatility(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/volatility"])
+
+    def test_details(self):
+        response = self.client.zip.details(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/details"])
+
+    def test_hpi_ts(self):
+        response = self.client.zip.hpi_ts(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/hpi_ts"])
+
+    def test_hpi_ts_forecast(self):
+        response = self.client.zip.hpi_ts_forecast(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/hpi_ts_forecast"])
+
+    def test_hpi_ts_historical(self):
+        response = self.client.zip.hpi_ts_historical(self.test_data)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/hpi_ts_historical"])
+
+    def test_component_mget(self):
+        components = ["zip/details", "zip/volatility"]
+        response = self.client.zip.component_mget(self.test_data, components)
+        self.assertTrue(isinstance(response, ZipCodeResponse))
+        self.assertIsNotNone(response.json()[0]["zip/details"])
+        self.assertIsNotNone(response.json()[0]["zip/volatility"])
 
 
 if __name__ == "__main__":

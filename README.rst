@@ -344,6 +344,72 @@ or the output of a custom OutputGenerator if one was specified in the constructo
 
     result = client.block.value_distribution(["012345678901234", "060750615003005"])
 
+
+Zip Endpoints
+~~~~~~~~~~~~~~~
+
+Analytics API Zip Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    -  **details**
+    -  **hpi_forecast**
+    -  **hpi_historical**
+    -  **hpi_ts**
+    -  **hpi_ts_forecast**
+    -  **hpi_ts_historical**
+    -  **volatility**
+    -  **component_mget**
+
+Args:
+^^^^^
+
+All of the Analytics API zip endpoints take a ``zip_data`` argument.
+``zip_data`` can be in the following forms:
+
+A dict with a ``zipcode`` like:
+
+.. code:: python
+
+    {"zipcode": "90274", "meta": "someId"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"zipcode": "90274", "meta": "someId"}, {"zipcode": "01960", "meta": "someId2}]
+
+A single string representing a ``zipcode``:
+
+.. code:: python
+
+    "90274"
+
+A list of ``zipcode`` strings:
+
+.. code:: python
+
+    ["90274", "01960"]
+
+The "meta" field is always optional.
+
+All of the zip endpoint methods return a ZipCodeResponse,
+or the output of a custom OutputGenerator if one was specified in the constructor.
+
+
+**Examples:**
+        
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.zip.details("90274")
+
+    result = client.zip.details({"zipcode": "90274", "meta": "someId"})
+
+    result = client.zip.details([{"zipcode": "90274", "meta": "someId"}, {"zipcode": "01960", "meta": "someId2"}])
+
+    result = client.zip.details(["90274", "01960"])
+
+
 Response Objects
 ~~~~~~~~~~~~~~~~
 
@@ -384,6 +450,32 @@ except for ``value_report`` and ``rental_report``.
    properties, each containing the object's returned json data from the
    API.
 -  **properties()** - An alias for the objects() method.
+
+BlockResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all block endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of Block objects for the requested
+   blocks, each containing the object's returned json data from the
+   API.
+-  **blocks()** - An alias for the objects() method.
+
+ZipCodeResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all zip endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of ZipCode objects for the requested
+   zipcodes, each containing the object's returned json data from the
+   API.
+-  **zipcodes()** - An alias for the objects() method.
 
 HouseCanaryObject
 ^^^^^^^^^^^^^^^^^
@@ -452,6 +544,83 @@ address and it's returned data.
     print p.has_error()
     # False
     print p.get_errors()
+    # []
+
+
+Block
+^^^^^
+
+A subclass of HouseCanaryObject, the Block represents a single
+block and it's returned data.
+
+**Properties:**
+           
+
+-  **block_id**
+-  **property_type**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.block.value_ts("060750615003005")
+    b = result.blocks()[0]
+    print b.block_id
+    # "060750615003005"
+    print b.meta
+    # "meta information"
+    value_result = b.component_results[0]
+    print value_result.component_name
+    # 'block/value_ts'
+    print value_result.api_code
+    # 0
+    print value_result.api_code_description
+    # 'ok'
+    print value_result.json_data
+    # [...data...]
+    print b.has_error()
+    # False
+    print b.get_errors()
+    # []
+
+
+ZipCode
+^^^^^^^
+
+A subclass of HouseCanaryObject, the ZipCode represents a single
+zipcode and it's returned data.
+
+**Properties:**
+           
+
+-  **zipcode**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.zip.details("90274")
+    z = result.zipcodes()[0]
+    print z.zipcode
+    # "90274"
+    print z.meta
+    # "meta information"
+    details_result = z.component_results[0]
+    print details_result.component_name
+    # 'zip/details'
+    print details_result.api_code
+    # 0
+    print details_result.api_code_description
+    # 'ok'
+    print details_result.json_data
+    # [...data...]
+    print z.has_error()
+    # False
+    print z.get_errors()
     # []
 
 ValueReportResponse
