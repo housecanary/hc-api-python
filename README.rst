@@ -64,7 +64,7 @@ Endpoint methods
 
 The ApiClient class provides a ``property`` wrapper which contains
 various methods for calling the property endpoints of the Analytics API
-as well as the Value Report, Rental Report APIs:
+as well as the Value Report and Rental Report APIs:
 
 Analytics API Property Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -265,7 +265,7 @@ PropertyResponse
 ~~~~~~~~~~~~~~~~
 
 A subclass of Response, this is returned for all property endpoints
-except for ``value_report``.
+except for ``value_report`` and ``rental_report``.
 
 **Methods:**
         
@@ -357,6 +357,21 @@ returns the JSON data of the Value Report.
 .. code:: python
 
     result = client.property.value_report("123 Main St", "01234")
+    print result.json()
+
+RentalReportResponse
+~~~~~~~~~~~~~~~~~~~~
+
+A subclass of Response, this is the object returned for the
+``rental_report`` endpoint when "json" format\_type is used. It simply
+returns the JSON data of the Rental Report.
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.property.rental_report("123 Main St", "01234")
     print result.json()
 
 Command Line Tools

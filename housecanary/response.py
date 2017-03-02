@@ -35,8 +35,11 @@ class Response(object):
 
         if endpoint_name == "property/value_report":
             return ValueReportResponse(endpoint_name, json_body, original_response)
-        else:
-            return PropertyResponse(endpoint_name, json_body, original_response)
+
+        if endpoint_name == "property/rental_report":
+            return RentalReportResponse(endpoint_name, json_body, original_response)
+
+        return PropertyResponse(endpoint_name, json_body, original_response)
 
     @property
     def endpoint_name(self):
@@ -154,5 +157,14 @@ class ValueReportResponse(Response):
 
     def objects(self):
         """The value_report endpoint returns a json dict
+           instead of a list of address results."""
+        return []
+
+
+class RentalReportResponse(Response):
+    """The response from a rental_report request."""
+
+    def objects(self):
+        """The rental_report endpoint returns a json dict
            instead of a list of address results."""
         return []
