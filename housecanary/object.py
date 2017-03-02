@@ -119,7 +119,7 @@ class Property(HouseCanaryObject):
         return prop
 
     def __str__(self):
-        return self.address
+        return self.address or self.meta or "PropertyObject"
 
 
 class Zipcode(HouseCanaryObject):
