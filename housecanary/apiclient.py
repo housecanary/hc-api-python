@@ -148,6 +148,8 @@ class PropertyComponentWrapper(object):
             - city (optional)
             - state (optional)
             - meta (optional)
+            - client_value (optional, for "value_within_block" and "rental_value_within_block")
+            - client_value_sqft (optional, for "value_within_block" and "rental_value_within_block")
 
     All the component methods of this class return a Response object,
     or the output of a custom OutputGenerator if one was specified in the constructor.
@@ -212,6 +214,10 @@ class PropertyComponentWrapper(object):
         """Call the rental_value endpoint"""
         return self.fetch_property_component("property/rental_value", address_data)
 
+    def rental_value_within_block(self, address_data):
+        """Call the rental_value_within_block endpoint"""
+        return self.fetch_property_component("property/rental_value_within_block", address_data)
+
     def sales_history(self, address_data):
         """Call the sales_history endpoint"""
         return self.fetch_property_component("property/sales_history", address_data)
@@ -227,6 +233,10 @@ class PropertyComponentWrapper(object):
     def value_forecast(self, address_data):
         """Call the value_forecast endpoint"""
         return self.fetch_property_component("property/value_forecast", address_data)
+
+    def value_within_block(self, address_data):
+        """Call the value_within_block endpoint"""
+        return self.fetch_property_component("property/value_within_block", address_data)
 
     def zip_details(self, address_data):
         """Call the zip_details endpoint"""
@@ -339,7 +349,8 @@ class PropertyComponentWrapper(object):
             return address_json
 
         elif isinstance(address_data, dict):
-            allowed_keys = ["address", "zipcode", "unit", "city", "state", "slug", "meta"]
+            allowed_keys = ["address", "zipcode", "unit", "city", "state", "slug", "meta",
+                            "client_value", "client_value_sqft"]
 
             # ensure the dict does not contain any unallowed keys
             for key in address_data:

@@ -162,6 +162,8 @@ The available keys in the dict are:
     - city (optional)
     - state (optional)
     - meta (optional)
+    - client_value (optional, for ``value_within_block`` and ``rental_value_within_block``)
+    - client_value_sqft (optional, for ``value_within_block`` and ``rental_value_within_block``)
 
 All of the endpoint methods of this class return a Response object or
 the output of a custom OutputGenerator if one was specified in the

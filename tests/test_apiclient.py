@@ -197,6 +197,13 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/rental_value"])
 
+    def test_rental_value_within_block(self):
+        test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1",
+                      "client_value": 1000000, "client_value_sqft": 3000}]
+        response = self.client.property.rental_value_within_block(test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/rental_value_within_block"])
+
     def test_sales_history(self):
         response = self.client.property.sales_history(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -216,6 +223,13 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.value_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/value_forecast"])
+
+    def test_value_within_block(self):
+        test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1",
+                      "client_value": 1000000, "client_value_sqft": 3000}]
+        response = self.client.property.value_within_block(test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/value_within_block"])
 
     def test_zip_details(self):
         response = self.client.property.zip_details(self.test_data)
