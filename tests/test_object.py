@@ -8,6 +8,7 @@ import unittest
 from housecanary.object import Property
 from housecanary.object import Block
 from housecanary.object import ZipCode
+from housecanary.object import Msa
 
 
 class PropertyTestCase(unittest.TestCase):
@@ -273,6 +274,81 @@ class ZipTestCase(unittest.TestCase):
         self.test_json['zip/details']['api_code_description'] = "test error"
         zip2 = ZipCode.create_from_json(self.test_json)
         self.assertEqual(zip2.get_errors(), [{"zip/details": "test error"}])
+
+
+class MsaTestCase(unittest.TestCase):
+    def setUp(self):
+        self.test_json = {
+            'msa/details': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'some result'
+            },
+            'msa_info': {
+                'msa': '41860'
+            },
+            'meta': 'Test Meta'
+        }
+
+        self.msa = Msa.create_from_json(self.test_json)
+
+    def test_create_from_json(self):
+        self.assertEqual(self.msa.msa, "41860")
+        self.assertEqual(self.msa.meta, "Test Meta")
+        self.assertEqual(len(self.msa.component_results), 1)
+        self.assertEqual(self.msa.component_results[0].api_code, 0)
+        self.assertEqual(self.msa.component_results[0].api_code_description, 'ok')
+        self.assertEqual(self.msa.component_results[0].json_data, 'some result')
+
+    def test_create_from_json_with_multiple_components(self):
+        test_json2 = {
+            'msa/details': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'details result'
+            },
+            'msa/hpi_ts': {
+                'api_code_description': 'ok',
+                'api_code': 0,
+                'result': 'dummy data'
+            },
+            'msa_info': {
+                'msa': '41860',
+            },
+            'meta': 'Test Meta'
+        }
+
+        msa2 = Msa.create_from_json(test_json2)
+
+        self.assertEqual(msa2.msa, "41860")
+        self.assertEqual(len(msa2.component_results), 2)
+        result1 = next(
+            (cr for cr in msa2.component_results if cr.component_name == "msa/details"),
+            None
+        )
+        self.assertEqual(result1.json_data, "details result")
+        result2 = next(
+            (cr for cr in msa2.component_results if cr.component_name == "msa/hpi_ts"),
+            None
+        )
+        self.assertEqual(result2.json_data, "dummy data")
+
+    def test_has_error(self):
+        self.assertFalse(self.msa.has_error())
+
+    def test_has_error_with_error(self):
+        self.test_json['msa/details']['api_code'] = 1001
+        msa2 = Msa.create_from_json(self.test_json)
+        self.assertTrue(msa2.has_error())
+
+    def test_get_errors(self):
+        self.assertEqual(self.msa.get_errors(), [])
+
+    def test_get_errors_with_errors(self):
+        self.test_json['msa/details']['api_code'] = 1001
+        self.test_json['msa/details']['api_code_description'] = "test error"
+        msa2 = Msa.create_from_json(self.test_json)
+        self.assertEqual(msa2.get_errors(), [{"msa/details": "test error"}])
 
 
 if __name__ == "__main__":

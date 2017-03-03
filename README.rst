@@ -410,6 +410,68 @@ or the output of a custom OutputGenerator if one was specified in the constructo
     result = client.zip.details(["90274", "01960"])
 
 
+MSA Endpoints
+~~~~~~~~~~~~~~~
+
+Analytics API MSA Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    -  **details**
+    -  **hpi_ts**
+    -  **hpi_ts_forecast**
+    -  **hpi_ts_historical**
+    -  **component_mget**
+
+Args:
+^^^^^
+
+All of the Analytics API MSA endpoints take an ``msa_data`` argument.
+``msa_data`` can be in the following forms:
+
+A dict with an ``msa`` like:
+
+.. code:: python
+
+    {"msa": "41860", "meta": "someId"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"msa": "41860", "meta": "someId"}, {"msa": "40928", "meta": "someId2}]
+
+A single string representing a ``msa``:
+
+.. code:: python
+
+    "41860"
+
+A list of ``msa`` strings:
+
+.. code:: python
+
+    ["41860", "40928"]
+
+The "meta" field is always optional.
+
+All of the msa endpoint methods return an MsaResponse,
+or the output of a custom OutputGenerator if one was specified in the constructor.
+
+
+**Examples:**
+        
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.msa.details("41860")
+
+    result = client.msa.details({"msa": "90274", "meta": "someId"})
+
+    result = client.msa.details([{"msa": "41860", "meta": "someId"}, {"msa": "40928", "meta": "someId2"}])
+
+    result = client.msa.details(["41860", "40928"])
+
+
 Response Objects
 ~~~~~~~~~~~~~~~~
 
@@ -476,6 +538,19 @@ A subclass of Response, this is returned for all zip endpoints.
    zipcodes, each containing the object's returned json data from the
    API.
 -  **zipcodes()** - An alias for the objects() method.
+
+MsaResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all msa endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of Msa objects for the requested
+   msas, each containing the object's returned json data from the
+   API.
+-  **msas()** - An alias for the objects() method.
 
 HouseCanaryObject
 ^^^^^^^^^^^^^^^^^
@@ -622,6 +697,45 @@ zipcode and it's returned data.
     # False
     print z.get_errors()
     # []
+
+
+Msa
+^^^^^^^
+
+A subclass of HouseCanaryObject, the Msa represents a single
+Metropolitan Statistical Area and it's returned data.
+
+**Properties:**
+           
+
+-  **msa**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.msa.details("41860")
+    m = result.msas()[0]
+    print m.msa
+    # "41860"
+    print m.meta
+    # "meta information"
+    details_result = m.component_results[0]
+    print details_result.component_name
+    # 'msa/details'
+    print details_result.api_code
+    # 0
+    print details_result.api_code_description
+    # 'ok'
+    print details_result.json_data
+    # [...data...]
+    print m.has_error()
+    # False
+    print m.get_errors()
+    # []
+
 
 ValueReportResponse
 ^^^^^^^^^^^^^^^^^^^

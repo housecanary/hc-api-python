@@ -5,6 +5,7 @@ Provides Response to encapsulate API responses.
 from housecanary.object import Property
 from housecanary.object import Block
 from housecanary.object import ZipCode
+from housecanary.object import Msa
 from . import utilities
 
 
@@ -48,6 +49,9 @@ class Response(object):
 
         if prefix == "zip":
             return ZipCodeResponse(endpoint_name, json_body, original_response)
+
+        if prefix == "msa":
+            return MsaResponse(endpoint_name, json_body, original_response)
 
         return PropertyResponse(endpoint_name, json_body, original_response)
 
@@ -215,14 +219,35 @@ class ZipCodeResponse(Response):
         return self.objects()
 
 
-class ZipcodeResponse(Response):
-    """To be implemented later."""
-    pass
+class MsaResponse(Response):
+    """Represents the data returned from an Analytics API msa endpoint."""
 
+    def objects(self):
+        """Gets a list of Msa objects for the requested msas,
+        each containing the msa's returned json data from the API.
 
-class LatLngResponse(Response):
-    """To be implemented later."""
-    pass
+        Returns:
+            List of Msa objects
+        """
+        if not self._objects:
+            body = self.json()
+
+            self._objects = []
+
+            if not isinstance(body, list):
+                # The zip endpoints return a list in the body.
+                # This could maybe raise an exception.
+                return []
+
+            for msa in body:
+                prop = Msa.create_from_json(msa)
+                self._objects.append(prop)
+
+        return self._objects
+
+    def msas(self):
+        """Alias method for objects."""
+        return self.objects()
 
 
 class ValueReportResponse(Response):

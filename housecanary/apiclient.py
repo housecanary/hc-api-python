@@ -54,6 +54,7 @@ class ApiClient(object):
         self.property = PropertyComponentWrapper(self)
         self.block = BlockComponentWrapper(self)
         self.zip = ZipComponentWrapper(self)
+        self.msa = MsaComponentWrapper(self)
 
     def fetch(self, endpoint_name, identifier_input, query_params=None):
         """Calls this instance's request_client's post method with the
@@ -573,9 +574,9 @@ class ZipComponentWrapper(object):
         zip_input = []
 
         if isinstance(zip_data, list) and len(zip_data) > 0:
-            # if list, convert each block data in the list to json
-            for block in zip_data:
-                zip_input.append(self._convert_to_zip_json(block))
+            # if list, convert each zip data in the list to json
+            for item in zip_data:
+                zip_input.append(self._convert_to_zip_json(item))
         else:
             zip_input.append(self._convert_to_zip_json(zip_data))
 
@@ -648,3 +649,116 @@ class ZipComponentWrapper(object):
 
         return self.fetch_zip_component(
             "zip/component_mget", zip_data, query_params)
+
+
+class MsaComponentWrapper(object):
+    """MSA specific components
+
+    All of the Analytics API msa endpoints take an ``msa_data`` argument.
+    msa_data can be in the following forms:
+
+    - A dict with an ``msa`` like:
+      {"msa": "41860", "meta": "someId"}
+
+    - A list of dicts as specified above:
+      [{"msa": "41860", "meta": "someId"}, {"msa": "40928", "meta": "someId2}]
+
+    - A single string representing a ``msa``:
+      "41860"
+
+    - A list of ``msa`` strings:
+      ["41860", "40928"]
+
+    The "meta" field is always optional.
+
+    All of the msa endpoint methods return an MsaResponse,
+    or the output of a custom OutputGenerator if one was specified in the constructor.
+    """
+
+    def __init__(self, api_client=None):
+        """
+        Args:
+            - api_client - An instance of ApiClient
+        """
+        self._api_client = api_client
+
+    def fetch_msa_component(self, endpoint_name, msa_data, query_params=None):
+        """common method for handling parameters before passing to api_client"""
+
+        if query_params is None:
+            query_params = {}
+
+        msa_input = self.get_msa_input(msa_data)
+
+        return self._api_client.fetch(endpoint_name, msa_input, query_params)
+
+    def get_msa_input(self, msa_data):
+        """Convert the various formats of input msa_data into
+        the proper json format expected by the API."""
+
+        msa_input = []
+
+        if isinstance(msa_data, list) and len(msa_data) > 0:
+            # if list, convert each msa data in the list to json
+            for msa in msa_data:
+                msa_input.append(self._convert_to_msa_json(msa))
+        else:
+            msa_input.append(self._convert_to_msa_json(msa_data))
+
+        return msa_input
+
+    def _convert_to_msa_json(self, msa_data):
+        if msa_data and isinstance(msa_data, str):
+            # allow just passing a msa string.
+            return {"msa": msa_data}
+
+        if isinstance(msa_data, dict):
+            allowed_keys = ["msa", "meta"]
+
+            # ensure the dict does not contain any unallowed keys
+            for key in msa_data:
+                if key not in allowed_keys:
+                    msg = "Key in msa input not allowed: " + key
+                    raise housecanary.exceptions.InvalidInputException(msg)
+
+            # ensure it contains a "msa" key
+            if "msa" in msa_data:
+                return msa_data
+
+        # if we made it here, the input was not valid.
+        msg = ("Input is invalid. Must be a dict or list of dicts"
+               " with each item containing at least 'msa' key.")
+        raise housecanary.exceptions.InvalidInputException((msg))
+
+    def details(self, msa_data):
+        """Call the details endpoint"""
+        return self.fetch_msa_component("msa/details", msa_data)
+
+    def hpi_ts(self, msa_data):
+        """Call the hpi_ts endpoint"""
+        return self.fetch_msa_component("msa/hpi_ts", msa_data)
+
+    def hpi_ts_forecast(self, msa_data):
+        """Call the hpi_ts_forecast endpoint"""
+        return self.fetch_msa_component("msa/hpi_ts_forecast", msa_data)
+
+    def hpi_ts_historical(self, msa_data):
+        """Call the hpi_ts_historical endpoint"""
+        return self.fetch_msa_component("msa/hpi_ts_historical", msa_data)
+
+    def component_mget(self, msa_data, components):
+        """Call the msa component_mget endpoint
+
+        Args:
+            - msa_data - As described in the class docstring.
+            - components - A list of strings for each component to include in the request.
+                Example: ["msa/details", "msa/hpi_ts"]
+        """
+        if not isinstance(components, list):
+            print "Components param must be a list"
+            return
+
+        query_params = {"components": ",".join(components)}
+
+        return self.fetch_msa_component(
+            "msa/component_mget", msa_data, query_params)

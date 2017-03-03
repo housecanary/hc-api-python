@@ -229,8 +229,55 @@ class ZipCode(HouseCanaryObject):
         return self.zipcode or self.meta or "ZipCodeObject"
 
 
-class LatLng(HouseCanaryObject):
-    pass
+class Msa(HouseCanaryObject):
+    """A single MSA"""
+
+    def __init__(self, msa=None):
+        """
+        Args:
+            msa (required) -- MSA.
+            data (optional) -- The data returned from the API for this MSA.
+            api_code (optional) -- The HouseCanary business logic
+                error code reflecting any error with this MSA.
+            api_code_description (optional) -- The HouseCanary business logic error description.
+        """
+        super(Msa, self).__init__()
+
+        self.msa = str(msa)
+        self.meta = None
+
+    @classmethod
+    def create_from_json(cls, json_data):
+        """Deserialize msa json data into a Msa object
+
+        Args:
+            json_data (dict): The json data for this msa
+
+        Returns:
+            Msa object
+
+        """
+        msa = Msa()
+        msa.msa = json_data["msa_info"]["msa"]
+        msa.meta = json_data["meta"] if "meta" in json_data else None
+
+        # create a ComponentResult from each returned component's data
+        # and append to this msa's component_results list.
+        for key, value in json_data.iteritems():
+            if key not in ["msa_info", "meta"]:
+                component_result = ComponentResult(
+                    key,
+                    value["result"],
+                    value["api_code"],
+                    value["api_code_description"]
+                )
+
+                msa.component_results.append(component_result)
+
+        return msa
+
+    def __str__(self):
+        return self.msa or self.meta or "MsaObject"
 
 
 class ComponentResult(object):

@@ -9,6 +9,7 @@ from housecanary.apiclient import ApiClient
 from housecanary.response import PropertyResponse
 from housecanary.response import BlockResponse
 from housecanary.response import ZipCodeResponse
+from housecanary.response import MsaResponse
 from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
 import housecanary.exceptions
@@ -454,7 +455,7 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
         response = self.client.zip.hpi_forecast(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
         self.assertIsNotNone(response.json()[0]["zip/hpi_forecast"])
-    
+
     def test_hpi_historical(self):
         response = self.client.zip.hpi_historical(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
@@ -491,6 +492,73 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, ZipCodeResponse))
         self.assertIsNotNone(response.json()[0]["zip/details"])
         self.assertIsNotNone(response.json()[0]["zip/volatility"])
+
+
+class MsaComponentWrapperTestCase(unittest.TestCase):
+    """Tests for the MsaComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"msa": "41860", "meta": "block1"}]
+
+    def test_get_msa_input_with_single_msa_string(self):
+        msa_data = "41860"
+        identifier_input = self.client.msa.get_msa_input(msa_data)
+        self.assertEqual([{"msa": "41860"}], identifier_input)
+
+    def test_get_msa_input_with_list_of_msa_strings(self):
+        msa_data = ["41860", "40928"]
+        identifier_input = self.client.msa.get_msa_input(msa_data)
+        self.assertEqual([{"msa": "41860"}, {"msa": "40928"}],
+                         identifier_input)
+
+    def test_get_msa_input_with_dict(self):
+        msa_data = {"msa": "41860", "meta": "someId"}
+        identifier_input = self.client.msa.get_msa_input(msa_data)
+        self.assertEqual([msa_data], identifier_input)
+
+    def test_get_msa_input_with_list_of_dicts(self):
+        msa_data = [{"msa": "41860", "meta": "someId"},
+                    {"msa": "41860", "meta": "someId2"}]
+        identifier_input = self.client.msa.get_msa_input(msa_data)
+        self.assertEqual(msa_data, identifier_input)
+
+    def test_get_msa_input_dict_with_invalid_key(self):
+        msa_data = {"msa": "41860", "color": "green"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.msa.get_msa_input(msa_data)
+
+    def test_get_msa_input_dict_missing_msa(self):
+        msa_data = {"meta": "test"}
+        with self.assertRaises(housecanary.exceptions.InvalidInputException):
+            self.client.msa.get_msa_input(msa_data)
+
+    def test_details(self):
+        response = self.client.msa.details(self.test_data)
+        self.assertTrue(isinstance(response, MsaResponse))
+        self.assertIsNotNone(response.json()[0]["msa/details"])
+
+    def test_hpi_ts(self):
+        response = self.client.msa.hpi_ts(self.test_data)
+        self.assertTrue(isinstance(response, MsaResponse))
+        self.assertIsNotNone(response.json()[0]["msa/hpi_ts"])
+
+    def test_hpi_ts_forecast(self):
+        response = self.client.msa.hpi_ts_forecast(self.test_data)
+        self.assertTrue(isinstance(response, MsaResponse))
+        self.assertIsNotNone(response.json()[0]["msa/hpi_ts_forecast"])
+
+    def test_hpi_ts_historical(self):
+        response = self.client.msa.hpi_ts_historical(self.test_data)
+        self.assertTrue(isinstance(response, MsaResponse))
+        self.assertIsNotNone(response.json()[0]["msa/hpi_ts_historical"])
+
+    def test_component_mget(self):
+        components = ["msa/details", "msa/hpi_ts"]
+        response = self.client.msa.component_mget(self.test_data, components)
+        self.assertTrue(isinstance(response, MsaResponse))
+        self.assertIsNotNone(response.json()[0]["msa/details"])
+        self.assertIsNotNone(response.json()[0]["msa/hpi_ts"])
 
 
 if __name__ == "__main__":

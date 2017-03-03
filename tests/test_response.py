@@ -9,6 +9,7 @@ from housecanary.apiclient import ApiClient
 from housecanary.object import Property
 from housecanary.object import Block
 from housecanary.object import ZipCode
+from housecanary.object import Msa
 
 
 class PropertyResponseTestCase(unittest.TestCase):
@@ -98,6 +99,24 @@ class ZipCodeResponseTestCase(unittest.TestCase):
         self.assertTrue(len(response.zipcodes()), 2)
         self.assertTrue(isinstance(response.zipcodes()[0], ZipCode))
         self.assertTrue(isinstance(response.zipcodes()[1], ZipCode))
+
+
+class MsaResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"msa": "41860"}]
+
+    def test_msas(self):
+        response = self.client.fetch("msa/details", self.test_data)
+        self.assertTrue(len(response.msas()), 1)
+        self.assertTrue(isinstance(response.msas()[0], Msa))
+
+    def test_msas_with_multiple(self):
+        self.test_data.append({"msa": "41860"})
+        response = self.client.fetch("msa/details", self.test_data)
+        self.assertTrue(len(response.msas()), 2)
+        self.assertTrue(isinstance(response.msas()[0], Msa))
+        self.assertTrue(isinstance(response.msas()[1], Msa))
 
 
 if __name__ == "__main__":
