@@ -88,67 +88,67 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
 
     def test_get_property_input_with_single_tuple(self):
         address_data = ("47 Perley Ave", "01960")
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, [{"address": "47 Perley Ave", "zipcode": "01960"}])
 
     def test_get_property_input_with_multiple_tuples(self):
         address_data = [("47 Perley Ave", "01960"), ("85 Clay St", "02140")]
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, [{"address": "47 Perley Ave", "zipcode": "01960"},
                                           {"address": "85 Clay St", "zipcode": "02140"}])
 
     def test_get_property_input_with_slug_string(self):
         address_data = "123-Example-St-San-Francisco-CA-94105"
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, [{"slug": "123-Example-St-San-Francisco-CA-94105"}])
 
     def test_get_property_input_with_invalid_key(self):
         address_data = [{"address": "47 Perley Ave", "zipcode": "01960", "color": "green"}]
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.property.get_property_input(address_data)
+            self.client.property.get_identifier_input(address_data)
 
     def test_get_property_input_with_city_state_unit(self):
         address_data = [{"address": "47 Perley Ave", "unit": "2", "city": "Peabody", "state": "MA"}]
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, address_data)
 
     def test_get_property_input_with_slug_list(self):
         address_data = [{"slug": "123-Example-St-San-Francisco-CA-94105"},
                         {"slug": "345-Example-St-San-Francisco-CA-94105"}]
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, address_data)
 
     def test_get_property_input_with_slug_dict(self):
         address_data = {"slug": "123-Example-St-San-Francisco-CA-94105"}
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, [address_data])
 
     def test_get_property_input_with_meta(self):
         address_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, address_data)
 
     def test_get_property_input_with_multiple_addresses(self):
         address_data = [{"address": "47 Perley Ave", "zipcode": "01960"},
                         {"address": "123 Main St", "zipcode": "01010"}]
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, address_data)
 
     def test_get_property_input_with_single_dict(self):
         address_data = {"address": "47 Perley Ave", "zipcode": "01960"}
-        property_input = self.client.property.get_property_input(address_data)
+        property_input = self.client.property.get_identifier_input(address_data)
         self.assertEqual(property_input, [address_data])
 
     def test_get_property_input_dict_without_address_slug(self):
         address_data = {"state": "CA"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.property.get_property_input(address_data)
+            self.client.property.get_identifier_input(address_data)
 
     def test_get_property_input_list_without_address_slug(self):
         address_data = [{"state": "CA"},
                         {"address" "43 Valmonte Plaza"}]
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.property.get_property_input(address_data)
+            self.client.property.get_identifier_input(address_data)
 
     def test_census(self):
         response = self.client.property.census(self.test_data)
@@ -313,46 +313,46 @@ class BlockComponentWrapperTestCase(unittest.TestCase):
 
     def test_get_block_input_with_single_block_string(self):
         block_data = "060750615003005"
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual([{"block_id": "060750615003005"}], identifier_input)
 
     def test_get_block_input_with_list_of_block_strings(self):
         block_data = ["060750615003005", "012345678901234"]
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual([{"block_id": "060750615003005"}, {"block_id": "012345678901234"}],
                          identifier_input)
 
     def test_get_block_input_with_dict(self):
         block_data = {"block_id": "060750615003005", "meta": "someId"}
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual([block_data], identifier_input)
 
     def test_get_block_input_with_dict_num_bins(self):
         block_data = {"block_id": "060750615003005", "num_bins": 5}
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual([block_data], identifier_input)
 
     def test_get_block_input_with_dict_property_type(self):
         block_data = {"block_id": "060750615003005", "property_type": "SFD"}
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual([block_data],
                          identifier_input)
 
     def test_get_block_input_with_list_of_dicts(self):
         block_data = [{"block_id": "060750615003005", "meta": "someId"},
                       {"block_id": "012345678901234", "meta": "someId2"}]
-        identifier_input = self.client.block.get_block_input(block_data)
+        identifier_input = self.client.block.get_identifier_input(block_data)
         self.assertEqual(block_data, identifier_input)
 
     def test_get_block_input_dict_with_invalid_key(self):
         block_data = {"block_id": "060750615003005", "color": "green"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.block.get_block_input(block_data)
+            self.client.block.get_identifier_input(block_data)
 
     def test_get_block_input_dict_missing_block_id(self):
         block_data = {"num_bins": 5}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.block.get_block_input(block_data)
+            self.client.block.get_identifier_input(block_data)
 
     def test_histogram_baths(self):
         response = self.client.block.histogram_baths(self.test_data_num_bins)
@@ -421,35 +421,35 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
 
     def test_get_zip_input_with_single_zipcode_string(self):
         zip_data = "01960"
-        identifier_input = self.client.zip.get_zip_input(zip_data)
+        identifier_input = self.client.zip.get_identifier_input(zip_data)
         self.assertEqual([{"zipcode": "01960"}], identifier_input)
 
     def test_get_zip_input_with_list_of_zipcode_strings(self):
         zip_data = ["01960", "01960"]
-        identifier_input = self.client.zip.get_zip_input(zip_data)
+        identifier_input = self.client.zip.get_identifier_input(zip_data)
         self.assertEqual([{"zipcode": "01960"}, {"zipcode": "01960"}],
                          identifier_input)
 
     def test_get_zip_input_with_dict(self):
         zip_data = {"zipcode": "01960", "meta": "someId"}
-        identifier_input = self.client.zip.get_zip_input(zip_data)
+        identifier_input = self.client.zip.get_identifier_input(zip_data)
         self.assertEqual([zip_data], identifier_input)
 
     def test_get_zip_input_with_list_of_dicts(self):
         zip_data = [{"zipcode": "01960", "meta": "someId"},
                     {"zipcode": "01960", "meta": "someId2"}]
-        identifier_input = self.client.zip.get_zip_input(zip_data)
+        identifier_input = self.client.zip.get_identifier_input(zip_data)
         self.assertEqual(zip_data, identifier_input)
 
     def test_get_zip_input_dict_with_invalid_key(self):
         zip_data = {"zipcode": "01960", "color": "green"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.zip.get_zip_input(zip_data)
+            self.client.zip.get_identifier_input(zip_data)
 
     def test_get_zip_input_dict_missing_zipcode(self):
         zip_data = {"meta": "test"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.zip.get_zip_input(zip_data)
+            self.client.zip.get_identifier_input(zip_data)
 
     def test_hpi_forecast(self):
         response = self.client.zip.hpi_forecast(self.test_data)
@@ -503,35 +503,35 @@ class MsaComponentWrapperTestCase(unittest.TestCase):
 
     def test_get_msa_input_with_single_msa_string(self):
         msa_data = "41860"
-        identifier_input = self.client.msa.get_msa_input(msa_data)
+        identifier_input = self.client.msa.get_identifier_input(msa_data)
         self.assertEqual([{"msa": "41860"}], identifier_input)
 
     def test_get_msa_input_with_list_of_msa_strings(self):
         msa_data = ["41860", "40928"]
-        identifier_input = self.client.msa.get_msa_input(msa_data)
+        identifier_input = self.client.msa.get_identifier_input(msa_data)
         self.assertEqual([{"msa": "41860"}, {"msa": "40928"}],
                          identifier_input)
 
     def test_get_msa_input_with_dict(self):
         msa_data = {"msa": "41860", "meta": "someId"}
-        identifier_input = self.client.msa.get_msa_input(msa_data)
+        identifier_input = self.client.msa.get_identifier_input(msa_data)
         self.assertEqual([msa_data], identifier_input)
 
     def test_get_msa_input_with_list_of_dicts(self):
         msa_data = [{"msa": "41860", "meta": "someId"},
                     {"msa": "41860", "meta": "someId2"}]
-        identifier_input = self.client.msa.get_msa_input(msa_data)
+        identifier_input = self.client.msa.get_identifier_input(msa_data)
         self.assertEqual(msa_data, identifier_input)
 
     def test_get_msa_input_dict_with_invalid_key(self):
         msa_data = {"msa": "41860", "color": "green"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.msa.get_msa_input(msa_data)
+            self.client.msa.get_identifier_input(msa_data)
 
     def test_get_msa_input_dict_missing_msa(self):
         msa_data = {"meta": "test"}
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
-            self.client.msa.get_msa_input(msa_data)
+            self.client.msa.get_identifier_input(msa_data)
 
     def test_details(self):
         response = self.client.msa.details(self.test_data)
