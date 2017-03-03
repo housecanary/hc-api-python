@@ -216,7 +216,7 @@ class PropertyComponentWrapper(ComponentWrapper):
     def _convert_to_identifier_json(self, address_data):
         """Convert input address data into json format"""
 
-        if address_data and isinstance(address_data, str):
+        if isinstance(address_data, str) or isinstance(address_data, unicode):
             # allow just passing a slug string.
             return {"slug": address_data}
 
@@ -485,7 +485,7 @@ class BlockComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, block_data):
-        if block_data and isinstance(block_data, str):
+        if isinstance(block_data, str) or isinstance(block_data, unicode):
             # allow just passing a block_id string.
             return {"block_id": block_data}
 
@@ -590,7 +590,7 @@ class ZipComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, zip_data):
-        if zip_data and isinstance(zip_data, str):
+        if isinstance(zip_data, str) or isinstance(zip_data, unicode):
             # allow just passing a zipcode string.
             return {"zipcode": zip_data}
 
@@ -683,7 +683,7 @@ class MsaComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, msa_data):
-        if msa_data and isinstance(msa_data, str):
+        if isinstance(msa_data, str) or isinstance(msa_data, unicode):
             # allow just passing a msa string.
             return {"msa": msa_data}
 
