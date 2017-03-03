@@ -115,6 +115,23 @@ class Response(object):
         """Override in subclasses"""
         raise NotImplementedError()
 
+    def _get_objects(self, obj_type):
+        if not self._objects:
+            body = self.json()
+
+            self._objects = []
+
+            if not isinstance(body, list):
+                # The endpoints return a list in the body.
+                # This could maybe raise an exception.
+                return []
+
+            for item in body:
+                prop = obj_type.create_from_json(item)
+                self._objects.append(prop)
+
+        return self._objects
+
     @property
     def rate_limits(self):
         """Returns a list of rate limit details."""
@@ -136,21 +153,7 @@ class PropertyResponse(Response):
         Returns:
             List of Property objects
         """
-        if not self._objects:
-            body = self.json()
-
-            self._objects = []
-
-            if not isinstance(body, list):
-                # The property endpoints return a list in the body.
-                # This could maybe raise an exception.
-                return []
-
-            for address in body:
-                prop = Property.create_from_json(address)
-                self._objects.append(prop)
-
-        return self._objects
+        return self._get_objects(Property)
 
     def properties(self):
         """Alias method for objects."""
@@ -167,21 +170,7 @@ class BlockResponse(Response):
         Returns:
             List of Block objects
         """
-        if not self._objects:
-            body = self.json()
-
-            self._objects = []
-
-            if not isinstance(body, list):
-                # The block endpoints return a list in the body.
-                # This could maybe raise an exception.
-                return []
-
-            for block in body:
-                prop = Block.create_from_json(block)
-                self._objects.append(prop)
-
-        return self._objects
+        return self._get_objects(Block)
 
     def blocks(self):
         """Alias method for objects."""
@@ -198,21 +187,7 @@ class ZipCodeResponse(Response):
         Returns:
             List of ZipCode objects
         """
-        if not self._objects:
-            body = self.json()
-
-            self._objects = []
-
-            if not isinstance(body, list):
-                # The zip endpoints return a list in the body.
-                # This could maybe raise an exception.
-                return []
-
-            for zip in body:
-                prop = ZipCode.create_from_json(zip)
-                self._objects.append(prop)
-
-        return self._objects
+        return self._get_objects(ZipCode)
 
     def zipcodes(self):
         """Alias method for objects."""
@@ -229,21 +204,7 @@ class MsaResponse(Response):
         Returns:
             List of Msa objects
         """
-        if not self._objects:
-            body = self.json()
-
-            self._objects = []
-
-            if not isinstance(body, list):
-                # The zip endpoints return a list in the body.
-                # This could maybe raise an exception.
-                return []
-
-            for msa in body:
-                prop = Msa.create_from_json(msa)
-                self._objects.append(prop)
-
-        return self._objects
+        return self._get_objects(Msa)
 
     def msas(self):
         """Alias method for objects."""
