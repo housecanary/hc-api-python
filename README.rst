@@ -81,6 +81,16 @@ Property Endpoints
 Analytics API Property Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+-  **block_histogram_baths**
+-  **block_histogram_beds**
+-  **block_histogram_building_area**
+-  **block_histogram_value**
+-  **block_histogram_value_sqft**
+-  **block_rental_value_distribution**
+-  **block_value_distribution**
+-  **block_value_ts**
+-  **block_value_ts_historical**
+-  **block_value_ts_forecast**
 -  **census**
 -  **details**
 -  **flood**
@@ -88,6 +98,9 @@ Analytics API Property Endpoints:
 -  **ltv_details**
 -  **mortgage_lien**
 -  **msa_details**
+-  **msa_hpi_ts**
+-  **msa_hpi_ts_forecast**
+-  **msa_hpi_ts_historical**
 -  **nod**
 -  **owner_occupied**
 -  **rental_value**
@@ -100,6 +113,9 @@ Analytics API Property Endpoints:
 -  **zip_details**
 -  **zip_hpi_forecast**
 -  **zip_hpi_historical**
+-  **zip_hpi_ts**
+-  **zip_hpi_ts_forecast**
+-  **zip_hpi_ts_historical**
 -  **zip_volatility**
 -  **component_mget**
 
@@ -118,7 +134,7 @@ Args:
 ^^^^^     
 
 All of the Analytics API property endpoint methods take an
-``address_data`` argument. ``address_data`` can be in the following forms:
+``data`` argument. ``data`` can be in the following forms:
 
 A dict like:
 

@@ -169,7 +169,7 @@ class PropertyComponentWrapper(ComponentWrapper):
     """Property specific components
 
     All the component methods of this class (except value_report and rental_report)
-    take address_data as a parameter. address_data can be in the following forms:
+    take data as a parameter. data can be in the following forms:
 
         - A dict like:
           {"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"}
@@ -247,91 +247,155 @@ class PropertyComponentWrapper(ComponentWrapper):
                " of dicts with each item containing at least an 'address' or 'slug' key.")
         raise housecanary.exceptions.InvalidInputException((msg))
 
-    def census(self, address_data):
+    def block_histogram_baths(self, data):
+        """Call the block_histogram_baths endpoint"""
+        return self.fetch_identifier_component("property/block_histogram_baths", data)
+
+    def block_histogram_beds(self, data):
+        """Call the block_histogram_beds endpoint"""
+        return self.fetch_identifier_component("property/block_histogram_beds", data)
+
+    def block_histogram_building_area(self, data):
+        """Call the block_histogram_building_area endpoint"""
+        return self.fetch_identifier_component("property/block_histogram_building_area", data)
+
+    def block_histogram_value(self, data):
+        """Call the block_histogram_value endpoint"""
+        return self.fetch_identifier_component("property/block_histogram_value", data)
+
+    def block_histogram_value_sqft(self, data):
+        """Call the block_histogram_value_sqft endpoint"""
+        return self.fetch_identifier_component("property/block_histogram_value_sqft", data)
+
+    def block_rental_value_distribution(self, data):
+        """Call the block_rental_value_distribution endpoint"""
+        return self.fetch_identifier_component("property/block_rental_value_distribution", data)
+
+    def block_value_distribution(self, data):
+        """Call the block_value_distribution endpoint"""
+        return self.fetch_identifier_component("property/block_value_distribution", data)
+
+    def block_value_ts(self, data):
+        """Call the block_value_ts endpoint"""
+        return self.fetch_identifier_component("property/block_value_ts", data)
+
+    def block_value_ts_historical(self, data):
+        """Call the block_value_ts_historical endpoint"""
+        return self.fetch_identifier_component("property/block_value_ts_historical", data)
+
+    def block_value_ts_forecast(self, data):
+        """Call the block_value_ts_forecast endpoint"""
+        return self.fetch_identifier_component("property/block_value_ts_forecast", data)
+
+    def census(self, data):
         """Call the census endpoint"""
-        return self.fetch_identifier_component("property/census", address_data)
+        return self.fetch_identifier_component("property/census", data)
 
-    def details(self, address_data):
+    def details(self, data):
         """Call the details endpoint"""
-        return self.fetch_identifier_component("property/details", address_data)
+        return self.fetch_identifier_component("property/details", data)
 
-    def flood(self, address_data):
+    def flood(self, data):
         """Call the flood endpoint"""
-        return self.fetch_identifier_component("property/flood", address_data)
+        return self.fetch_identifier_component("property/flood", data)
 
-    def ltv(self, address_data):
+    def ltv(self, data):
         """Call the ltv endpoint"""
-        return self.fetch_identifier_component("property/ltv", address_data)
+        return self.fetch_identifier_component("property/ltv", data)
 
-    def ltv_details(self, address_data):
+    def ltv_details(self, data):
         """Call the ltv_details endpoint"""
-        return self.fetch_identifier_component("property/ltv_details", address_data)
+        return self.fetch_identifier_component("property/ltv_details", data)
 
-    def mortgage_lien(self, address_data):
+    def mortgage_lien(self, data):
         """Call the mortgage_lien endpoint"""
-        return self.fetch_identifier_component("property/mortgage_lien", address_data)
+        return self.fetch_identifier_component("property/mortgage_lien", data)
 
-    def msa_details(self, address_data):
+    def msa_details(self, data):
         """Call the msa_details endpoint"""
-        return self.fetch_identifier_component("property/msa_details", address_data)
+        return self.fetch_identifier_component("property/msa_details", data)
 
-    def nod(self, address_data):
+    def msa_hpi_ts(self, data):
+        """Call the msa_hpi_ts endpoint"""
+        return self.fetch_identifier_component("property/msa_hpi_ts", data)
+
+    def msa_hpi_ts_forecast(self, data):
+        """Call the msa_hpi_ts_forecast endpoint"""
+        return self.fetch_identifier_component("property/msa_hpi_ts_forecast", data)
+
+    def msa_hpi_ts_historical(self, data):
+        """Call the msa_hpi_ts_historical endpoint"""
+        return self.fetch_identifier_component("property/msa_hpi_ts_historical", data)
+
+    def nod(self, data):
         """Call the nod endpoint"""
-        return self.fetch_identifier_component("property/nod", address_data)
+        return self.fetch_identifier_component("property/nod", data)
 
-    def owner_occupied(self, address_data):
+    def owner_occupied(self, data):
         """Call the owner_occupied endpoint"""
-        return self.fetch_identifier_component("property/owner_occupied", address_data)
+        return self.fetch_identifier_component("property/owner_occupied", data)
 
-    def rental_value(self, address_data):
+    def rental_value(self, data):
         """Call the rental_value endpoint"""
-        return self.fetch_identifier_component("property/rental_value", address_data)
+        return self.fetch_identifier_component("property/rental_value", data)
 
-    def rental_value_within_block(self, address_data):
+    def rental_value_within_block(self, data):
         """Call the rental_value_within_block endpoint"""
-        return self.fetch_identifier_component("property/rental_value_within_block", address_data)
+        return self.fetch_identifier_component("property/rental_value_within_block", data)
 
-    def sales_history(self, address_data):
+    def sales_history(self, data):
         """Call the sales_history endpoint"""
-        return self.fetch_identifier_component("property/sales_history", address_data)
+        return self.fetch_identifier_component("property/sales_history", data)
 
-    def school(self, address_data):
+    def school(self, data):
         """Call the school endpoint"""
-        return self.fetch_identifier_component("property/school", address_data)
+        return self.fetch_identifier_component("property/school", data)
 
-    def value(self, address_data):
+    def value(self, data):
         """Call the value endpoint"""
-        return self.fetch_identifier_component("property/value", address_data)
+        return self.fetch_identifier_component("property/value", data)
 
-    def value_forecast(self, address_data):
+    def value_forecast(self, data):
         """Call the value_forecast endpoint"""
-        return self.fetch_identifier_component("property/value_forecast", address_data)
+        return self.fetch_identifier_component("property/value_forecast", data)
 
-    def value_within_block(self, address_data):
+    def value_within_block(self, data):
         """Call the value_within_block endpoint"""
-        return self.fetch_identifier_component("property/value_within_block", address_data)
+        return self.fetch_identifier_component("property/value_within_block", data)
 
-    def zip_details(self, address_data):
+    def zip_details(self, data):
         """Call the zip_details endpoint"""
-        return self.fetch_identifier_component("property/zip_details", address_data)
+        return self.fetch_identifier_component("property/zip_details", data)
 
-    def zip_hpi_forecast(self, address_data):
+    def zip_hpi_forecast(self, data):
         """Call the zip_hpi_forecast endpoint"""
-        return self.fetch_identifier_component("property/zip_hpi_forecast", address_data)
+        return self.fetch_identifier_component("property/zip_hpi_forecast", data)
 
-    def zip_hpi_historical(self, address_data):
+    def zip_hpi_historical(self, data):
         """Call the zip_hpi_historical endpoint"""
-        return self.fetch_identifier_component("property/zip_hpi_historical", address_data)
+        return self.fetch_identifier_component("property/zip_hpi_historical", data)
 
-    def zip_volatility(self, address_data):
+    def zip_hpi_ts(self, data):
+        """Call the zip_hpi_ts endpoint"""
+        return self.fetch_identifier_component("property/zip_hpi_ts", data)
+
+    def zip_hpi_ts_forecast(self, data):
+        """Call the zip_hpi_ts_forecast endpoint"""
+        return self.fetch_identifier_component("property/zip_hpi_ts_forecast", data)
+
+    def zip_hpi_ts_historical(self, data):
+        """Call the zip_hpi_ts_historical endpoint"""
+        return self.fetch_identifier_component("property/zip_hpi_ts_historical", data)
+
+    def zip_volatility(self, data):
         """Call the zip_volatility endpoint"""
-        return self.fetch_identifier_component("property/zip_volatility", address_data)
+        return self.fetch_identifier_component("property/zip_volatility", data)
 
-    def component_mget(self, address_data, components):
+    def component_mget(self, data, components):
         """Call the component_mget endpoint
 
         Args:
-            - address_data - As described in the class docstring.
+            - data - As described in the class docstring.
             - components - A list of strings for each component to include in the request.
                 Example: ["property/details", "property/flood", "property/value"]
         """
@@ -342,7 +406,7 @@ class PropertyComponentWrapper(ComponentWrapper):
         query_params = {"components": ",".join(components)}
 
         return self.fetch_identifier_component(
-            "property/component_mget", address_data, query_params)
+            "property/component_mget", data, query_params)
 
     def value_report(self, address, zipcode, report_type="full", format_type="json"):
         """Call the value_report component

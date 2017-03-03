@@ -150,6 +150,56 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             self.client.property.get_identifier_input(address_data)
 
+    def test_block_histogram_baths(self):
+        response = self.client.property.block_histogram_baths(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_histogram_baths"])
+
+    def test_block_histogram_beds(self):
+        response = self.client.property.block_histogram_beds(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_histogram_beds"])
+
+    def test_block_histogram_building_area(self):
+        response = self.client.property.block_histogram_building_area(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_histogram_building_area"])
+
+    def test_block_histogram_value(self):
+        response = self.client.property.block_histogram_value(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_histogram_value"])
+
+    def test_block_histogram_value_sqft(self):
+        response = self.client.property.block_histogram_value_sqft(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_histogram_value_sqft"])
+
+    def test_block_rental_value_distribution(self):
+        response = self.client.property.block_rental_value_distribution(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_rental_value_distribution"])
+
+    def test_block_value_distribution(self):
+        response = self.client.property.block_value_distribution(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_value_distribution"])
+
+    def test_block_value_ts(self):
+        response = self.client.property.block_value_ts(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_value_ts"])
+
+    def test_block_value_ts_historical(self):
+        response = self.client.property.block_value_ts_historical(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_value_ts_historical"])
+
+    def test_block_value_ts_forecast(self):
+        response = self.client.property.block_value_ts_forecast(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/block_value_ts_forecast"])
+
     def test_census(self):
         response = self.client.property.census(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
@@ -184,6 +234,21 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.msa_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/msa_details"])
+
+    def test_msa_hpi_ts(self):
+        response = self.client.property.msa_hpi_ts(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts"])
+
+    def test_msa_hpi_ts_forecast(self):
+        response = self.client.property.msa_hpi_ts_forecast(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts_forecast"])
+
+    def test_msa_hpi_ts_historical(self):
+        response = self.client.property.msa_hpi_ts_historical(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts_historical"])
 
     def test_nod(self):
         response = self.client.property.nod(self.test_data)
@@ -248,6 +313,21 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         response = self.client.property.zip_hpi_historical(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertIsNotNone(response.json()[0]["property/zip_hpi_historical"])
+
+    def test_zip_hpi_ts(self):
+        response = self.client.property.zip_hpi_ts(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts"])
+
+    def test_zip_hpi_ts_forecast(self):
+        response = self.client.property.zip_hpi_ts_forecast(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts_forecast"])
+
+    def test_zip_hpi_ts_historical(self):
+        response = self.client.property.zip_hpi_ts_historical(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts_historical"])
 
     def test_zip_volatility(self):
         response = self.client.property.zip_volatility(self.test_data)
