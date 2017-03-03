@@ -22,10 +22,12 @@ class PropertyTestCase(unittest.TestCase):
                 }
             },
             'address_info': {
-                'city': 'Peabody', 'county_fips': '25009', 'zipcode': '01960',
-                'address_full': '47 Perley Ave Peabody MA 01960', 'state': 'MA',
-                'zipcode_plus4': '3459', 'address': '47 Perley Ave',
-                'lat': 42.549, 'lng': -71.029, 'unit': None
+                'city': 'Palos Verdes Estates', 'county_fips': '06037', 'geo_precision': 'rooftop',
+                'block_id': '060376703241005', 'zipcode': '90274',
+                'address_full': '43 Valmonte Plz Palos Verdes Estates CA 90274',
+                'state': 'CA', 'zipcode_plus4': '1444', 'address': '43 Valmonte Plz',
+                'lat': 33.79814, 'lng': -118.36455,
+                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None
             },
             'meta': 'Test Meta'
         }
@@ -33,15 +35,18 @@ class PropertyTestCase(unittest.TestCase):
         self.prop = Property.create_from_json(self.test_json)
 
     def test_create_from_json(self):
-        self.assertEqual(self.prop.address, "47 Perley Ave")
-        self.assertEqual(self.prop.county_fips, "25009")
-        self.assertEqual(self.prop.zipcode, "01960")
-        self.assertEqual(self.prop.address_full, "47 Perley Ave Peabody MA 01960")
-        self.assertEqual(self.prop.state, "MA")
-        self.assertEqual(self.prop.zipcode_plus4, "3459")
-        self.assertEqual(self.prop.city, "Peabody")
-        self.assertEqual(self.prop.lat, 42.549)
-        self.assertEqual(self.prop.lng, -71.029)
+        self.assertEqual(self.prop.address, "43 Valmonte Plz")
+        self.assertEqual(self.prop.county_fips, "06037")
+        self.assertEqual(self.prop.geo_precision, "rooftop")
+        self.assertEqual(self.prop.block_id, "060376703241005")
+        self.assertEqual(self.prop.zipcode, "90274")
+        self.assertEqual(self.prop.address_full, "43 Valmonte Plz Palos Verdes Estates CA 90274")
+        self.assertEqual(self.prop.state, "CA")
+        self.assertEqual(self.prop.zipcode_plus4, "1444")
+        self.assertEqual(self.prop.city, "Palos Verdes Estates")
+        self.assertEqual(self.prop.lat, 33.79814)
+        self.assertEqual(self.prop.lng, -118.36455)
+        self.assertEqual(self.prop.slug, "43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274")
         self.assertEqual(self.prop.unit, None)
         self.assertEqual(self.prop.meta, 'Test Meta')
         self.assertEqual(len(self.prop.component_results), 1)
@@ -66,17 +71,19 @@ class PropertyTestCase(unittest.TestCase):
                 'result': 'dummy data'
             },
             'address_info': {
-                'city': 'Peabody', 'county_fips': '25009', 'zipcode': '01960',
-                'address_full': '47 Perley Ave Peabody MA 01960', 'state': 'MA',
-                'zipcode_plus4': '3459', 'address': '47 Perley Ave',
-                'lat': 42.549, 'lng': -71.029, 'unit': None
+                'city': 'Palos Verdes Estates', 'county_fips': '06037', 'geo_precision': 'rooftop',
+                'block_id': '060376703241005', 'zipcode': '90274',
+                'address_full': '43 Valmonte Plz Palos Verdes Estates CA 90274',
+                'state': 'CA', 'zipcode_plus4': '1444', 'address': '43 Valmonte Plz',
+                'lat': 33.79814, 'lng': -118.36455,
+                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None
             },
             'meta': 'Test Meta'
         }
 
         prop2 = Property.create_from_json(test_json2)
 
-        self.assertEqual(prop2.address, "47 Perley Ave")
+        self.assertEqual(prop2.address, "43 Valmonte Plz")
         self.assertEqual(len(prop2.component_results), 2)
         value_result = next(
             (cr for cr in prop2.component_results if cr.component_name == "property/value"),

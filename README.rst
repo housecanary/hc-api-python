@@ -282,17 +282,17 @@ Block Endpoints
 Analytics API Block Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    -  **histogram_baths**
-    -  **histogram_beds**
-    -  **histogram_building_area**
-    -  **histogram_value**
-    -  **histogram_value_sqft**
-    -  **rental_value_distribution**
-    -  **value_distribution**
-    -  **value_ts**
-    -  **value_ts_forecast**
-    -  **value_ts_historical**
-    -  **component_mget**
+-  **histogram_baths**
+-  **histogram_beds**
+-  **histogram_building_area**
+-  **histogram_value**
+-  **histogram_value_sqft**
+-  **rental_value_distribution**
+-  **value_distribution**
+-  **value_ts**
+-  **value_ts_forecast**
+-  **value_ts_historical**
+-  **component_mget**
 
 Args:
 ^^^^^
@@ -367,14 +367,14 @@ Zip Endpoints
 Analytics API Zip Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    -  **details**
-    -  **hpi_forecast**
-    -  **hpi_historical**
-    -  **hpi_ts**
-    -  **hpi_ts_forecast**
-    -  **hpi_ts_historical**
-    -  **volatility**
-    -  **component_mget**
+-  **details**
+-  **hpi_forecast**
+-  **hpi_historical**
+-  **hpi_ts**
+-  **hpi_ts_forecast**
+-  **hpi_ts_historical**
+-  **volatility**
+-  **component_mget**
 
 Args:
 ^^^^^
@@ -432,11 +432,11 @@ MSA Endpoints
 Analytics API MSA Endpoints:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    -  **details**
-    -  **hpi_ts**
-    -  **hpi_ts_forecast**
-    -  **hpi_ts_historical**
-    -  **component_mget**
+-  **details**
+-  **hpi_ts**
+-  **hpi_ts_forecast**
+-  **hpi_ts_historical**
+-  **component_mget**
 
 Args:
 ^^^^^
