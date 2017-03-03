@@ -7,6 +7,23 @@ Currently, only the Property subclass is implemented.
 import housecanary.constants as constants
 
 
+def _create_component_results(json_data, result_key):
+    """ Returns a list of ComponentResult from the json_data"""
+    component_results = []
+    for key, value in json_data.iteritems():
+        if key not in [result_key, "meta"]:
+            component_result = ComponentResult(
+                key,
+                value["result"],
+                value["api_code"],
+                value["api_code_description"]
+            )
+
+            component_results.append(component_result)
+
+    return component_results
+
+
 class HouseCanaryObject(object):
     """Base class for returned API objects."""
 
@@ -103,18 +120,7 @@ class Property(HouseCanaryObject):
         if "meta" in json_data:
             prop.meta = json_data["meta"]
 
-        # create a ComponentResult from each returned component's data
-        # and append to this property's component_results list.
-        for key, value in json_data.iteritems():
-            if key not in ["address_info", "meta"]:
-                component_result = ComponentResult(
-                    key,
-                    value["result"],
-                    value["api_code"],
-                    value["api_code_description"]
-                )
-
-                prop.component_results.append(component_result)
+        prop.component_results = _create_component_results(json_data, "address_info")
 
         return prop
 
@@ -159,18 +165,7 @@ class Block(HouseCanaryObject):
         block.property_type = block_info["property_type"] if "property_type" in block_info else None
         block.meta = json_data["meta"] if "meta" in json_data else None
 
-        # create a ComponentResult from each returned component's data
-        # and append to this block's component_results list.
-        for key, value in json_data.iteritems():
-            if key not in ["block_info", "meta"]:
-                component_result = ComponentResult(
-                    key,
-                    value["result"],
-                    value["api_code"],
-                    value["api_code_description"]
-                )
-
-                block.component_results.append(component_result)
+        block.component_results = _create_component_results(json_data, "block_info")
 
         return block
 
@@ -210,18 +205,7 @@ class ZipCode(HouseCanaryObject):
         zipcode.zipcode = json_data["zipcode_info"]["zipcode"]
         zipcode.meta = json_data["meta"] if "meta" in json_data else None
 
-        # create a ComponentResult from each returned component's data
-        # and append to this zipcode's component_results list.
-        for key, value in json_data.iteritems():
-            if key not in ["zipcode_info", "meta"]:
-                component_result = ComponentResult(
-                    key,
-                    value["result"],
-                    value["api_code"],
-                    value["api_code_description"]
-                )
-
-                zipcode.component_results.append(component_result)
+        zipcode.component_results = _create_component_results(json_data, "zipcode_info")
 
         return zipcode
 
@@ -261,18 +245,7 @@ class Msa(HouseCanaryObject):
         msa.msa = json_data["msa_info"]["msa"]
         msa.meta = json_data["meta"] if "meta" in json_data else None
 
-        # create a ComponentResult from each returned component's data
-        # and append to this msa's component_results list.
-        for key, value in json_data.iteritems():
-            if key not in ["msa_info", "meta"]:
-                component_result = ComponentResult(
-                    key,
-                    value["result"],
-                    value["api_code"],
-                    value["api_code_description"]
-                )
-
-                msa.component_results.append(component_result)
+        msa.component_results = _create_component_results(json_data, "msa_info")
 
         return msa
 
