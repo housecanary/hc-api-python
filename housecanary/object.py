@@ -82,12 +82,15 @@ class Property(HouseCanaryObject):
 
         self.address = str(address)
         self.zipcode = str(zipcode)
+        self.block_id = None
         self.zipcode_plus4 = None
         self.address_full = None
         self.city = None
         self.county_fips = None
+        self.geo_precision = None
         self.lat = None
         self.lng = None
+        self.slug = None
         self.state = None
         self.unit = None
         self.meta = None
