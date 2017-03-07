@@ -6,19 +6,20 @@ with a CSV file containing properties, blocks, zip codes and MSAs.
 
 The input CSV file must contain a header row with columns indicating the identifiers.
 Allowed identifiers are:
-- address
-- zipcode
-- unit
-- city
-- state
-- slug
-- block_id
-- msa
-- client_value
-- client_value_sqft
-- num_bins
-- property_type
-- meta
+
+-  **address**
+-  **zipcode**
+-  **unit**
+-  **city**
+-  **state**
+-  **slug**
+-  **block_id**
+-  **msa**
+-  **client_value**
+-  **client_value_sqft**
+-  **num_bins**
+-  **property_type**
+-  **meta**
 
 Other columns can be included but will be ignored.
 See an example input `here <../../sample_input/sample-input.csv>`_.
