@@ -22,7 +22,7 @@ Allowed identifiers are:
 -  **meta**
 
 Other columns can be included but will be ignored.
-See an example input `here <../../sample_input/sample-input.csv>`_.
+See some example inputs `here <../../sample_input/>`_.
 
 It generates an export of the Analytics API data in Excel or CSV format.
 
