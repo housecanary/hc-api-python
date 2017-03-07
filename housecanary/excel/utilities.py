@@ -53,7 +53,9 @@ def convert_title_to_snake_case(key):
 
 
 def get_addresses_from_input_file(input_file_name):
-    """Read addresses from input file into list of tuples."""
+    """Read addresses from input file into list of tuples.
+       This only supports address and zipcode headers
+    """
     with open(input_file_name, 'rb') as input_file:
         reader = csv.reader(input_file, delimiter=',', quotechar='"')
 
@@ -74,8 +76,17 @@ a column labeled 'address' and a column labeled 'zipcode'.""")
         return list((row[address_index], row[zipcode_index]) for row in addresses)
 
 
-def print_no_addresses():
-    print 'No addresses were found in the input file'
+def get_identifiers_from_input_file(input_file_name):
+    """Read identifiers from input file into list of dicts with the header row values
+       as keys, and the rest of the rows as values.
+    """
+    valid_identifiers = ['address', 'zipcode', 'unit', 'city', 'state', 'slug', 'block_id', 'msa',
+                         'num_bins', 'property_type', 'client_value', 'client_value_sqft', 'meta']
+    with open(input_file_name, 'rb') as input_file:
+        result = [{identifier: val for identifier, val in row.items()
+                  if identifier in valid_identifiers}
+                  for row in csv.DictReader(input_file, skipinitialspace=True)]
+        return result
 
 
 def print_rate_limit_error(rate_limit):
@@ -85,3 +96,72 @@ def print_rate_limit_error(rate_limit):
     print "Requests remaining: ", rate_limit["requests_remaining"]
     print "Rate limit resets at: ", rate_limit["reset"]
     print "Time until rate limit resets: ", rate_limit["time_to_reset"]
+
+
+def get_all_endpoints(level):
+    if level == 'property':
+        return ['property/block_histogram_baths',
+                'property/block_histogram_beds',
+                'property/block_histogram_building_area',
+                'property/block_histogram_value',
+                'property/block_histogram_value_sqft',
+                'property/block_rental_value_distribution',
+                'property/block_value_distribution',
+                'property/block_value_ts',
+                'property/block_value_ts_historical',
+                'property/block_value_ts_forecast',
+                'property/census',
+                'property/details',
+                'property/flood',
+                'property/ltv',
+                'property/ltv_details',
+                'property/mortgage_lien',
+                'property/msa_details',
+                'property/msa_hpi_ts',
+                'property/msa_hpi_ts_forecast',
+                'property/msa_hpi_ts_historical',
+                'property/nod',
+                'property/owner_occupied',
+                'property/rental_value',
+                'property/rental_value_within_block',
+                'property/sales_history',
+                'property/school',
+                'property/value',
+                'property/value_forecast',
+                'property/value_within_block',
+                'property/zip_details',
+                'property/zip_hpi_forecast',
+                'property/zip_hpi_historical',
+                'property/zip_hpi_ts',
+                'property/zip_hpi_ts_forecast',
+                'property/zip_hpi_ts_historical',
+                'property/zip_volatility']
+
+    if level == 'block':
+        return ['block/histogram_baths',
+                'block/histogram_beds',
+                'block/histogram_building_area',
+                'block/histogram_value',
+                'block/histogram_value_sqft',
+                'block/rental_value_distribution',
+                'block/value_distribution',
+                'block/value_ts',
+                'block/value_ts_forecast',
+                'block/value_ts_historical']
+
+    if level == 'zip':
+        return ['zip/details',
+                'zip/hpi_forecast',
+                'zip/hpi_historical',
+                'zip/hpi_ts',
+                'zip/hpi_ts_forecast',
+                'zip/hpi_ts_historical',
+                'zip/volatility']
+
+    if level == 'msa':
+        return ['msa/details',
+                'msa/hpi_ts',
+                'msa/hpi_ts_forecast',
+                'msa/hpi_ts_historical']
+
+    raise Exception('Invalid endpoint level specified: {}'.format(level))

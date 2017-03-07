@@ -62,7 +62,7 @@ def hc_api_excel_concat(docopt_args):
         sys.exit(2)
 
     if len(addresses) == 0:
-        housecanary.utilities.print_no_addresses()
+        print 'No addresses were found in the input file'
         sys.exit(2)
 
     if endpoint != 'value_report' and endpoint != 'rental_report':
