@@ -1,8 +1,13 @@
 import codecs
 import os
+from platform import python_version
 import re
 
 from setuptools import setup
+
+
+if not python_version().startswith('2'):
+    raise Exception('housecanary only supports Python 2')
 
 
 def read(*parts):
@@ -36,4 +41,8 @@ setup(name='housecanary',
               'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
               'hc_api_export=housecanary.hc_api_export.hc_api_export:main'
           ]
-      })
+      },
+      classifiers=[
+          'Programming Language :: Python :: 2.7',
+      ],
+      )
