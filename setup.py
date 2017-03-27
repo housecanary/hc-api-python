@@ -2,7 +2,7 @@ import codecs
 import os
 import re
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def read(*parts):
@@ -26,7 +26,7 @@ setup(name='housecanary',
       author='HouseCanary',
       author_email='techops@housecanary.com',
       license='MIT',
-      packages=['housecanary', 'housecanary.excel'],
+      packages=find_packages(include=['housecanary', 'housecanary.*']),
       install_requires=['requests', 'docopt', 'openpyxl', 'python-slugify'],
       zip_safe=False,
       test_suite='nose.collector',
