@@ -90,11 +90,11 @@ def hc_api_export(docopt_args):
     try:
         identifiers = housecanary.utilities.get_identifiers_from_input_file(input_file_name)
     except Exception as ex:
-        print str(ex)
+        print(str(ex))
         sys.exit(2)
 
     if len(identifiers) == 0:
-        print 'No identifiers were found in the input file'
+        print('No identifiers were found in the input file')
         sys.exit(2)
 
     if ',' in endpoints:
@@ -142,7 +142,7 @@ def __get_results_from_api_with_retry(identifiers, endpoints, api_key, api_secre
             rate_limit = e.rate_limits[0]
             housecanary.utilities.print_rate_limit_error(rate_limit)
             if rate_limit["reset_in_seconds"] < 300:
-                print "Will retry once rate limit resets..."
+                print("Will retry once rate limit resets...")
                 time.sleep(rate_limit["reset_in_seconds"])
             else:
                 # Rate limit will take more than 5 minutes to reset, so just exit

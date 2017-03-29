@@ -400,7 +400,7 @@ class PropertyComponentWrapper(ComponentWrapper):
                 Example: ["property/details", "property/flood", "property/value"]
         """
         if not isinstance(components, list):
-            print "Components param must be a list"
+            print("Components param must be a list")
             return
 
         query_params = {"components": ",".join(components)}
@@ -556,7 +556,7 @@ class BlockComponentWrapper(ComponentWrapper):
                 Example: ["block/value_ts", "block/value_distribution"]
         """
         if not isinstance(components, list):
-            print "Components param must be a list"
+            print("Components param must be a list")
             return
 
         query_params = {"components": ",".join(components)}
@@ -649,7 +649,7 @@ class ZipComponentWrapper(ComponentWrapper):
                 Example: ["zip/details", "zip/volatility"]
         """
         if not isinstance(components, list):
-            print "Components param must be a list"
+            print("Components param must be a list")
             return
 
         query_params = {"components": ",".join(components)}
@@ -730,7 +730,7 @@ class MsaComponentWrapper(ComponentWrapper):
                 Example: ["msa/details", "msa/hpi_ts"]
         """
         if not isinstance(components, list):
-            print "Components param must be a list"
+            print("Components param must be a list")
             return
 
         query_params = {"components": ",".join(components)}

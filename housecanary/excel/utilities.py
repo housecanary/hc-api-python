@@ -66,12 +66,12 @@ def get_identifiers_from_input_file(input_file_name):
 
 
 def print_rate_limit_error(rate_limit):
-    print "You have hit the API rate limit"
-    print "Rate limit period: ", rate_limit["period"]
-    print "Request limit: ", rate_limit["request_limit"]
-    print "Requests remaining: ", rate_limit["requests_remaining"]
-    print "Rate limit resets at: ", rate_limit["reset"]
-    print "Time until rate limit resets: ", rate_limit["time_to_reset"]
+    print("You have hit the API rate limit")
+    print("Rate limit period: ", rate_limit["period"])
+    print("Request limit: ", rate_limit["request_limit"])
+    print("Requests remaining: ", rate_limit["requests_remaining"])
+    print("Rate limit resets at: ", rate_limit["reset"])
+    print("Time until rate limit resets: ", rate_limit["time_to_reset"])
 
 
 def get_all_endpoints(level):

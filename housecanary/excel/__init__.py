@@ -22,7 +22,7 @@ def export_analytics_data_to_excel(data, output_file_name, result_info_key, iden
     """
     workbook = create_excel_workbook(data, result_info_key, identifier_keys)
     workbook.save(output_file_name)
-    print 'Saved Excel file to {}'.format(output_file_name)
+    print('Saved Excel file to {}'.format(output_file_name))
 
 
 def export_analytics_data_to_csv(data, output_folder, result_info_key, identifier_keys):
@@ -51,7 +51,7 @@ def export_analytics_data_to_csv(data, output_folder, result_info_key, identifie
             for row in worksheet.rows:
                 csv_writer.writerow([cell.value for cell in row])
 
-    print 'Saved CSV files to {}'.format(output_folder)
+    print('Saved CSV files to {}'.format(output_folder))
 
 
 def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
@@ -81,13 +81,13 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
     # for each address, call the API and load the xlsx content in a workbook.
     for index, addr in enumerate(addresses):
-        print 'Processing {}'.format(addr[0])
+        print('Processing {}'.format(addr[0]))
         result = _get_excel_report(
             client, endpoint, addr[0], addr[1], report_type, retry)
 
         if not result['success']:
-            print 'Error retrieving report for {}'.format(addr[0])
-            print result['content']
+            print('Error retrieving report for {}'.format(addr[0]))
+            print(result['content'])
             errors.append({'address': addr[0], 'message': result['content']})
             continue
 
@@ -126,7 +126,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
     adjust_column_width_workbook(master_workbook)
     output_file_path = os.path.join(files_path, output_file_name)
     master_workbook.save(output_file_path)
-    print 'Saved output to {}'.format(output_file_path)
+    print('Saved output to {}'.format(output_file_path))
 
 
 def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
@@ -197,7 +197,7 @@ def _get_excel_report(client, endpoint, address, zipcode, report_type, retry):
                     # Rate limit will take more than 5 minutes to reset, so just fail
                     return {'success': False, 'content': str(e)}
 
-                print 'Will retry once rate limit resets...'
+                print('Will retry once rate limit resets...')
                 time.sleep(rate_limit['reset_in_seconds'])
             except exceptions.RequestException as e:
                 return {'success': False, 'content': str(e)}
@@ -225,7 +225,7 @@ def _save_individual_file(workbook, files_path, addr):
         '{}-{}.xlsx'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S'))))
 
     workbook.save(file_path)
-    print 'Saved output to {}'.format(file_path)
+    print('Saved output to {}'.format(file_path))
 
 
 def create_excel_workbook(data, result_info_key, identifier_keys):
