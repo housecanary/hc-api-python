@@ -3,30 +3,6 @@
 import json
 import csv
 
-ADDRESS_T = '{street_address} {city} {state} {zipcode}'
-
-
-def get_formatted_address(data_dict):
-    """Gets user friendly address string.
-
-    Args:
-        data_dict: Analytics API data as a dict
-    """
-    address = ''
-    if 'address_info' in data_dict:
-        address_info = data_dict['address_info']
-
-        if 'address_full' in address_info:
-            return address_info['address_full']
-
-        address = ADDRESS_T.format(
-            street_address=address_info.get('address', ''),
-            city=address_info.get('city', ''),
-            state=address_info.get('state', ''),
-            zipcode=address_info.get('zipcode', '')
-        )
-    return address
-
 
 def normalize_cell_value(value):
     """Process value for writing into a cell.
