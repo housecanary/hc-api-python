@@ -11,3 +11,4 @@
 /notebooks/.ipynb_checkpoints
 
 .coverage
+/cover/
