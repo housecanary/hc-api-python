@@ -1,5 +1,6 @@
 import io
 import os
+from platform import python_version
 import re
 
 from setuptools import setup
@@ -18,6 +19,13 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
+def test_requirements():
+    if python_version().startswith('2'):
+        return ['nose', 'mock']
+
+    return ['nose']
+
+
 setup(name='housecanary',
       version=find_version('housecanary', '__init__.py'),
       description='Client Wrapper for the HouseCanary API',
@@ -30,7 +38,7 @@ setup(name='housecanary',
       install_requires=['requests', 'docopt', 'openpyxl', 'python-slugify'],
       zip_safe=False,
       test_suite='nose.collector',
-      tests_require=['nose', 'mock'],
+      tests_require=test_requirements(),
       entry_points={
           'console_scripts': [
               'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
