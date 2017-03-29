@@ -56,11 +56,11 @@ Usage instructions
 
     hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output
 
-    hc_api_export sample-input-blocks.csv block/* -t excel block_output.xlsx
+    hc_api_export sample-input-blocks.csv block/* -t excel -o block_output.xlsx
 
-    hc_api_export sample-input-zipcodes.csv zip/* -t excel zip_output.xlsx
+    hc_api_export sample-input-zipcodes.csv zip/* -t excel -o zip_output.xlsx
 
-    hc_api_export sample-input-msas.csv msa/* -t excel msa_output.xlsx
+    hc_api_export sample-input-msas.csv msa/* -t excel -o msa_output.xlsx
 
 **Options:**
 
