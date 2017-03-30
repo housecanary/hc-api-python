@@ -88,7 +88,7 @@ def hc_api_export(docopt_args):
     retry = docopt_args['--retry'] or False
 
     try:
-        identifiers = housecanary.utilities.get_identifiers_from_input_file(input_file_name)
+        identifiers = housecanary.excel_utilities.get_identifiers_from_input_file(input_file_name)
     except Exception as ex:
         print(str(ex))
         sys.exit(2)
@@ -100,7 +100,7 @@ def hc_api_export(docopt_args):
     if ',' in endpoints:
         endpoints = endpoints.split(',')
     elif '*' in endpoints:
-        endpoints = housecanary.utilities.get_all_endpoints(endpoints.split('/')[0])
+        endpoints = housecanary.excel_utilities.get_all_endpoints(endpoints.split('/')[0])
     else:
         endpoints = [endpoints]
 
@@ -118,7 +118,7 @@ def hc_api_export(docopt_args):
         try:
             api_result = _get_results_from_api(identifiers, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
-            housecanary.utilities.print_rate_limit_error(e.rate_limits[0])
+            housecanary.excel_utilities.print_rate_limit_error(e.rate_limits[0])
             sys.exit(2)
 
     all_data = api_result.json()
@@ -140,7 +140,7 @@ def __get_results_from_api_with_retry(identifiers, endpoints, api_key, api_secre
             return _get_results_from_api(identifiers, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
             rate_limit = e.rate_limits[0]
-            housecanary.utilities.print_rate_limit_error(rate_limit)
+            housecanary.excel_utilities.print_rate_limit_error(rate_limit)
             if rate_limit["reset_in_seconds"] < 300:
                 print("Will retry once rate limit resets...")
                 time.sleep(rate_limit["reset_in_seconds"])

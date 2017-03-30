@@ -56,7 +56,7 @@ def hc_api_excel_concat(docopt_args):
     files_path = docopt_args['--files'] or 'output_files'
 
     try:
-        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+        addresses = housecanary.excel_utilities.get_addresses_from_input_file(input_file_name)
     except Exception as ex:
         print(str(ex))
         sys.exit(2)
