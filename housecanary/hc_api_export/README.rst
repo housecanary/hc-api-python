@@ -2,11 +2,27 @@ HouseCanary Analytics API Export
 =============================
 
 HouseCanary Analytics API Export is a command line tool that allows you to call API endpoints
-with a CSV file containing addresses and zip codes.
+with a CSV file containing properties, blocks, zip codes and MSAs.
 
-The input CSV file must contain a header row with columns for ``address`` and ``zipcode``.
+The input CSV file must contain a header row with columns indicating the identifiers.
+Allowed identifiers are:
+
+-  **address**
+-  **zipcode**
+-  **unit**
+-  **city**
+-  **state**
+-  **slug**
+-  **block_id**
+-  **msa**
+-  **client_value**
+-  **client_value_sqft**
+-  **num_bins**
+-  **property_type**
+-  **meta**
+
 Other columns can be included but will be ignored.
-See an example input `here <../../sample_input/sample-input.csv>`_.
+See some example inputs `here <../../sample_input/>`_.
 
 It generates an export of the Analytics API data in Excel or CSV format.
 
@@ -40,17 +56,25 @@ Usage instructions
 
     hc_api_export sample-input.csv property/value,property/school -t csv -p /home/my_output
 
+    hc_api_export sample-input-blocks.csv block/* -t excel -o block_output.xlsx
+
+    hc_api_export sample-input-zipcodes.csv zip/* -t excel -o zip_output.xlsx
+
+    hc_api_export sample-input-msas.csv msa/* -t excel -o msa_output.xlsx
+
 **Options:**
 
 - input
 
-    Required. An input CSV file containing addresses and zipcodes
+    Required. An input CSV file containing property, zipcode, block or MSA identifiers
 
 - endpoints
 
     Required. A comma separated list of endpoints to call like: ``property/value,property/school``
 
-    To call all endpoints, use ``property/\*``
+    To call all property endpoints, use ``property/\*``. The same applies for `block`, `zipcode` and `msa` endpoints.
+
+    Only one level of endpoints can be called at a time, meaning you can't mix `property` and `block` endpoints.
 
 - -t TYPE --type=TYPE
 

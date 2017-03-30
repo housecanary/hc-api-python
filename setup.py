@@ -1,12 +1,13 @@
-import codecs
+import io
 import os
+from platform import python_version
 import re
 
 from setuptools import find_packages, setup
 
 
 def read(*parts):
-    return codecs.open(os.path.join(*parts), 'r').read().decode('UTF-8')
+    return io.open(os.path.join(*parts), 'rb').read().decode('UTF-8')
 
 
 def find_version(*file_paths):
@@ -16,6 +17,13 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
+
+def test_requirements():
+    if python_version().startswith('2'):
+        return ['nose', 'mock']
+
+    return ['nose']
 
 
 setup(name='housecanary',
@@ -30,10 +38,14 @@ setup(name='housecanary',
       install_requires=['requests', 'docopt', 'openpyxl', 'python-slugify'],
       zip_safe=False,
       test_suite='nose.collector',
-      tests_require=['nose', 'mock'],
+      tests_require=test_requirements(),
       entry_points={
           'console_scripts': [
               'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
               'hc_api_export=housecanary.hc_api_export.hc_api_export:main'
           ]
-      })
+      },
+      classifiers=[
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3'
+      ])

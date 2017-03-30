@@ -2,7 +2,13 @@
 Provides Response to encapsulate API responses.
 """
 
+from builtins import next
+from builtins import str
+from builtins import object
 from housecanary.object import Property
+from housecanary.object import Block
+from housecanary.object import ZipCode
+from housecanary.object import Msa
 from . import utilities
 
 
@@ -35,8 +41,22 @@ class Response(object):
 
         if endpoint_name == "property/value_report":
             return ValueReportResponse(endpoint_name, json_body, original_response)
-        else:
-            return PropertyResponse(endpoint_name, json_body, original_response)
+
+        if endpoint_name == "property/rental_report":
+            return RentalReportResponse(endpoint_name, json_body, original_response)
+
+        prefix = endpoint_name.split("/")[0]
+
+        if prefix == "block":
+            return BlockResponse(endpoint_name, json_body, original_response)
+
+        if prefix == "zip":
+            return ZipCodeResponse(endpoint_name, json_body, original_response)
+
+        if prefix == "msa":
+            return MsaResponse(endpoint_name, json_body, original_response)
+
+        return PropertyResponse(endpoint_name, json_body, original_response)
 
     @property
     def endpoint_name(self):
@@ -98,6 +118,23 @@ class Response(object):
         """Override in subclasses"""
         raise NotImplementedError()
 
+    def _get_objects(self, obj_type):
+        if not self._objects:
+            body = self.json()
+
+            self._objects = []
+
+            if not isinstance(body, list):
+                # The endpoints return a list in the body.
+                # This could maybe raise an exception.
+                return []
+
+            for item in body:
+                prop = obj_type.create_from_json(item)
+                self._objects.append(prop)
+
+        return self._objects
+
     @property
     def rate_limits(self):
         """Returns a list of rate limit details."""
@@ -108,7 +145,8 @@ class Response(object):
 
 
 class PropertyResponse(Response):
-    """Represents a single property and its data returned from the API."""
+    """Represents the data returned from an Analytics API property endpoint."""
+
     def objects(self):
         """Gets a list of Property objects for the requested properties,
         each containing the property's returned json data from the API.
@@ -118,35 +156,62 @@ class PropertyResponse(Response):
         Returns:
             List of Property objects
         """
-        if not self._objects:
-            body = self.json()
-
-            self._objects = []
-
-            if not isinstance(body, list):
-                # The property endpoints return a list in the body.
-                # This could maybe raise an exception.
-                return []
-
-            for address in body:
-                prop = Property.create_from_json(address)
-                self._objects.append(prop)
-
-        return self._objects
+        return self._get_objects(Property)
 
     def properties(self):
         """Alias method for objects."""
         return self.objects()
 
 
-class ZipcodeResponse(Response):
-    """To be implemented later."""
-    pass
+class BlockResponse(Response):
+    """Represents the data returned from an Analytics API block endpoint."""
+
+    def objects(self):
+        """Gets a list of Block objects for the requested blocks,
+        each containing the block's returned json data from the API.
+
+        Returns:
+            List of Block objects
+        """
+        return self._get_objects(Block)
+
+    def blocks(self):
+        """Alias method for objects."""
+        return self.objects()
 
 
-class LatLngResponse(Response):
-    """To be implemented later."""
-    pass
+class ZipCodeResponse(Response):
+    """Represents the data returned from an Analytics API zip endpoint."""
+
+    def objects(self):
+        """Gets a list of ZipCode objects for the requested zipcodes,
+        each containing the zipcodes's returned json data from the API.
+
+        Returns:
+            List of ZipCode objects
+        """
+        return self._get_objects(ZipCode)
+
+    def zipcodes(self):
+        """Alias method for objects."""
+        return self.objects()
+
+
+class MsaResponse(Response):
+    """Represents the data returned from an Analytics API msa endpoint."""
+
+    def objects(self):
+        """Gets a list of Msa objects for the requested msas,
+        each containing the msa's returned json data from the API.
+
+        Returns:
+            List of Msa objects
+        """
+        return self._get_objects(Msa)
+
+    def msas(self):
+        """Alias method for objects."""
+        return self.objects()
 
 
 class ValueReportResponse(Response):
@@ -154,5 +219,14 @@ class ValueReportResponse(Response):
 
     def objects(self):
         """The value_report endpoint returns a json dict
+           instead of a list of address results."""
+        return []
+
+
+class RentalReportResponse(Response):
+    """The response from a rental_report request."""
+
+    def objects(self):
+        """The rental_report endpoint returns a json dict
            instead of a list of address results."""
         return []

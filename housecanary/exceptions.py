@@ -1,5 +1,6 @@
 from . import utilities
 
+
 class RequestException(Exception):
     """Exception representing an error due to an incorrect request structure
     or missing required fields."""

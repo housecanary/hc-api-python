@@ -40,7 +40,9 @@ Options:
 """
 
 
+from __future__ import print_function
 import sys
+from builtins import str
 from docopt import docopt
 import housecanary
 
@@ -56,18 +58,18 @@ def hc_api_excel_concat(docopt_args):
     files_path = docopt_args['--files'] or 'output_files'
 
     try:
-        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+        addresses = housecanary.excel_utilities.get_addresses_from_input_file(input_file_name)
     except Exception as ex:
-        print str(ex)
+        print(str(ex))
         sys.exit(2)
 
     if len(addresses) == 0:
-        housecanary.utilities.print_no_addresses()
+        print('No addresses were found in the input file')
         sys.exit(2)
 
     if endpoint != 'value_report' and endpoint != 'rental_report':
-        print """Invalid endpoint '{}'. Must be one of 'value_report' or 'rental_report'.
-You can omit the endpoint param to default to 'value_report'""".format(endpoint)
+        print("""Invalid endpoint '{}'. Must be one of 'value_report' or 'rental_report'.
+You can omit the endpoint param to default to 'value_report'""".format(endpoint))
         sys.exit(2)
 
     housecanary.concat_excel_reports(

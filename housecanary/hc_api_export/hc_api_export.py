@@ -1,11 +1,27 @@
-"""hc_api_export - Takes a CSV file containing rows of addresses and zipcodes, calls
-                the specified HouseCanary API endpoints to retrieve data
-                for the addresses and outputs the data to Excel or CSV.
+"""hc_api_export - Takes a CSV file containing rows of property, zipcode, block or MSA identifiers,
+                   calls the specified HouseCanary API endpoints to retrieve data
+                   for the identifiers and outputs the data to Excel or CSV.
 
-                If exporting to Excel, this creates a single Excel file
-                with a worksheet per endpoint.
+                   The input CSV file must contain a header row with columns indicating the identifiers.
+                   Allowed identifiers are:
+                   - address
+                   - zipcode
+                   - unit
+                   - city
+                   - state
+                   - slug
+                   - block_id
+                   - msa
+                   - client_value
+                   - client_value_sqft
+                   - num_bins
+                   - property_type
+                   - meta
 
-                If exporting to CSV, this creates a single CSV file per endpoint.
+                   If exporting to Excel, this creates a single Excel file
+                   with a worksheet per endpoint.
+
+                   If exporting to CSV, this creates a single CSV file per endpoint.
 
 Usage: hc_api_export (<input> <endpoints>) [-t TYPE] [-o FILE] [-p PATH] [-k KEY] [-s SECRET] [-h?] [-r]
 
@@ -14,12 +30,21 @@ Examples:
 
     hc_api_export sample_input/sample-input.csv property/value,property/school -t csv -p /home/my_output
 
+    hc_api_export sample_input/sample-input-blocks.csv block/* -t excel -o block_output.xlsx
+
+    hc_api_export sample_input/sample-input-zipcodes.csv zip/* -t excel -o zip_output.xlsx
+
+    hc_api_export sample_input/sample-input-msas.csv msa/* -t excel -o msa_output.xlsx
+
 Options:
     input                     Required. An input CSV file containing addresses and zipcodes
 
     endpoints                 Required. A comma separated list of endpoints to call like:
-                              'property/value,property/school'
-                              To call all endpoints, use 'property/*'
+                                'property/value,property/school'
+                              To call all endpoints,
+                                use 'property/*', 'block/*', 'zipcode/*' or 'msa/*'.
+                              Only one level of endpoints can be called at a time,
+                                meaning you can't mix 'property' and 'block' endpoints.
 
     -t TYPE --type=TYPE       Optional. An output type of 'excel' or 'csv'. Default is 'excel'
 
@@ -46,8 +71,10 @@ Options:
 """
 
 
+from __future__ import print_function
 import sys
 import time
+from builtins import str
 from docopt import docopt
 import housecanary
 
@@ -63,65 +90,68 @@ def hc_api_export(docopt_args):
     retry = docopt_args['--retry'] or False
 
     try:
-        addresses = housecanary.utilities.get_addresses_from_input_file(input_file_name)
+        identifiers = housecanary.excel_utilities.get_identifiers_from_input_file(input_file_name)
     except Exception as ex:
-        print str(ex)
+        print(str(ex))
         sys.exit(2)
 
-    if len(addresses) == 0:
-        housecanary.utilities.print_no_addresses()
+    if len(identifiers) == 0:
+        print('No identifiers were found in the input file')
         sys.exit(2)
 
-    if endpoints == 'property/*':
-        endpoints = ['property/census', 'property/details', 'property/flood',
-                     'property/mortgage_lien', 'property/msa_details', 'property/nod',
-                     'property/owner_occupied', 'property/rental_value', 'property/sales_history',
-                     'property/school', 'property/value', 'property/value_forecast',
-                     'property/zip_details', 'property/zip_hpi_forecast',
-                     'property/zip_hpi_historical']
+    if ',' in endpoints:
+        endpoints = endpoints.split(',')
+    elif '*' in endpoints:
+        endpoints = housecanary.excel_utilities.get_all_endpoints(endpoints.split('/')[0])
     else:
-        endpoints = endpoints.split(",")
+        endpoints = [endpoints]
 
-    if 'property/value_report' in endpoints:
-        print(("property/value_report is not allowed for export to Excel. "
+    if 'property/value_report' in endpoints or 'property/rental_report' in endpoints:
+        print(("property/value_report and property/rental_report"
+               "are not allowed for export to Excel."
                "Please use the Value Report application to get Excel outputs of Value Reports."))
         return
 
     if retry:
         # If rate limit exceeded, enter retry process
-        api_result = __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret)
+        api_result = __get_results_from_api_with_retry(identifiers, endpoints, api_key, api_secret)
     else:
         # Just try once and exit if rate limit exceeded
         try:
-            api_result = _get_results_from_api(addresses, endpoints, api_key, api_secret)
+            api_result = _get_results_from_api(identifiers, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
-            housecanary.utilities.print_rate_limit_error(e.rate_limits[0])
+            housecanary.excel_utilities.print_rate_limit_error(e.rate_limits[0])
             sys.exit(2)
 
     all_data = api_result.json()
 
+    result_info_key = _get_result_info_key(endpoints[0].split('/')[0])
+    identifier_keys = list(identifiers[0].keys())
+
     if output_type.lower() == 'csv':
-        housecanary.export_analytics_data_to_csv(all_data, output_csv_path)
+        housecanary.export_analytics_data_to_csv(
+            all_data, output_csv_path, result_info_key, identifier_keys)
     else:
-        housecanary.export_analytics_data_to_excel(all_data, output_file_name)
+        housecanary.export_analytics_data_to_excel(
+            all_data, output_file_name, result_info_key, identifier_keys)
 
 
-def __get_results_from_api_with_retry(addresses, endpoints, api_key, api_secret):
+def __get_results_from_api_with_retry(identifiers, endpoints, api_key, api_secret):
     while True:
         try:
-            return _get_results_from_api(addresses, endpoints, api_key, api_secret)
+            return _get_results_from_api(identifiers, endpoints, api_key, api_secret)
         except housecanary.exceptions.RateLimitException as e:
             rate_limit = e.rate_limits[0]
-            housecanary.utilities.print_rate_limit_error(rate_limit)
+            housecanary.excel_utilities.print_rate_limit_error(rate_limit)
             if rate_limit["reset_in_seconds"] < 300:
-                print "Will retry once rate limit resets..."
+                print("Will retry once rate limit resets...")
                 time.sleep(rate_limit["reset_in_seconds"])
             else:
                 # Rate limit will take more than 5 minutes to reset, so just exit
                 sys.exit(2)
 
 
-def _get_results_from_api(addresses, endpoints, api_key, api_secret):
+def _get_results_from_api(identifiers, endpoints, api_key, api_secret):
     """Use the HouseCanary API Python Client to access the API"""
 
     if api_key is not None and api_secret is not None:
@@ -129,11 +159,25 @@ def _get_results_from_api(addresses, endpoints, api_key, api_secret):
     else:
         client = housecanary.ApiClient()
 
+    wrapper = getattr(client, endpoints[0].split('/')[0])
+
     if len(endpoints) > 1:
         # use component_mget to request multiple endpoints in one call
-        return client.property.component_mget(addresses, endpoints)
+        return wrapper.component_mget(identifiers, endpoints)
     else:
-        return client.property.fetch_property_component(endpoints[0], addresses)
+        return wrapper.fetch_identifier_component(endpoints[0], identifiers)
+
+
+def _get_result_info_key(level):
+    if level == 'property':
+        return 'address_info'
+    if level == 'block':
+        return 'block_info'
+    if level == 'zip':
+        return 'zipcode_info'
+    if level == 'msa':
+        return 'msa_info'
+    raise Exception('Invalid endpoint level found: {}'.format(level))
 
 
 def main():

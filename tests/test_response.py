@@ -7,11 +7,15 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 import unittest
 from housecanary.apiclient import ApiClient
 from housecanary.object import Property
+from housecanary.object import Block
+from housecanary.object import ZipCode
+from housecanary.object import Msa
+
 
 class PropertyResponseTestCase(unittest.TestCase):
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"address":"43 Valmonte Plaza", "zipcode":"90274"}]
+        self.test_data = [{"address": "43 Valmonte Plaza", "zipcode": "90274"}]
 
     def test_endpoint_name(self):
         response = self.client.fetch("property/value", self.test_data)
@@ -59,6 +63,60 @@ class PropertyResponseTestCase(unittest.TestCase):
         response = self.client.fetch("property/value", self.test_data)
         self.assertTrue(isinstance(response.rate_limits, list))
         self.assertTrue(isinstance(response.rate_limits[0]['period'], str))
+
+
+class BlockResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"block_id": "060376703241005"}]
+
+    def test_blocks(self):
+        response = self.client.fetch("block/value_ts", self.test_data)
+        self.assertTrue(len(response.blocks()), 1)
+        self.assertTrue(isinstance(response.blocks()[0], Block))
+
+    def test_blocks_with_multiple(self):
+        self.test_data.append({"block_id": "160376703241005"})
+        response = self.client.fetch("block/value_ts", self.test_data)
+        self.assertTrue(len(response.blocks()), 2)
+        self.assertTrue(isinstance(response.blocks()[0], Block))
+        self.assertTrue(isinstance(response.blocks()[1], Block))
+
+
+class ZipCodeResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"zipcode": "90274"}]
+
+    def test_zipcodes(self):
+        response = self.client.fetch("zip/details", self.test_data)
+        self.assertTrue(len(response.zipcodes()), 1)
+        self.assertTrue(isinstance(response.zipcodes()[0], ZipCode))
+
+    def test_zipcodes_with_multiple(self):
+        self.test_data.append({"zipcode": "01960"})
+        response = self.client.fetch("zip/details", self.test_data)
+        self.assertTrue(len(response.zipcodes()), 2)
+        self.assertTrue(isinstance(response.zipcodes()[0], ZipCode))
+        self.assertTrue(isinstance(response.zipcodes()[1], ZipCode))
+
+
+class MsaResponseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"msa": "41860"}]
+
+    def test_msas(self):
+        response = self.client.fetch("msa/details", self.test_data)
+        self.assertTrue(len(response.msas()), 1)
+        self.assertTrue(isinstance(response.msas()[0], Msa))
+
+    def test_msas_with_multiple(self):
+        self.test_data.append({"msa": "41860"})
+        response = self.client.fetch("msa/details", self.test_data)
+        self.assertTrue(len(response.msas()), 2)
+        self.assertTrue(isinstance(response.msas()[0], Msa))
+        self.assertTrue(isinstance(response.msas()[1], Msa))
 
 
 if __name__ == "__main__":

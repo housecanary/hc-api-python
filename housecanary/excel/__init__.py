@@ -1,10 +1,13 @@
 """Module for creating Excel exports of HouseCanary API data"""
 
+from __future__ import print_function
 import os
 import csv
 import time
-from io import BytesIO
+import io
+import sys
 import openpyxl
+from builtins import str
 from slugify import slugify
 from . import analytics_data_excel
 from . import utilities
@@ -12,7 +15,7 @@ from .. import ApiClient
 from .. import exceptions
 
 
-def export_analytics_data_to_excel(data, output_file_name):
+def export_analytics_data_to_excel(data, output_file_name, result_info_key, identifier_keys):
     """Creates an Excel file containing data returned by the Analytics API
 
     Args:
@@ -20,12 +23,12 @@ def export_analytics_data_to_excel(data, output_file_name):
         output_file_name: File name for output Excel file (use .xlsx extension).
 
     """
-    workbook = create_excel_workbook(data)
+    workbook = create_excel_workbook(data, result_info_key, identifier_keys)
     workbook.save(output_file_name)
-    print 'Saved Excel file to {}'.format(output_file_name)
+    print('Saved Excel file to {}'.format(output_file_name))
 
 
-def export_analytics_data_to_csv(data, output_folder):
+def export_analytics_data_to_csv(data, output_folder, result_info_key, identifier_keys):
     """Creates CSV files containing data returned by the Analytics API.
        Creates one file per requested endpoint and saves it into the
        specified output_folder
@@ -34,7 +37,7 @@ def export_analytics_data_to_csv(data, output_folder):
         data: Analytics API data as a list of dicts
         output_folder: Path to a folder to save the CSV files into
     """
-    workbook = create_excel_workbook(data)
+    workbook = create_excel_workbook(data, result_info_key, identifier_keys)
 
     suffix = '.csv'
 
@@ -46,12 +49,15 @@ def export_analytics_data_to_csv(data, output_folder):
 
         file_path = os.path.join(output_folder, file_name + suffix)
 
-        with open(file_path, 'wb') as output_file:
+        mode = 'w'
+        if sys.version_info[0] < 3:
+            mode = 'wb'
+        with io.open(file_path, mode) as output_file:
             csv_writer = csv.writer(output_file)
             for row in worksheet.rows:
                 csv_writer.writerow([cell.value for cell in row])
 
-    print 'Saved CSV files to {}'.format(output_folder)
+    print('Saved CSV files to {}'.format(output_folder))
 
 
 def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
@@ -81,17 +87,17 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
     # for each address, call the API and load the xlsx content in a workbook.
     for index, addr in enumerate(addresses):
-        print 'Processing {}'.format(addr[0])
+        print('Processing {}'.format(addr[0]))
         result = _get_excel_report(
             client, endpoint, addr[0], addr[1], report_type, retry)
 
         if not result['success']:
-            print 'Error retrieving report for {}'.format(addr[0])
-            print result['content']
+            print('Error retrieving report for {}'.format(addr[0]))
+            print(result['content'])
             errors.append({'address': addr[0], 'message': result['content']})
             continue
 
-        orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
+        orig_wb = openpyxl.load_workbook(filename=io.BytesIO(result['content']))
 
         _save_individual_file(orig_wb, files_path, addr[0])
 
@@ -126,7 +132,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
     adjust_column_width_workbook(master_workbook)
     output_file_path = os.path.join(files_path, output_file_name)
     master_workbook.save(output_file_path)
-    print 'Saved output to {}'.format(output_file_path)
+    print('Saved output to {}'.format(output_file_path))
 
 
 def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
@@ -197,7 +203,7 @@ def _get_excel_report(client, endpoint, address, zipcode, report_type, retry):
                     # Rate limit will take more than 5 minutes to reset, so just fail
                     return {'success': False, 'content': str(e)}
 
-                print 'Will retry once rate limit resets...'
+                print('Will retry once rate limit resets...')
                 time.sleep(rate_limit['reset_in_seconds'])
             except exceptions.RequestException as e:
                 return {'success': False, 'content': str(e)}
@@ -225,12 +231,12 @@ def _save_individual_file(workbook, files_path, addr):
         '{}-{}.xlsx'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S'))))
 
     workbook.save(file_path)
-    print 'Saved output to {}'.format(file_path)
+    print('Saved output to {}'.format(file_path))
 
 
-def create_excel_workbook(data):
+def create_excel_workbook(data, result_info_key, identifier_keys):
     """Calls the analytics_data_excel module to create the Workbook"""
-    workbook = analytics_data_excel.get_excel_workbook(data)
+    workbook = analytics_data_excel.get_excel_workbook(data, result_info_key, identifier_keys)
     adjust_column_width_workbook(workbook)
     return workbook
 
@@ -257,5 +263,5 @@ def adjust_column_width(worksheet):
                 dims.get(cell.column, 0),
                 len(str(cell.value))
             )
-    for col, value in dims.items():
+    for col, value in list(dims.items()):
         worksheet.column_dimensions[col].width = value + padding

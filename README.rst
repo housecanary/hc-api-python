@@ -1,6 +1,9 @@
 HouseCanary API Python Client
 =============================
 
+.. image:: https://img.shields.io/pypi/pyversions/housecanary.svg
+    :target: https://pypi.python.org/pypi/housecanary
+
 The `HouseCanary <http://www.housecanary.com>`_ API Python Client provides an easy interface to call the HouseCanary API.
 
 
@@ -62,12 +65,35 @@ Usage Details
 Endpoint methods
 ~~~~~~~~~~~~~~~~
 
-The ApiClient class provides a ``property`` wrapper which contains
-various methods for calling the endpoints of the Value Report, Rental Report and Analytics APIs:
+The ApiClient class provides a few wrappers which contain
+various methods for calling the different API endpoints.
 
-Analytics API Endpoints:
-^^^^^^^^^^^^^^^^^^^^^^^^^
+The property wrapper is used for calling the Analytics API Property endpoints as well
+as the Value Report and Rental Report endpoints.
 
+The block wrapper is used for calling the Analytics API Block endpoints.
+
+The zip wrapper is used for calling the Analytics API Zip endpoints.
+
+The msa wrapper is used for calling the Analytics API MSA endpoints.
+
+
+Property Endpoints
+~~~~~~~~~~~~~~~~~~
+
+Analytics API Property Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-  **block_histogram_baths**
+-  **block_histogram_beds**
+-  **block_histogram_building_area**
+-  **block_histogram_value**
+-  **block_histogram_value_sqft**
+-  **block_rental_value_distribution**
+-  **block_value_distribution**
+-  **block_value_ts**
+-  **block_value_ts_historical**
+-  **block_value_ts_forecast**
 -  **census**
 -  **details**
 -  **flood**
@@ -75,16 +101,24 @@ Analytics API Endpoints:
 -  **ltv_details**
 -  **mortgage_lien**
 -  **msa_details**
+-  **msa_hpi_ts**
+-  **msa_hpi_ts_forecast**
+-  **msa_hpi_ts_historical**
 -  **nod**
 -  **owner_occupied**
 -  **rental_value**
+-  **rental_value_within_block**
 -  **sales_history**
 -  **school**
 -  **value**
--  **value_forecase**
+-  **value_forecast**
+-  **value_within_block**
 -  **zip_details**
 -  **zip_hpi_forecast**
 -  **zip_hpi_historical**
+-  **zip_hpi_ts**
+-  **zip_hpi_ts_forecast**
+-  **zip_hpi_ts_historical**
 -  **zip_volatility**
 -  **component_mget**
 
@@ -98,39 +132,78 @@ Rental Report API Endpoint:
 
 - **rental_report**
 
-More wrapper objects may be added to ApiClient later like "zipcode" and
-"lat\_lng".
 
-**Args:**
-     
+Args:
+^^^^^     
 
-All of the Analytics API endpoint methods take an
-``address_data`` argument. ``address_data`` can be in one of two forms:
+All of the Analytics API property endpoint methods take an
+``data`` argument. ``data`` can be in the following forms:
 
-A Json formatted list like:
+A dict like:
 
 .. code:: python
 
-    [{"address":"82 County Line Rd", "zipcode":"72173", "meta":"extra info"}]
+    {"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"}
 
-Or, a list of (address, zipcode, meta) tuples like:
-
-.. code:: python
-
-    [("82 County Line Rd", "72173", "extra info")]
-
-The "meta" field is optional. If you're only providing one address, you
-can provide a tuple on it's own:
+Or
 
 .. code:: python
 
-    ("82 County Line Rd", "72173")
+    {"address": "82 County Line Rd", "city": "San Francisco", "state": "CA", "meta": "someID"}
 
-All of the endpoint methods of this class return a Response object or
-the output of a custom OutputGenerator if one was specified in the
-constructor.
+Or
 
-**Example:**
+.. code:: python
+
+    {"slug": "123-Example-St-San-Francisco-CA-94105"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"address": "82 County Line Rd", "zipcode": "72173", "meta": "someID"},
+     {"address": "43 Valmonte Plaza", "zipcode": "90274", "meta": "someID2"}]
+
+A single string representing a slug:
+
+.. code:: python
+    
+    "123-Example-St-San-Francisco-CA-94105"
+
+A tuple in the form of (address, zipcode, meta) like:
+
+.. code:: python
+
+    ("82 County Line Rd", "72173", "someID")
+
+A list of (address, zipcode, meta) tuples like:
+
+.. code:: python
+
+    [("82 County Line Rd", "72173", "someID"),
+     ("43 Valmonte Plaza", "90274", "someID2")]
+
+Using a tuple only supports address, zipcode and meta. To specify city, state, unit or slug,
+please use a dict.
+
+The "meta" field is always optional.
+
+The available keys in the dict are:
+    - address (required if no slug)
+    - slug (required if no address)
+    - zipcode (optional)
+    - unit (optional)
+    - city (optional)
+    - state (optional)
+    - meta (optional)
+    - client_value (optional, for ``value_within_block`` and ``rental_value_within_block``)
+    - client_value_sqft (optional, for ``value_within_block`` and ``rental_value_within_block``)
+
+All of the property endpoint methods return a PropertyResponse object
+(or ValueReportResponse or RentalReportResponse) or
+the output of a custom OutputGenerator if one was specified in the constructor.
+
+**Examples:**
         
 
 .. code:: python
@@ -138,8 +211,31 @@ constructor.
     client = housecanary.ApiClient()
     result = client.property.value([("10216 N Willow Ave", "64157"), ("82 County Line Rd", "72173")])
 
-**Value Report:**
-             
+    result = client.property.value({"address": "10216 N Willow Ave", "city": "San Francisco", "state": "CA"})
+
+    result = client.property.value("123-Example-St-San-Francisco-CA-94105")
+
+
+Component_mget endpoint
+^^^^^^^^^^^^^^^^^^^^^^^
+
+You may want to retrieve data from multiple Analytics API endpoints in one request.
+In this case, you can use the ``component_mget`` method.
+The ``component_mget`` method takes an ``address_data`` argument just like the other endpoint methods.
+Pass in a list of Analytics API property endpoint names as the second argument.
+Note that ``value_report`` and ``rental_report`` cannot be included.
+
+**Example:**
+        
+
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.property.component_mget(("10216 N Willow Ave", "64157"), ["property/school", "property/census", "property/details"])
+
+
+Value Report:
+^^^^^^^^^^^^^
 
 The ``value_report`` method behaves differently than the other endpoint
 methods. It only supports one address at a time, and it takes some
@@ -168,7 +264,8 @@ Kwargs:
     result = client.property.value_report("10216 N Willow Ave", "64157", format_type="pdf")
     # result is binary data of the PDF.
 
-**Rental Report**
+Rental Report:
+^^^^^^^^^^^^^^
 
 The ``rental_report`` method is for calling the Rental Report API. It only supports one address at a time.
 
@@ -182,22 +279,223 @@ Kwargs:
 Learn more about the various endpoints in the `API docs. <https://api-docs.housecanary.com/#endpoints>`_
 
 
-Component_mget endpoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Block Endpoints
+~~~~~~~~~~~~~~~
 
-You may want to retrieve data from multiple Analytics API endpoints in one request. In this case, you can use the ``component_mget`` method. The ``component_mget`` method takes an ``address_data`` argument just like the other endpoint methods. Pass in a list of Analytics API endpoint names as the second argument. Note that ``value_report`` cannot be included.
+Analytics API Block Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Example:**
-        
+-  **histogram_baths**
+-  **histogram_beds**
+-  **histogram_building_area**
+-  **histogram_value**
+-  **histogram_value_sqft**
+-  **rental_value_distribution**
+-  **value_distribution**
+-  **value_ts**
+-  **value_ts_forecast**
+-  **value_ts_historical**
+-  **component_mget**
+
+Args:
+^^^^^
+
+All of the Analytics API block endpoints take a ``block_data`` argument.
+``block_data`` can be in the following forms:
+
+A dict with a ``block_id`` like:
 
 .. code:: python
 
-    client = housecanary.ApiClient()
-    result = client.property.component_mget(("10216 N Willow Ave", "64157"), ["property/school", "property/census", "property/details"])
+    {"block_id": "060750615003005", "meta": "someId"}
 
+For histogram endpoints you can include the ``num_bins`` key:
+
+.. code:: python
+
+    {"block_id": "060750615003005", "num_bins": 5, "meta": "someId"}
+
+For time series and distribution endpoints you can include the ``property_type`` key:
+
+.. code:: python
+
+    {"block_id": "060750615003005", "property_type": "SFD", "meta": "someId"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"block_id": "012345678901234", "meta": "someId"}, {"block_id": "012345678901234", "meta": "someId2}]
+
+A single string representing a ``block_id``:
+
+.. code:: python
+
+    "012345678901234"
+
+A list of ``block_id`` strings:
+
+.. code:: python
+
+    ["012345678901234", "060750615003005"]
+
+The "meta" field is always optional.
+
+See https://api-docs.housecanary.com/#analytics-api-block-level for more details
+on the available parameters such as ``num_bins`` and ``property_type``.
+
+All of the block endpoint methods return a BlockResponse,
+or the output of a custom OutputGenerator if one was specified in the constructor.
+
+
+**Examples:**
+        
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.block.histogram_baths("060750615003005")
+
+    result = client.block.histogram_baths({"block_id": "060750615003005", "num_bins": 5})
+
+    result = client.block.value_ts({"block_id": "060750615003005", "property_type": "SFD"})
+
+    result = client.block.value_ts([{"block_id": "060750615003005", "property_type": "SFD"}, {"block_id": "012345678901234", "property_type": "SFD"}])
+
+    result = client.block.value_distribution(["012345678901234", "060750615003005"])
+
+
+Zip Endpoints
+~~~~~~~~~~~~~~~
+
+Analytics API Zip Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-  **details**
+-  **hpi_forecast**
+-  **hpi_historical**
+-  **hpi_ts**
+-  **hpi_ts_forecast**
+-  **hpi_ts_historical**
+-  **volatility**
+-  **component_mget**
+
+Args:
+^^^^^
+
+All of the Analytics API zip endpoints take a ``zip_data`` argument.
+``zip_data`` can be in the following forms:
+
+A dict with a ``zipcode`` like:
+
+.. code:: python
+
+    {"zipcode": "90274", "meta": "someId"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"zipcode": "90274", "meta": "someId"}, {"zipcode": "01960", "meta": "someId2}]
+
+A single string representing a ``zipcode``:
+
+.. code:: python
+
+    "90274"
+
+A list of ``zipcode`` strings:
+
+.. code:: python
+
+    ["90274", "01960"]
+
+The "meta" field is always optional.
+
+All of the zip endpoint methods return a ZipCodeResponse,
+or the output of a custom OutputGenerator if one was specified in the constructor.
+
+
+**Examples:**
+        
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.zip.details("90274")
+
+    result = client.zip.details({"zipcode": "90274", "meta": "someId"})
+
+    result = client.zip.details([{"zipcode": "90274", "meta": "someId"}, {"zipcode": "01960", "meta": "someId2"}])
+
+    result = client.zip.details(["90274", "01960"])
+
+
+MSA Endpoints
+~~~~~~~~~~~~~~~
+
+Analytics API MSA Endpoints:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-  **details**
+-  **hpi_ts**
+-  **hpi_ts_forecast**
+-  **hpi_ts_historical**
+-  **component_mget**
+
+Args:
+^^^^^
+
+All of the Analytics API MSA endpoints take an ``msa_data`` argument.
+``msa_data`` can be in the following forms:
+
+A dict with an ``msa`` like:
+
+.. code:: python
+
+    {"msa": "41860", "meta": "someId"}
+
+A list of dicts as specified above:
+
+.. code:: python
+
+    [{"msa": "41860", "meta": "someId"}, {"msa": "40928", "meta": "someId2}]
+
+A single string representing a ``msa``:
+
+.. code:: python
+
+    "41860"
+
+A list of ``msa`` strings:
+
+.. code:: python
+
+    ["41860", "40928"]
+
+The "meta" field is always optional.
+
+All of the msa endpoint methods return an MsaResponse,
+or the output of a custom OutputGenerator if one was specified in the constructor.
+
+
+**Examples:**
+        
+.. code:: python
+
+    client = housecanary.ApiClient()
+    result = client.msa.details("41860")
+
+    result = client.msa.details({"msa": "90274", "meta": "someId"})
+
+    result = client.msa.details([{"msa": "41860", "meta": "someId"}, {"msa": "40928", "meta": "someId2"}])
+
+    result = client.msa.details(["41860", "40928"])
+
+
+Response Objects
+~~~~~~~~~~~~~~~~
 
 Response
-~~~~~~~~
+^^^^^^^^
 
 Response is a base class for encapsulating an HTTP response from the
 HouseCanary API.
@@ -221,10 +519,10 @@ HouseCanary API.
 -  **rate_limits** - Returns a list of rate limit information
 
 PropertyResponse
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 A subclass of Response, this is returned for all property endpoints
-except for ``value_report``.
+except for ``value_report`` and ``rental_report``.
 
 **Methods:**
         
@@ -234,8 +532,47 @@ except for ``value_report``.
    API.
 -  **properties()** - An alias for the objects() method.
 
+BlockResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all block endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of Block objects for the requested
+   blocks, each containing the object's returned json data from the
+   API.
+-  **blocks()** - An alias for the objects() method.
+
+ZipCodeResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all zip endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of ZipCode objects for the requested
+   zipcodes, each containing the object's returned json data from the
+   API.
+-  **zipcodes()** - An alias for the objects() method.
+
+MsaResponse
+^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is returned for all msa endpoints.
+
+**Methods:**
+        
+
+-  **objects()** - Gets a list of Msa objects for the requested
+   msas, each containing the object's returned json data from the
+   API.
+-  **msas()** - An alias for the objects() method.
+
 HouseCanaryObject
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 Base class for various types of objects returned from the HouseCanary
 API. Currently, only the Property subclass is implemented.
@@ -256,7 +593,7 @@ API. Currently, only the Property subclass is implemented.
    any components for this object, returns the error messages.
 
 Property
-~~~~~~~~
+^^^^^^^^
 
 A subclass of HouseCanaryObject, the Property represents a single
 address and it's returned data.
@@ -303,8 +640,124 @@ address and it's returned data.
     print p.get_errors()
     # []
 
+
+Block
+^^^^^
+
+A subclass of HouseCanaryObject, the Block represents a single
+block and it's returned data.
+
+**Properties:**
+           
+
+-  **block_id**
+-  **property_type**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.block.value_ts("060750615003005")
+    b = result.blocks()[0]
+    print b.block_id
+    # "060750615003005"
+    print b.meta
+    # "meta information"
+    value_result = b.component_results[0]
+    print value_result.component_name
+    # 'block/value_ts'
+    print value_result.api_code
+    # 0
+    print value_result.api_code_description
+    # 'ok'
+    print value_result.json_data
+    # [...data...]
+    print b.has_error()
+    # False
+    print b.get_errors()
+    # []
+
+
+ZipCode
+^^^^^^^
+
+A subclass of HouseCanaryObject, the ZipCode represents a single
+zipcode and it's returned data.
+
+**Properties:**
+           
+
+-  **zipcode**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.zip.details("90274")
+    z = result.zipcodes()[0]
+    print z.zipcode
+    # "90274"
+    print z.meta
+    # "meta information"
+    details_result = z.component_results[0]
+    print details_result.component_name
+    # 'zip/details'
+    print details_result.api_code
+    # 0
+    print details_result.api_code_description
+    # 'ok'
+    print details_result.json_data
+    # [...data...]
+    print z.has_error()
+    # False
+    print z.get_errors()
+    # []
+
+
+Msa
+^^^^^^^
+
+A subclass of HouseCanaryObject, the Msa represents a single
+Metropolitan Statistical Area and it's returned data.
+
+**Properties:**
+           
+
+-  **msa**
+-  **meta**
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.msa.details("41860")
+    m = result.msas()[0]
+    print m.msa
+    # "41860"
+    print m.meta
+    # "meta information"
+    details_result = m.component_results[0]
+    print details_result.component_name
+    # 'msa/details'
+    print details_result.api_code
+    # 0
+    print details_result.api_code_description
+    # 'ok'
+    print details_result.json_data
+    # [...data...]
+    print m.has_error()
+    # False
+    print m.get_errors()
+    # []
+
+
 ValueReportResponse
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 
 A subclass of Response, this is the object returned for the
 ``value_report`` endpoint when "json" format\_type is used. It simply
@@ -316,6 +769,21 @@ returns the JSON data of the Value Report.
 .. code:: python
 
     result = client.property.value_report("123 Main St", "01234")
+    print result.json()
+
+RentalReportResponse
+^^^^^^^^^^^^^^^^^^^^
+
+A subclass of Response, this is the object returned for the
+``rental_report`` endpoint when "json" format\_type is used. It simply
+returns the JSON data of the Rental Report.
+
+**Example:**
+        
+
+.. code:: python
+
+    result = client.property.rental_report("123 Main St", "01234")
     print result.json()
 
 Command Line Tools
