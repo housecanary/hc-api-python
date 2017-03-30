@@ -2,6 +2,9 @@
 Provides Response to encapsulate API responses.
 """
 
+from builtins import next
+from builtins import str
+from builtins import object
 from housecanary.object import Property
 from housecanary.object import Block
 from housecanary.object import ZipCode

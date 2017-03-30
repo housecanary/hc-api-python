@@ -40,7 +40,9 @@ Options:
 """
 
 
+from __future__ import print_function
 import sys
+from builtins import str
 from docopt import docopt
 import housecanary
 

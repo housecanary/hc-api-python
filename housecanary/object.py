@@ -4,13 +4,16 @@ an object and its associated data.
 Currently, only the Property subclass is implemented.
 """
 
+from builtins import str
+from builtins import next
+from builtins import object
 import housecanary.constants as constants
 
 
 def _create_component_results(json_data, result_key):
     """ Returns a list of ComponentResult from the json_data"""
     component_results = []
-    for key, value in json_data.iteritems():
+    for key, value in list(json_data.items()):
         if key not in [result_key, "meta"]:
             component_result = ComponentResult(
                 key,

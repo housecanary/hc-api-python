@@ -71,8 +71,10 @@ Options:
 """
 
 
+from __future__ import print_function
 import sys
 import time
+from builtins import str
 from docopt import docopt
 import housecanary
 
@@ -124,7 +126,7 @@ def hc_api_export(docopt_args):
     all_data = api_result.json()
 
     result_info_key = _get_result_info_key(endpoints[0].split('/')[0])
-    identifier_keys = identifiers[0].keys()
+    identifier_keys = list(identifiers[0].keys())
 
     if output_type.lower() == 'csv':
         housecanary.export_analytics_data_to_csv(

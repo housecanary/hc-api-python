@@ -1,4 +1,6 @@
+from __future__ import print_function
 import os
+from builtins import object
 from housecanary.output import ResponseOutputGenerator
 from housecanary.requestclient import RequestClient
 import housecanary.exceptions
@@ -216,7 +218,7 @@ class PropertyComponentWrapper(ComponentWrapper):
     def _convert_to_identifier_json(self, address_data):
         """Convert input address data into json format"""
 
-        if isinstance(address_data, str) or isinstance(address_data, unicode):
+        if isinstance(address_data, str):
             # allow just passing a slug string.
             return {"slug": address_data}
 
@@ -485,7 +487,7 @@ class BlockComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, block_data):
-        if isinstance(block_data, str) or isinstance(block_data, unicode):
+        if isinstance(block_data, str):
             # allow just passing a block_id string.
             return {"block_id": block_data}
 
@@ -590,7 +592,7 @@ class ZipComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, zip_data):
-        if isinstance(zip_data, str) or isinstance(zip_data, unicode):
+        if isinstance(zip_data, str):
             # allow just passing a zipcode string.
             return {"zipcode": zip_data}
 
@@ -683,7 +685,7 @@ class MsaComponentWrapper(ComponentWrapper):
     """
 
     def _convert_to_identifier_json(self, msa_data):
-        if isinstance(msa_data, str) or isinstance(msa_data, unicode):
+        if isinstance(msa_data, str):
             # allow just passing a msa string.
             return {"msa": msa_data}
 

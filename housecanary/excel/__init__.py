@@ -1,10 +1,13 @@
 """Module for creating Excel exports of HouseCanary API data"""
 
+from __future__ import print_function
 import os
 import csv
 import time
-from io import BytesIO
+import io
+import sys
 import openpyxl
+from builtins import str
 from slugify import slugify
 from . import analytics_data_excel
 from . import utilities
@@ -46,7 +49,10 @@ def export_analytics_data_to_csv(data, output_folder, result_info_key, identifie
 
         file_path = os.path.join(output_folder, file_name + suffix)
 
-        with open(file_path, 'wb') as output_file:
+        mode = 'w'
+        if sys.version_info[0] < 3:
+            mode = 'wb'
+        with io.open(file_path, mode) as output_file:
             csv_writer = csv.writer(output_file)
             for row in worksheet.rows:
                 csv_writer.writerow([cell.value for cell in row])
@@ -91,7 +97,7 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
             errors.append({'address': addr[0], 'message': result['content']})
             continue
 
-        orig_wb = openpyxl.load_workbook(filename=BytesIO(result['content']))
+        orig_wb = openpyxl.load_workbook(filename=io.BytesIO(result['content']))
 
         _save_individual_file(orig_wb, files_path, addr[0])
 
@@ -257,5 +263,5 @@ def adjust_column_width(worksheet):
                 dims.get(cell.column, 0),
                 len(str(cell.value))
             )
-    for col, value in dims.items():
+    for col, value in list(dims.items()):
         worksheet.column_dimensions[col].width = value + padding

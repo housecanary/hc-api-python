@@ -169,7 +169,7 @@ def get_keys(data_list, leading_columns=LEADING_COLUMNS):
     Returns:
         list of keys to be included as columns in excel worksheet
     """
-    all_keys = set().union(*(d.keys() for d in data_list))
+    all_keys = set().union(*(list(d.keys()) for d in data_list))
 
     leading_keys = []
 

@@ -6,16 +6,13 @@ import hmac
 import hashlib
 import datetime
 import calendar
-
-try:
-    # Python 3
-    from urllib.parse import urlencode, urlparse, parse_qsl, urlunparse
-except ImportError:
-    # Python 2
-    from urllib import urlencode
-    from urlparse import urlparse, parse_qsl, urlunparse
-
+from future import standard_library
+from urllib.parse import urlencode
+from urllib.parse import urlparse, parse_qsl, urlunparse
+from builtins import str
 import requests
+
+standard_library.install_aliases()
 
 
 class HCAuth(requests.auth.AuthBase):

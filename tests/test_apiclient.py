@@ -4,7 +4,10 @@ These tests require the HC_API_KEY and HC_API_SECRET environment variables to be
 # pylint: disable=missing-docstring
 
 import unittest
-import mock
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
 from housecanary.apiclient import ApiClient
 from housecanary.response import PropertyResponse
 from housecanary.response import BlockResponse
@@ -20,7 +23,7 @@ class ApiClientTestCase(unittest.TestCase):
 
     def test_fetch(self):
         client = ApiClient()
-        client._request_client.get = mock.MagicMock()
+        client._request_client.get = MagicMock()
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
 
         client.fetch("property/value", post_data)
@@ -29,7 +32,7 @@ class ApiClientTestCase(unittest.TestCase):
         client._request_client.get.assert_called_with(expected_url, post_data[0])
 
     def test_fetch_with_custom_request_client(self):
-        custom_request_client = mock.MagicMock()
+        custom_request_client = MagicMock()
         custom_request_client.get.return_value = "Response body"
         client = ApiClient(request_client=custom_request_client)
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
@@ -37,7 +40,7 @@ class ApiClientTestCase(unittest.TestCase):
         self.assertEqual(response, "Response body")
 
     def test_fetch_with_custom_ouput_generator(self):
-        custom_output_generator = mock.MagicMock()
+        custom_output_generator = MagicMock()
         custom_output_generator.process_response.return_value = "Custom Response"
         client = ApiClient(output_generator=custom_output_generator)
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
@@ -52,7 +55,7 @@ class ApiClientTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, list))
 
     def test_fetch_with_custom_auth(self):
-        auth = mock.MagicMock()
+        auth = MagicMock()
         auth.process.return_value = "Auth Processed"
 
         class TestRequestClient(object):
@@ -71,7 +74,7 @@ class ApiClientTestCase(unittest.TestCase):
 
     def test_fetch_synchronous(self):
         client = ApiClient()
-        client._request_client.get = mock.MagicMock()
+        client._request_client.get = MagicMock()
 
         client.fetch_synchronous("property/value")
 
@@ -342,7 +345,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         self.assertIsNotNone(response.json()[0]["property/census"])
 
     def test_value_report(self):
-        self.client.fetch_synchronous = mock.MagicMock()
+        self.client.fetch_synchronous = MagicMock()
 
         self.client.property.value_report("47 Perley Ave", "01960")
 
@@ -355,7 +358,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         self.client.fetch_synchronous.assert_called_with("property/value_report", expected_params)
 
     def test_rental_report(self):
-        self.client.fetch_synchronous = mock.MagicMock()
+        self.client.fetch_synchronous = MagicMock()
 
         self.client.property.rental_report("47 Perley Ave", "01960")
 

@@ -2,6 +2,7 @@
 Provides a base client for making API requests.
 """
 
+from builtins import object
 import requests
 
 import housecanary
