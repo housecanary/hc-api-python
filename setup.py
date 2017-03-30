@@ -44,4 +44,8 @@ setup(name='housecanary',
               'hc_api_excel_concat=housecanary.hc_api_excel_concat.hc_api_excel_concat:main',
               'hc_api_export=housecanary.hc_api_export.hc_api_export:main'
           ]
-      })
+      },
+      classifiers=[
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3'
+      ])

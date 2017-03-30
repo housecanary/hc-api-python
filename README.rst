@@ -1,6 +1,9 @@
 HouseCanary API Python Client
 =============================
 
+.. image:: https://img.shields.io/pypi/pyversions/housecanary.svg
+    :target: https://pypi.python.org/pypi/housecanary
+
 The `HouseCanary <http://www.housecanary.com>`_ API Python Client provides an easy interface to call the HouseCanary API.
 
 
