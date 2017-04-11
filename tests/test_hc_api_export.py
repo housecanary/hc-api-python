@@ -28,11 +28,11 @@ class HcApiExportTestCase(unittest.TestCase):
     def get_docopt_args(self, output_type, endpoints, input_file):
         return {
             '--help': False,
-            '--key': None,
+            '--key': 'test_key',
             '--output': self.output_excel_file,
             '--path': self.output_csv_path,
             '--retry': False,
-            '--secret': None,
+            '--secret': 'test_secret',
             '--type': output_type,
             '-h': False,
             '<endpoints>': endpoints,

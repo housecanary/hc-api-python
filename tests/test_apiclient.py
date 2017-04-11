@@ -33,7 +33,7 @@ class ApiClientTestCase(unittest.TestCase):
     """Tests for the ApiClient class"""
 
     def test_fetch(self):
-        client = ApiClient()
+        client = ApiClient('test_key', 'test_secret')
         client._request_client.get = MagicMock()
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
 
@@ -45,7 +45,7 @@ class ApiClientTestCase(unittest.TestCase):
     def test_fetch_with_custom_request_client(self):
         custom_request_client = MagicMock()
         custom_request_client.get.return_value = "Response body"
-        client = ApiClient(request_client=custom_request_client)
+        client = ApiClient('test_key', 'test_secret', request_client=custom_request_client)
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertEqual(response, "Response body")
@@ -55,7 +55,7 @@ class ApiClientTestCase(unittest.TestCase):
             m.get('/v2/property/value', json={'test': 'ok'})
             custom_output_generator = MagicMock()
             custom_output_generator.process_response.return_value = "Custom Response"
-            client = ApiClient(output_generator=custom_output_generator)
+            client = ApiClient('test_key', 'test_secret', output_generator=custom_output_generator)
             post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
             response = client.fetch("property/value", post_data)
             self.assertEqual(response, "Custom Response")
@@ -64,7 +64,7 @@ class ApiClientTestCase(unittest.TestCase):
         with requests_mock.Mocker() as m:
             m.get('/v2/property/value', json={'test': 'ok'})
             output_generator = JsonOutputGenerator()
-            client = ApiClient(output_generator=output_generator)
+            client = ApiClient('test_key', 'test_secret', output_generator=output_generator)
             post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
             response = client.fetch("property/value", post_data)
             self.assertEqual(response, {'test': 'ok'})
@@ -82,13 +82,13 @@ class ApiClientTestCase(unittest.TestCase):
                 return self._auth.process()
 
         request_client = TestRequestClient(None, auth)
-        client = ApiClient(request_client=request_client)
+        client = ApiClient('test_key', 'test_secret', request_client=request_client)
         post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
         response = client.fetch("property/value", post_data)
         self.assertEqual(response, "Auth Processed")
 
     def test_fetch_synchronous(self):
-        client = ApiClient()
+        client = ApiClient('test_key', 'test_secret')
         client._request_client.get = MagicMock()
 
         client.fetch_synchronous("property/value")
@@ -101,7 +101,7 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
     """Tests for the PropertyComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
 
     def test_get_property_input_with_single_tuple(self):
         address_data = ("47 Perley Ave", "01960")
@@ -173,7 +173,7 @@ class PropertyComponentWrapperApiCallsTestCase(unittest.TestCase):
     """Tests for the PropertyComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
         self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
 
     def test_block_histogram_baths(self, mock):
@@ -433,7 +433,7 @@ class BlockComponentWrapperTestCase(unittest.TestCase):
     """Tests for the BlockComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
 
     def test_get_block_input_with_single_block_string(self):
         block_data = "060750615003005"
@@ -484,7 +484,7 @@ class BlockComponentWrapperApiCallsTestCase(unittest.TestCase):
     """Tests for the BlockComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
         self.test_data_num_bins = [{"block_id": "060750615003005", "num_bins": "5",
                                     "meta": "block1"}]
         self.test_data_prop_type = [{"block_id": "060750615003005", "meta": "block1",
@@ -562,7 +562,7 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
     """Tests for the ZipComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
 
     def test_get_zip_input_with_single_zipcode_string(self):
         zip_data = "01960"
@@ -602,7 +602,7 @@ class ZipComponentWrapperApiCallsTestCase(unittest.TestCase):
     """Tests for the BlockComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
         self.test_data = [{"zipcode": "90274", "meta": "block1"}]
         self.headers = {"content-type": "application/json"}
         self.response = {"api_code": 0}
@@ -661,7 +661,7 @@ class MsaComponentWrapperTestCase(unittest.TestCase):
     """Tests for the MsaComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
 
     def test_get_msa_input_with_single_msa_string(self):
         msa_data = "41860"
@@ -701,7 +701,7 @@ class MsaComponentWrapperApiCallsTestCase(unittest.TestCase):
     """Tests for the MsaComponentWrapper class."""
 
     def setUp(self):
-        self.client = ApiClient()
+        self.client = ApiClient('test_key', 'test_secret')
         self.test_data = [{"msa": "41860", "meta": "block1"}]
         self.headers = {"content-type": "application/json"}
         self.response = {"api_code": 0}
