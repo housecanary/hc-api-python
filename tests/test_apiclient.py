@@ -1,9 +1,8 @@
-"""
-These tests require the HC_API_KEY and HC_API_SECRET environment variables to be set.
-"""
 # pylint: disable=missing-docstring
 
 import unittest
+import requests_mock
+import os
 try:
     from unittest.mock import MagicMock
 except ImportError:
@@ -13,9 +12,21 @@ from housecanary.response import PropertyResponse
 from housecanary.response import BlockResponse
 from housecanary.response import ZipCodeResponse
 from housecanary.response import MsaResponse
+from housecanary.response import ValueReportResponse
+from housecanary.response import RentalReportResponse
 from housecanary.output import JsonOutputGenerator
 import housecanary.constants as constants
 import housecanary.exceptions
+
+
+def mock_request(mock, endpoint, meth='GET'):
+    headers = {"content-type": "application/json"}
+    response = {"api_code": 0}
+    real_http = os.getenv('HC_API_CALLS')
+    if real_http:
+        mock.register_uri(meth, endpoint, real_http=real_http)
+    else:
+        mock.register_uri(meth, endpoint, headers=headers, json=response)
 
 
 class ApiClientTestCase(unittest.TestCase):
@@ -40,19 +51,23 @@ class ApiClientTestCase(unittest.TestCase):
         self.assertEqual(response, "Response body")
 
     def test_fetch_with_custom_ouput_generator(self):
-        custom_output_generator = MagicMock()
-        custom_output_generator.process_response.return_value = "Custom Response"
-        client = ApiClient(output_generator=custom_output_generator)
-        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
-        response = client.fetch("property/value", post_data)
-        self.assertEqual(response, "Custom Response")
+        with requests_mock.Mocker() as m:
+            m.get('/v2/property/value', json={'test': 'ok'})
+            custom_output_generator = MagicMock()
+            custom_output_generator.process_response.return_value = "Custom Response"
+            client = ApiClient(output_generator=custom_output_generator)
+            post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
+            response = client.fetch("property/value", post_data)
+            self.assertEqual(response, "Custom Response")
 
     def test_fetch_with_json_output_generator(self):
-        output_generator = JsonOutputGenerator()
-        client = ApiClient(output_generator=output_generator)
-        post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
-        response = client.fetch("property/value", post_data)
-        self.assertTrue(isinstance(response, list))
+        with requests_mock.Mocker() as m:
+            m.get('/v2/property/value', json={'test': 'ok'})
+            output_generator = JsonOutputGenerator()
+            client = ApiClient(output_generator=output_generator)
+            post_data = [{"address": "47 Perley Ave", "zipcode": "01960"}]
+            response = client.fetch("property/value", post_data)
+            self.assertEqual(response, {'test': 'ok'})
 
     def test_fetch_with_custom_auth(self):
         auth = MagicMock()
@@ -87,7 +102,6 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
 
     def test_get_property_input_with_single_tuple(self):
         address_data = ("47 Perley Ave", "01960")
@@ -153,235 +167,266 @@ class PropertyComponentWrapperTestCase(unittest.TestCase):
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             self.client.property.get_identifier_input(address_data)
 
-    def test_block_histogram_baths(self):
+
+@requests_mock.Mocker()
+class PropertyComponentWrapperApiCallsTestCase(unittest.TestCase):
+    """Tests for the PropertyComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"}]
+
+    def test_block_histogram_baths(self, mock):
+        mock_request(mock, "/v2/property/block_histogram_baths")
         response = self.client.property.block_histogram_baths(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_histogram_baths"])
+        self.assertEqual(response.endpoint_name, "property/block_histogram_baths")
 
-    def test_block_histogram_beds(self):
+    def test_block_histogram_beds(self, mock):
+        mock_request(mock, "/v2/property/block_histogram_beds")
         response = self.client.property.block_histogram_beds(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_histogram_beds"])
+        self.assertEqual(response.endpoint_name, "property/block_histogram_beds")
 
-    def test_block_histogram_building_area(self):
+    def test_block_histogram_building_area(self, mock):
+        mock_request(mock, "/v2/property/block_histogram_building_area")
         response = self.client.property.block_histogram_building_area(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_histogram_building_area"])
+        self.assertEqual(response.endpoint_name, "property/block_histogram_building_area")
 
-    def test_block_histogram_value(self):
+    def test_block_histogram_value(self, mock):
+        mock_request(mock, "/v2/property/block_histogram_value")
         response = self.client.property.block_histogram_value(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_histogram_value"])
+        self.assertEqual(response.endpoint_name, "property/block_histogram_value")
 
-    def test_block_histogram_value_sqft(self):
+    def test_block_histogram_value_sqft(self, mock):
+        mock_request(mock, "/v2/property/block_histogram_value_sqft")
         response = self.client.property.block_histogram_value_sqft(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_histogram_value_sqft"])
+        self.assertEqual(response.endpoint_name, "property/block_histogram_value_sqft")
 
-    def test_block_rental_value_distribution(self):
+    def test_block_rental_value_distribution(self, mock):
+        mock_request(mock, "/v2/property/block_rental_value_distribution")
         response = self.client.property.block_rental_value_distribution(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_rental_value_distribution"])
+        self.assertEqual(response.endpoint_name, "property/block_rental_value_distribution")
 
-    def test_block_value_distribution(self):
+    def test_block_value_distribution(self, mock):
+        mock_request(mock, "/v2/property/block_value_distribution")
         response = self.client.property.block_value_distribution(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_value_distribution"])
+        self.assertEqual(response.endpoint_name, "property/block_value_distribution")
 
-    def test_block_value_ts(self):
+    def test_block_value_ts(self, mock):
+        mock_request(mock, "/v2/property/block_value_ts")
         response = self.client.property.block_value_ts(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_value_ts"])
+        self.assertEqual(response.endpoint_name, "property/block_value_ts")
 
-    def test_block_value_ts_historical(self):
+    def test_block_value_ts_historical(self, mock):
+        mock_request(mock, "/v2/property/block_value_ts_historical")
         response = self.client.property.block_value_ts_historical(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_value_ts_historical"])
+        self.assertEqual(response.endpoint_name, "property/block_value_ts_historical")
 
-    def test_block_value_ts_forecast(self):
+    def test_block_value_ts_forecast(self, mock):
+        mock_request(mock, "/v2/property/block_value_ts_forecast")
         response = self.client.property.block_value_ts_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/block_value_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "property/block_value_ts_forecast")
 
-    def test_census(self):
+    def test_census(self, mock):
+        mock_request(mock, "/v2/property/census")
         response = self.client.property.census(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/census"])
+        self.assertEqual(response.endpoint_name, "property/census")
 
-    def test_details(self):
+    def test_details(self, mock):
+        mock_request(mock, "/v2/property/details")
         response = self.client.property.details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/details"])
+        self.assertEqual(response.endpoint_name, "property/details")
 
-    def test_flood(self):
+    def test_flood(self, mock):
+        mock_request(mock, "/v2/property/flood")
         response = self.client.property.flood(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/flood"])
+        self.assertEqual(response.endpoint_name, "property/flood")
 
-    def test_ltv(self):
+    def test_ltv(self, mock):
+        mock_request(mock, "/v2/property/ltv")
         response = self.client.property.ltv(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/ltv"])
+        self.assertEqual(response.endpoint_name, "property/ltv")
 
-    def test_ltv_details(self):
+    def test_ltv_details(self, mock):
+        mock_request(mock, "/v2/property/ltv_details")
         response = self.client.property.ltv_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/ltv_details"])
+        self.assertEqual(response.endpoint_name, "property/ltv_details")
 
-    def test_mortgage_lien(self):
+    def test_mortgage_lien(self, mock):
+        mock_request(mock, "/v2/property/mortgage_lien")
         response = self.client.property.mortgage_lien(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/mortgage_lien"])
+        self.assertEqual(response.endpoint_name, "property/mortgage_lien")
 
-    def test_msa_details(self):
+    def test_msa_details(self, mock):
+        mock_request(mock, "/v2/property/msa_details")
         response = self.client.property.msa_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/msa_details"])
+        self.assertEqual(response.endpoint_name, "property/msa_details")
 
-    def test_msa_hpi_ts(self):
+    def test_msa_hpi_ts(self, mock):
+        mock_request(mock, "/v2/property/msa_hpi_ts")
         response = self.client.property.msa_hpi_ts(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts"])
+        self.assertEqual(response.endpoint_name, "property/msa_hpi_ts")
 
-    def test_msa_hpi_ts_forecast(self):
+    def test_msa_hpi_ts_forecast(self, mock):
+        mock_request(mock, "/v2/property/msa_hpi_ts_forecast")
         response = self.client.property.msa_hpi_ts_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "property/msa_hpi_ts_forecast")
 
-    def test_msa_hpi_ts_historical(self):
+    def test_msa_hpi_ts_historical(self, mock):
+        mock_request(mock, "/v2/property/msa_hpi_ts_historical")
         response = self.client.property.msa_hpi_ts_historical(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/msa_hpi_ts_historical"])
+        self.assertEqual(response.endpoint_name, "property/msa_hpi_ts_historical")
 
-    def test_nod(self):
+    def test_nod(self, mock):
+        mock_request(mock, "/v2/property/nod")
         response = self.client.property.nod(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/nod"])
+        self.assertEqual(response.endpoint_name, "property/nod")
 
-    def test_owner_occupied(self):
+    def test_owner_occupied(self, mock):
+        mock_request(mock, "/v2/property/owner_occupied")
         response = self.client.property.owner_occupied(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/owner_occupied"])
+        self.assertEqual(response.endpoint_name, "property/owner_occupied")
 
-    def test_rental_value(self):
+    def test_rental_value(self, mock):
+        mock_request(mock, "/v2/property/rental_value")
         response = self.client.property.rental_value(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/rental_value"])
+        self.assertEqual(response.endpoint_name, "property/rental_value")
 
-    def test_rental_value_within_block(self):
+    def test_rental_value_within_block(self, mock):
+        mock_request(mock, "/v2/property/rental_value_within_block")
         test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1",
                       "client_value": 1000000, "client_value_sqft": 3000}]
         response = self.client.property.rental_value_within_block(test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/rental_value_within_block"])
+        self.assertEqual(response.endpoint_name, "property/rental_value_within_block")
 
-    def test_sales_history(self):
+    def test_sales_history(self, mock):
+        mock_request(mock, "/v2/property/sales_history")
         response = self.client.property.sales_history(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/sales_history"])
+        self.assertEqual(response.endpoint_name, "property/sales_history")
 
-    def test_school(self):
+    def test_school(self, mock):
+        mock_request(mock, "/v2/property/school")
         response = self.client.property.school(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/school"])
+        self.assertEqual(response.endpoint_name, "property/school")
 
-    def test_value(self):
+    def test_value(self, mock):
+        mock_request(mock, "/v2/property/value")
         response = self.client.property.value(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value"])
+        self.assertEqual(response.endpoint_name, "property/value")
 
-    def test_value_forecast(self):
+    def test_value_forecast(self, mock):
+        mock_request(mock, "/v2/property/value_forecast")
         response = self.client.property.value_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value_forecast"])
+        self.assertEqual(response.endpoint_name, "property/value_forecast")
 
-    def test_value_within_block(self):
+    def test_value_within_block(self, mock):
+        mock_request(mock, "/v2/property/value_within_block")
         test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1",
                       "client_value": 1000000, "client_value_sqft": 3000}]
         response = self.client.property.value_within_block(test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value_within_block"])
+        self.assertEqual(response.endpoint_name, "property/value_within_block")
 
-    def test_zip_details(self):
+    def test_zip_details(self, mock):
+        mock_request(mock, "/v2/property/zip_details")
         response = self.client.property.zip_details(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_details"])
+        self.assertEqual(response.endpoint_name, "property/zip_details")
 
-    def test_zip_hpi_forecast(self):
+    def test_zip_hpi_forecast(self, mock):
+        mock_request(mock, "/v2/property/zip_hpi_forecast")
         response = self.client.property.zip_hpi_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_hpi_forecast"])
+        self.assertEqual(response.endpoint_name, "property/zip_hpi_forecast")
 
-    def test_zip_hpi_historical(self):
+    def test_zip_hpi_historical(self, mock):
+        mock_request(mock, "/v2/property/zip_hpi_historical")
         response = self.client.property.zip_hpi_historical(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_hpi_historical"])
+        self.assertEqual(response.endpoint_name, "property/zip_hpi_historical")
 
-    def test_zip_hpi_ts(self):
+    def test_zip_hpi_ts(self, mock):
+        mock_request(mock, "/v2/property/zip_hpi_ts")
         response = self.client.property.zip_hpi_ts(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts"])
+        self.assertEqual(response.endpoint_name, "property/zip_hpi_ts")
 
-    def test_zip_hpi_ts_forecast(self):
+    def test_zip_hpi_ts_forecast(self, mock):
+        mock_request(mock, "/v2/property/zip_hpi_ts_forecast")
         response = self.client.property.zip_hpi_ts_forecast(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "property/zip_hpi_ts_forecast")
 
-    def test_zip_hpi_ts_historical(self):
+    def test_zip_hpi_ts_historical(self, mock):
+        mock_request(mock, "/v2/property/zip_hpi_ts_historical")
         response = self.client.property.zip_hpi_ts_historical(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_hpi_ts_historical"])
+        self.assertEqual(response.endpoint_name, "property/zip_hpi_ts_historical")
 
-    def test_zip_volatility(self):
+    def test_zip_volatility(self, mock):
+        mock_request(mock, "/v2/property/zip_volatility")
         response = self.client.property.zip_volatility(self.test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/zip_volatility"])
+        self.assertEqual(response.endpoint_name, "property/zip_volatility")
 
-    def test_component_mget(self):
+    def test_component_mget(self, mock):
+        mock_request(mock, "/v2/property/component_mget")
         components = ["property/value", "property/census"]
         response = self.client.property.component_mget(self.test_data, components)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value"])
-        self.assertIsNotNone(response.json()[0]["property/census"])
+        self.assertEqual(response.endpoint_name, "property/component_mget")
 
-    def test_value_report(self):
-        self.client.fetch_synchronous = MagicMock()
+    def test_value_report(self, mock):
+        mock_request(mock, "/v2/property/value_report")
+        response = self.client.property.value_report("43 Valmonte Plaza", "90274")
+        self.assertTrue(isinstance(response, ValueReportResponse))
 
-        self.client.property.value_report("47 Perley Ave", "01960")
+    def test_rental_report(self, mock):
+        mock_request(mock, "/v2/property/rental_report")
+        response = self.client.property.rental_report("43 Valmonte Plaza", "90274")
+        self.assertTrue(isinstance(response, RentalReportResponse))
 
-        expected_params = {
-            "report_type": "full",
-            "format": "json",
-            "address": "47 Perley Ave",
-            "zipcode": "01960"
-        }
-        self.client.fetch_synchronous.assert_called_with("property/value_report", expected_params)
-
-    def test_rental_report(self):
-        self.client.fetch_synchronous = MagicMock()
-
-        self.client.property.rental_report("47 Perley Ave", "01960")
-
-        expected_params = {
-            "format": "json",
-            "address": "47 Perley Ave",
-            "zipcode": "01960"
-        }
-        self.client.fetch_synchronous.assert_called_with("property/rental_report", expected_params)
-
-    def test_multiple_properties(self):
+    def test_multiple_properties(self, mock):
+        mock_request(mock, "/v2/property/value", 'POST')
         test_data = [{"address": "47 Perley Ave", "zipcode": "01960", "meta": "addr1"},
                      {"address": "43 Valmonte Plaza", "zipcode": "90274", "meta": "addr2"}]
         response = self.client.property.value(test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value"])
-        self.assertIsNotNone(response.json()[1]["property/value"])
+        self.assertEqual(response.endpoint_name, "property/value")
 
-    def test_with_city_state(self):
+    def test_with_city_state(self, mock):
+        mock_request(mock, "/v2/property/value")
         test_data = [{"address": "47 Perley Ave", "city": "Peabody", "state": "MA"}]
         response = self.client.property.value(test_data)
         self.assertTrue(isinstance(response, PropertyResponse))
-        self.assertIsNotNone(response.json()[0]["property/value"])
+        self.assertEqual(response.endpoint_name, "property/value")
 
 
 class BlockComponentWrapperTestCase(unittest.TestCase):
@@ -389,10 +434,6 @@ class BlockComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data_num_bins = [{"block_id": "060750615003005", "num_bins": "5",
-                                    "meta": "block1"}]
-        self.test_data_prop_type = [{"block_id": "060750615003005", "meta": "block1",
-                                     "property_type": "SFD"}]
 
     def test_get_block_input_with_single_block_string(self):
         block_data = "060750615003005"
@@ -437,62 +478,84 @@ class BlockComponentWrapperTestCase(unittest.TestCase):
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             self.client.block.get_identifier_input(block_data)
 
-    def test_histogram_baths(self):
+
+@requests_mock.Mocker()
+class BlockComponentWrapperApiCallsTestCase(unittest.TestCase):
+    """Tests for the BlockComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data_num_bins = [{"block_id": "060750615003005", "num_bins": "5",
+                                    "meta": "block1"}]
+        self.test_data_prop_type = [{"block_id": "060750615003005", "meta": "block1",
+                                     "property_type": "SFD"}]
+
+    def test_histogram_baths(self, mock):
+        mock_request(mock, "/v2/block/histogram_baths")
         response = self.client.block.histogram_baths(self.test_data_num_bins)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/histogram_baths"])
+        self.assertEqual(response.endpoint_name, "block/histogram_baths")
 
-    def test_histogram_beds(self):
+    def test_histogram_beds(self, mock):
+        mock_request(mock, "/v2/block/histogram_beds")
         response = self.client.block.histogram_beds(self.test_data_num_bins)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/histogram_beds"])
+        self.assertEqual(response.endpoint_name, "block/histogram_beds")
 
-    def test_histogram_building_area(self):
+    def test_histogram_building_area(self, mock):
+        mock_request(mock, "/v2/block/histogram_building_area")
         response = self.client.block.histogram_building_area(self.test_data_num_bins)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/histogram_building_area"])
+        self.assertEqual(response.endpoint_name, "block/histogram_building_area")
 
-    def test_histogram_value(self):
+    def test_histogram_value(self, mock):
+        mock_request(mock, "/v2/block/histogram_value")
         response = self.client.block.histogram_value(self.test_data_num_bins)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/histogram_value"])
+        self.assertEqual(response.endpoint_name, "block/histogram_value")
 
-    def test_histogram_value_sqft(self):
+    def test_histogram_value_sqft(self, mock):
+        mock_request(mock, "/v2/block/histogram_value_sqft")
         response = self.client.block.histogram_value_sqft(self.test_data_num_bins)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/histogram_value_sqft"])
+        self.assertEqual(response.endpoint_name, "block/histogram_value_sqft")
 
-    def test_rental_value_distribution(self):
+    def test_rental_value_distribution(self, mock):
+        mock_request(mock, "/v2/block/rental_value_distribution")
         response = self.client.block.rental_value_distribution(self.test_data_prop_type)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/rental_value_distribution"])
+        self.assertEqual(response.endpoint_name, "block/rental_value_distribution")
 
-    def test_value_distribution(self):
+    def test_value_distribution(self, mock):
+        mock_request(mock, "/v2/block/value_distribution")
         response = self.client.block.value_distribution(self.test_data_prop_type)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/value_distribution"])
+        self.assertEqual(response.endpoint_name, "block/value_distribution")
 
-    def test_value_ts(self):
+    def test_value_ts(self, mock):
+        mock_request(mock, "/v2/block/value_ts")
         response = self.client.block.value_ts(self.test_data_prop_type)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/value_ts"])
+        self.assertEqual(response.endpoint_name, "block/value_ts")
 
-    def test_value_ts_forecast(self):
+    def test_value_ts_forecast(self, mock):
+        mock_request(mock, "/v2/block/value_ts_forecast")
         response = self.client.block.value_ts_forecast(self.test_data_prop_type)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/value_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "block/value_ts_forecast")
 
-    def test_value_ts_historical(self):
+    def test_value_ts_historical(self, mock):
+        mock_request(mock, "/v2/block/value_ts_historical")
         response = self.client.block.value_ts_historical(self.test_data_prop_type)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/value_ts_historical"])
+        self.assertEqual(response.endpoint_name, "block/value_ts_historical")
 
-    def test_component_mget(self):
+    def test_component_mget(self, mock):
+        mock_request(mock, "/v2/block/component_mget")
         components = ["block/value_ts", "block/value_distribution"]
         response = self.client.block.component_mget(self.test_data_prop_type, components)
         self.assertTrue(isinstance(response, BlockResponse))
-        self.assertIsNotNone(response.json()[0]["block/value_ts"])
-        self.assertIsNotNone(response.json()[0]["block/value_distribution"])
+        self.assertEqual(response.endpoint_name, "block/component_mget")
 
 
 class ZipComponentWrapperTestCase(unittest.TestCase):
@@ -500,7 +563,6 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"zipcode": "90274", "meta": "block1"}]
 
     def test_get_zip_input_with_single_zipcode_string(self):
         zip_data = "01960"
@@ -534,47 +596,65 @@ class ZipComponentWrapperTestCase(unittest.TestCase):
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             self.client.zip.get_identifier_input(zip_data)
 
-    def test_hpi_forecast(self):
+
+@requests_mock.Mocker()
+class ZipComponentWrapperApiCallsTestCase(unittest.TestCase):
+    """Tests for the BlockComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"zipcode": "90274", "meta": "block1"}]
+        self.headers = {"content-type": "application/json"}
+        self.response = {"api_code": 0}
+
+    def test_hpi_forecast(self, mock):
+        mock_request(mock, "/v2/zip/hpi_forecast")
         response = self.client.zip.hpi_forecast(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/hpi_forecast"])
+        self.assertEqual(response.endpoint_name, "zip/hpi_forecast")
 
-    def test_hpi_historical(self):
+    def test_hpi_historical(self, mock):
+        mock_request(mock, "/v2/zip/hpi_historical")
         response = self.client.zip.hpi_historical(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/hpi_historical"])
+        self.assertEqual(response.endpoint_name, "zip/hpi_historical")
 
-    def test_volatility(self):
+    def test_volatility(self, mock):
+        mock_request(mock, "/v2/zip/volatility")
         response = self.client.zip.volatility(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/volatility"])
+        self.assertEqual(response.endpoint_name, "zip/volatility")
 
-    def test_details(self):
+    def test_details(self, mock):
+        mock_request(mock, "/v2/zip/details")
         response = self.client.zip.details(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/details"])
+        self.assertEqual(response.endpoint_name, "zip/details")
 
-    def test_hpi_ts(self):
+    def test_hpi_ts(self, mock):
+        mock_request(mock, "/v2/zip/hpi_ts")
         response = self.client.zip.hpi_ts(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/hpi_ts"])
+        self.assertEqual(response.endpoint_name, "zip/hpi_ts")
 
-    def test_hpi_ts_forecast(self):
+    def test_hpi_ts_forecast(self, mock):
+        mock_request(mock, "/v2/zip/hpi_ts_forecast")
         response = self.client.zip.hpi_ts_forecast(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/hpi_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "zip/hpi_ts_forecast")
 
-    def test_hpi_ts_historical(self):
+    def test_hpi_ts_historical(self, mock):
+        mock_request(mock, "/v2/zip/hpi_ts_historical")
         response = self.client.zip.hpi_ts_historical(self.test_data)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/hpi_ts_historical"])
+        self.assertEqual(response.endpoint_name, "zip/hpi_ts_historical")
 
-    def test_component_mget(self):
+    def test_component_mget(self, mock):
+        mock_request(mock, "/v2/zip/component_mget")
         components = ["zip/details", "zip/volatility"]
         response = self.client.zip.component_mget(self.test_data, components)
         self.assertTrue(isinstance(response, ZipCodeResponse))
-        self.assertIsNotNone(response.json()[0]["zip/details"])
-        self.assertIsNotNone(response.json()[0]["zip/volatility"])
+        self.assertEqual(response.endpoint_name, "zip/component_mget")
 
 
 class MsaComponentWrapperTestCase(unittest.TestCase):
@@ -582,7 +662,6 @@ class MsaComponentWrapperTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = ApiClient()
-        self.test_data = [{"msa": "41860", "meta": "block1"}]
 
     def test_get_msa_input_with_single_msa_string(self):
         msa_data = "41860"
@@ -616,32 +695,47 @@ class MsaComponentWrapperTestCase(unittest.TestCase):
         with self.assertRaises(housecanary.exceptions.InvalidInputException):
             self.client.msa.get_identifier_input(msa_data)
 
-    def test_details(self):
+
+@requests_mock.Mocker()
+class MsaComponentWrapperApiCallsTestCase(unittest.TestCase):
+    """Tests for the MsaComponentWrapper class."""
+
+    def setUp(self):
+        self.client = ApiClient()
+        self.test_data = [{"msa": "41860", "meta": "block1"}]
+        self.headers = {"content-type": "application/json"}
+        self.response = {"api_code": 0}
+
+    def test_details(self, mock):
+        mock_request(mock, "/v2/msa/details")
         response = self.client.msa.details(self.test_data)
         self.assertTrue(isinstance(response, MsaResponse))
-        self.assertIsNotNone(response.json()[0]["msa/details"])
+        self.assertEqual(response.endpoint_name, "msa/details")
 
-    def test_hpi_ts(self):
+    def test_hpi_ts(self, mock):
+        mock_request(mock, "/v2/msa/hpi_ts")
         response = self.client.msa.hpi_ts(self.test_data)
         self.assertTrue(isinstance(response, MsaResponse))
-        self.assertIsNotNone(response.json()[0]["msa/hpi_ts"])
+        self.assertEqual(response.endpoint_name, "msa/hpi_ts")
 
-    def test_hpi_ts_forecast(self):
+    def test_hpi_ts_forecast(self, mock):
+        mock_request(mock, "/v2/msa/hpi_ts_forecast")
         response = self.client.msa.hpi_ts_forecast(self.test_data)
         self.assertTrue(isinstance(response, MsaResponse))
-        self.assertIsNotNone(response.json()[0]["msa/hpi_ts_forecast"])
+        self.assertEqual(response.endpoint_name, "msa/hpi_ts_forecast")
 
-    def test_hpi_ts_historical(self):
+    def test_hpi_ts_historical(self, mock):
+        mock_request(mock, "/v2/msa/hpi_ts_historical")
         response = self.client.msa.hpi_ts_historical(self.test_data)
         self.assertTrue(isinstance(response, MsaResponse))
-        self.assertIsNotNone(response.json()[0]["msa/hpi_ts_historical"])
+        self.assertEqual(response.endpoint_name, "msa/hpi_ts_historical")
 
-    def test_component_mget(self):
+    def test_component_mget(self, mock):
+        mock_request(mock, "/v2/msa/component_mget")
         components = ["msa/details", "msa/hpi_ts"]
         response = self.client.msa.component_mget(self.test_data, components)
         self.assertTrue(isinstance(response, MsaResponse))
-        self.assertIsNotNone(response.json()[0]["msa/details"])
-        self.assertIsNotNone(response.json()[0]["msa/hpi_ts"])
+        self.assertEqual(response.endpoint_name, "msa/component_mget")
 
 
 if __name__ == "__main__":
