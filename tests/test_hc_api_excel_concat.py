@@ -29,10 +29,10 @@ class HcApiExcelConcatTestCase(unittest.TestCase):
           '--endpoint': endpoint,
           '--files': self.output_path,
           '--help': False,
-          '--key': None,
+          '--key': 'test_key',
           '--output': self.output_file,
           '--retry': False,
-          '--secret': None,
+          '--secret': 'test_secret',
           '--type': None,
           '-h': False,
           '<input>': './tests/test_files/test_input.csv'
