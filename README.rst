@@ -815,8 +815,7 @@ You can run the unit tests with real API requests by doing the following:
 
     HC_API_CALLS=true python setup.py nosetests
 
-**Note:** It's highly recommended to not run unit tests with API calls against the production environment,
-since you will be billed for any requests.
+**Note:** This setting will be ignored and API requests will be mocked if `URL_PREFIX` is pointing to Production.
 
 License
 -------
