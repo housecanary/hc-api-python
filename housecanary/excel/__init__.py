@@ -227,8 +227,8 @@ def _save_individual_file(workbook, files_path, addr):
     if not os.path.exists(files_path):
         os.makedirs(files_path)
 
-    file_path = os.path.join(files_path, slugify(
-        '{}-{}.xlsx'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S'))))
+    file_name = slugify('{}-{}'.format(addr, time.strftime('%Y-%m-%d_%H-%M-%S')))
+    file_path = os.path.join(files_path, '{}.xlsx'.format(file_name))
 
     workbook.save(file_path)
     print('Saved output to {}'.format(file_path))
