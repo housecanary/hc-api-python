@@ -38,8 +38,8 @@ class ApiClient(object):
                             Default is requests.auth.HTTPBasicAuth.
         """
 
-        self._auth_key = auth_key or os.environ['HC_API_KEY']
-        self._auth_secret = auth_secret or os.environ['HC_API_SECRET']
+        self._auth_key = auth_key or os.getenv('HC_API_KEY')
+        self._auth_secret = auth_secret or os.getenv('HC_API_SECRET')
 
         self._version = version or constants.DEFAULT_VERSION
 
