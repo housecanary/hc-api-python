@@ -23,7 +23,9 @@ def mock_request(mock, endpoint, meth='GET'):
     headers = {"content-type": "application/json"}
     response = {"api_code": 0}
     real_http = os.getenv('HC_API_CALLS')
-    if real_http:
+
+    # Don't use real_http against production.
+    if real_http and constants.URL_PREFIX != 'https://api.housecanary.com':
         mock.register_uri(meth, endpoint, real_http=real_http)
     else:
         mock.register_uri(meth, endpoint, headers=headers, json=response)
