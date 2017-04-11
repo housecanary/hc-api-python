@@ -12,7 +12,7 @@ from housecanary.object import Msa
 @requests_mock.Mocker()
 class PropertyResponseTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = ApiClient('test_key', 'test_secret')
+        self.client = ApiClient()
         self.test_data = [{"address": "43 Valmonte Plaza", "zipcode": "90274"}]
         self.headers = {'content-type': 'application/json', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Reset': '1491920221', 'X-RateLimit-Period': '60', 'X-RateLimit-Remaining': '4999'}
         self.response = [{'property/value': {'api_code_description': 'ok', 'result': {'value': {'price_upr': 1780318, 'fsd': 0.0836871, 'price_mean': 1642834, 'price_lwr': 1505350}}, 'api_code': 0}, 'address_info': {'state': 'CA', 'address_full': '43 Valmonte Plz Palos Verdes Estates CA 90274', 'block_id': '060376703241005', 'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'msa': '31080', 'zipcode': '90274', 'county_fips': '06037', 'city': 'Palos Verdes Estates', 'geo_precision': 'rooftop', 'unit': None, 'address': '43 Valmonte Plz', 'lat': 33.79814, 'zipcode_plus4': '1444', 'metrodiv': '31084', 'lng': -118.36455}}]
@@ -80,7 +80,7 @@ class PropertyResponseTestCase(unittest.TestCase):
 @requests_mock.Mocker()
 class BlockResponseTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = ApiClient('test_key', 'test_secret')
+        self.client = ApiClient()
         self.test_data = [{"block_id": "060376703241005"}]
         self.headers = {'content-type': 'application/json', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Reset': '1491920221', 'X-RateLimit-Period': '60', 'X-RateLimit-Remaining': '4999'}
         self.response = [{'block_info': {'block_id': '060376703241005'}, 'block/value_ts': {'api_code_description': 'ok', 'result': {'time_series': [{'value_sqft_median': 296.89, 'month': '1994-02-01', 'value_median': 513529}], 'property_type': 'SFD'}, 'api_code': 0}}]
@@ -104,7 +104,7 @@ class BlockResponseTestCase(unittest.TestCase):
 @requests_mock.Mocker()
 class ZipCodeResponseTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = ApiClient('test_key', 'test_secret')
+        self.client = ApiClient()
         self.test_data = [{"zipcode": "90274"}]
         self.headers = {'content-type': 'application/json', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Reset': '1491920221', 'X-RateLimit-Period': '60', 'X-RateLimit-Remaining': '4999'}
         self.response = [{'zip/details': {'api_code_description': 'ok', 'result': {'single_family': {'inventory_total': 78.538, 'price_median': 2748899.085, 'estimated_sales_total': None, 'days_on_market_median': 116.132, 'months_of_inventory_median': None, 'market_action_median': 62.34}, 'multi_family': {'inventory_total': None, 'price_median': None, 'estimated_sales_total': None, 'days_on_market_median': None, 'months_of_inventory_median': None, 'market_action_median': None}}, 'api_code': 0}, 'zipcode_info': {'zipcode': '90274'}}]
@@ -128,7 +128,7 @@ class ZipCodeResponseTestCase(unittest.TestCase):
 @requests_mock.Mocker()
 class MsaResponseTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = ApiClient('test_key', 'test_secret')
+        self.client = ApiClient()
         self.test_data = [{"msa": "41860"}]
         self.headers = {'content-type': 'application/json', 'X-RateLimit-Limit': '5000', 'X-RateLimit-Reset': '1491920221', 'X-RateLimit-Period': '60', 'X-RateLimit-Remaining': '4999'}
         self.response = [{'msa_info': {'msa': '41860', 'msa_name': 'San Francisco-Oakland-Hayward, CA'}, 'msa/details': {'api_code_description': 'ok', 'result': {'returns_5': 0.8724, 'cagr_1': 0.0673, 'cagr_5': 0.1336, 'max_12mo_loss': -0.210943, 'cagr_10': 0.0183, 'returns_1': 0.0673, 'risk_12mo_loss': 0.080268, 'cagr_20': 0.0658, 'returns_10': 0.1985}, 'api_code': 0}}]
