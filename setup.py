@@ -20,10 +20,11 @@ def find_version(*file_paths):
 
 
 def test_requirements():
+    reqs = ['nose', 'requests-mock']
     if python_version().startswith('2'):
-        return ['nose', 'mock']
+        reqs.append('mock')
 
-    return ['nose']
+    return reqs
 
 
 setup(name='housecanary',

@@ -69,7 +69,7 @@ class ExcelUtilitiesTestCase(unittest.TestCase):
         self.assertEqual(
             {'client_value': '1200000',
              'client_value_sqft': '2500',
-             'slug': '2024-Thoreau-St-Los-Angeles-CA-90047'},
+             'slug': '244-S-Altadena-Dr-Pasadena-CA-91107'},
             result[1]
         )
 

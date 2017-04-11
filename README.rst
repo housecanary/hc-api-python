@@ -793,6 +793,31 @@ When you install this package, a couple command line tools are included and inst
 - `HouseCanary Analytics API Export <housecanary/hc_api_export>`_
 - `HouseCanary API Excel Concat <housecanary/hc_api_excel_concat>`_
 
+Running Tests
+---------------------------
+
+To run the unit test suite:
+
+::
+
+    python setup.py nosetests --with-coverage --cover-package=housecanary
+
+During unit tests, all API requests are mocked.
+You can run the unit tests with real API requests by doing the following:
+
+
+- Update `URL_PREFIX` in `constants.py` to point to a test or dev environment
+- Obtain an account for that environment that has permissions to all API components
+- Obtain an API Key and Secret and put them in `HC_API_KEY` and `HC_API_SECRET` environment variables
+- Run the test suite as: 
+
+::
+
+    HC_API_CALLS=true python setup.py nosetests
+
+**Note:** It's highly recommended to not run unit tests with API calls against the production environment,
+since you will be billed for any requests.
+
 License
 -------
 

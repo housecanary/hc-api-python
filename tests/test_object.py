@@ -1,7 +1,3 @@
-"""
-These tests require the HC_API_KEY and HC_API_SECRET environment variables to be set.
-"""
-
 # pylint: disable=missing-docstring
 
 import unittest
