@@ -800,7 +800,7 @@ This API Client Library is made available under the MIT License:
 
 The MIT License (MIT)
 
-Copyright (c) 2016 HouseCanary, Inc
+Copyright (c) 2017 HouseCanary, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
