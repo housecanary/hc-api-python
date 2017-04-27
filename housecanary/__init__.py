@@ -1,4 +1,4 @@
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 from housecanary.apiclient import ApiClient
 from housecanary.excel import export_analytics_data_to_excel
