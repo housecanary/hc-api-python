@@ -99,6 +99,7 @@ def get_all_endpoints(level):
                 'property/census',
                 'property/details',
                 'property/flood',
+                'property/geocode',
                 'property/ltv',
                 'property/ltv_details',
                 'property/mortgage_lien',

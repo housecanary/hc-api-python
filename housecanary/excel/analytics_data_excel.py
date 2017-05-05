@@ -280,6 +280,11 @@ def process_data(key, data_list, result_info_key, identifier_keys):
                 top_level_keys = ['multi_family', 'single_family']
                 current_item_data = flatten_top_level_keys(data, top_level_keys)
 
+            elif key == 'property/geocode':
+                # geocode just returns a boolean in the result.
+                # Instead we want to use the address_info.
+                current_item_data = item_data['address_info']
+
             else:
                 current_item_data = data
 
