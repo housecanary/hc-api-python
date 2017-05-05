@@ -125,6 +125,11 @@ def hc_api_export(docopt_args):
 
     all_data = api_result.json()
 
+    if 'message' in all_data:
+        print('API error:')
+        print(all_data['message'])
+        return
+
     result_info_key = _get_result_info_key(endpoints[0].split('/')[0])
     identifier_keys = list(identifiers[0].keys())
 
