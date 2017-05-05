@@ -77,3 +77,12 @@ class ExcelUtilitiesTestCase(unittest.TestCase):
         result = utilities.get_identifiers_from_input_file('./sample_input/sample-input-zipcodes.csv')
         self.assertEqual({'meta': 'Area 1', 'zipcode': '90274'}, result[0])
         self.assertEqual({'meta': 'Area 2', 'zipcode': '91107'}, result[1])
+
+    def test_get_extra_identifiers_from_input_file(self):
+        result = utilities.get_extra_identifiers_from_input_file('./tests/test_files/test_input.csv')
+        self.assertEqual({'other_field': 'field1'}, result[0])
+        self.assertEqual({'other_field': 'field2'}, result[1])
+
+    def test_get_extra_identifiers_from_input_file_when_none(self):
+        result = utilities.get_extra_identifiers_from_input_file('./sample_input/sample-input-zipcodes.csv')
+        self.assertEqual([{}, {}], result)

@@ -8,7 +8,7 @@ KEY_TO_WORKSHEET_MAP = {
     'Msa Details': 'MSA Details'
 }
 
-LEADING_COLUMNS = (
+LEADING_COLUMNS = [
     'address',
     'unit',
     'city',
@@ -22,12 +22,12 @@ LEADING_COLUMNS = (
     'client_value',
     'client_value_sqft',
     'meta'
-)
+]
 
 LEADING_WORKSHEETS = ()
 
 
-def get_excel_workbook(api_data, result_info_key, identifier_keys):
+def get_excel_workbook(api_data, result_info_key, identifier_keys, extra_identifiers):
     """Generates an Excel workbook object given api_data returned by the Analytics API
 
     Args:
@@ -35,6 +35,7 @@ def get_excel_workbook(api_data, result_info_key, identifier_keys):
         result_info_key: the key in api_data dicts that contains the data results
         identifier_keys: the list of keys used as requested identifiers
                          (address, zipcode, block_id, etc)
+        extra_identifiers: list of dicts containing extra identifiers passed into the input file
 
     Returns:
         raw excel file data
@@ -62,12 +63,12 @@ def get_excel_workbook(api_data, result_info_key, identifier_keys):
 
     workbook = openpyxl.Workbook()
 
-    write_worksheets(workbook, data_list, result_info_key, identifier_keys)
+    write_worksheets(workbook, data_list, result_info_key, identifier_keys, extra_identifiers)
 
     return workbook
 
 
-def write_worksheets(workbook, data_list, result_info_key, identifier_keys):
+def write_worksheets(workbook, data_list, result_info_key, identifier_keys, extra_identifiers):
     """Writes rest of the worksheets to workbook.
 
     Args:
@@ -76,6 +77,7 @@ def write_worksheets(workbook, data_list, result_info_key, identifier_keys):
         result_info_key: the key in api_data dicts that contains the data results
         identifier_keys: the list of keys used as requested identifiers
                          (address, zipcode, block_id, etc)
+        extra_identifiers: list of dicts containing extra identifiers passed into the input file
     """
 
     # we can use the first item to figure out the worksheet keys
@@ -91,22 +93,25 @@ def write_worksheets(workbook, data_list, result_info_key, identifier_keys):
 
         if key == 'property/nod':
             # the property/nod endpoint needs to be split into two worksheets
-            create_property_nod_worksheets(workbook, data_list, result_info_key, identifier_keys)
+            create_property_nod_worksheets(
+                workbook, data_list, result_info_key, identifier_keys, extra_identifiers)
         else:
             # all other endpoints are written to a single worksheet
 
             # Maximum 31 characters allowed in sheet title
             worksheet = workbook.create_sheet(title=title[:31])
 
-            processed_data = process_data(key, data_list, result_info_key, identifier_keys)
+            processed_data = process_data(
+                key, data_list, result_info_key, identifier_keys, extra_identifiers)
 
-            write_data(worksheet, processed_data)
+            write_data(worksheet, processed_data, extra_identifiers)
 
     # remove the first, unused empty sheet
     workbook.remove_sheet(workbook.active)
 
 
-def create_property_nod_worksheets(workbook, data_list, result_info_key, identifier_keys):
+def create_property_nod_worksheets(workbook, data_list, result_info_key,
+                                   identifier_keys, extra_identifiers):
     """Creates two worksheets out of the property/nod data because the data
        doesn't come flat enough to make sense on one sheet.
 
@@ -117,11 +122,12 @@ def create_property_nod_worksheets(workbook, data_list, result_info_key, identif
                              Should always be 'address_info' for property/nod
             identifier_keys: the list of keys used as requested identifiers
                             (address, zipcode, city, state, etc)
+            extra_identifiers: list of dicts containing extra identifiers passed into the input file
     """
     nod_details_list = []
     nod_default_history_list = []
 
-    for prop_data in data_list:
+    for idx, prop_data in enumerate(data_list):
         nod_data = prop_data['property/nod']
 
         if nod_data is None:
@@ -129,19 +135,21 @@ def create_property_nod_worksheets(workbook, data_list, result_info_key, identif
 
         default_history_data = nod_data.pop('default_history', [])
 
-        _set_identifier_fields(nod_data, prop_data, result_info_key, identifier_keys)
+        extra_ids = extra_identifiers[idx]
+
+        _set_identifier_fields(nod_data, prop_data, result_info_key, identifier_keys, extra_ids)
 
         nod_details_list.append(nod_data)
 
         for item in default_history_data:
-            _set_identifier_fields(item, prop_data, result_info_key, identifier_keys)
+            _set_identifier_fields(item, prop_data, result_info_key, identifier_keys, extra_ids)
             nod_default_history_list.append(item)
 
     worksheet = workbook.create_sheet(title='NOD Details')
-    write_data(worksheet, nod_details_list)
+    write_data(worksheet, nod_details_list, extra_identifiers)
 
     worksheet = workbook.create_sheet(title='NOD Default History')
-    write_data(worksheet, nod_default_history_list)
+    write_data(worksheet, nod_default_history_list, extra_identifiers)
 
 
 def get_worksheet_keys(data_dict, result_info_key):
@@ -182,7 +190,7 @@ def get_keys(data_list, leading_columns=LEADING_COLUMNS):
     return leading_keys + sorted(all_keys)
 
 
-def write_data(worksheet, data):
+def write_data(worksheet, data, extra_identifiers):
     """Writes data into worksheet.
 
     Args:
@@ -198,7 +206,9 @@ def write_data(worksheet, data):
         rows = [data]
 
     if isinstance(rows[0], dict):
-        keys = get_keys(rows)
+        extra_id_keys = get_keys_from_extra_identifiers(extra_identifiers)
+        leading_columns = LEADING_COLUMNS + extra_id_keys
+        keys = get_keys(rows, leading_columns)
         worksheet.append([utilities.convert_snake_to_title_case(key) for key in keys])
         for row in rows:
             values = [get_value_from_row(row, key) for key in keys]
@@ -212,6 +222,13 @@ def write_data(worksheet, data):
             worksheet.append([utilities.normalize_cell_value(row)])
 
 
+def get_keys_from_extra_identifiers(extra_identifiers):
+    """Use the first row of extra_identifiers to figure out the key
+       because they're all the same"""
+    first_row = extra_identifiers[0]
+    return first_row.keys()
+
+
 def get_value_from_row(row, key):
     """Gets a value and normalizes it's value"""
     if key in row:
@@ -219,7 +236,7 @@ def get_value_from_row(row, key):
     return ''
 
 
-def process_data(key, data_list, result_info_key, identifier_keys):
+def process_data(key, data_list, result_info_key, identifier_keys, extra_identifiers):
     """ Given a key as the endpoint name, pulls the data for that endpoint out
         of the data_list for each address, processes the data into a more
         excel-friendly format and returns that data.
@@ -230,13 +247,14 @@ def process_data(key, data_list, result_info_key, identifier_keys):
             result_info_key: the key in api_data dicts that contains the data results
             identifier_keys: the list of keys used as requested identifiers
                              (address, zipcode, block_id, etc)
+            extra_identifiers: list of dicts containing extra identifiers passed into the input file
 
         Returns:
             A list of dicts (rows) to be written to a worksheet
     """
     master_data = []
 
-    for item_data in data_list:
+    for idx, item_data in enumerate(data_list):
         data = item_data[key]
 
         if data is None:
@@ -288,21 +306,26 @@ def process_data(key, data_list, result_info_key, identifier_keys):
             else:
                 current_item_data = data
 
+        # the extra ids passed into the input file to keep in the output
+        extra_ids = extra_identifiers[idx]
+
         if isinstance(current_item_data, dict):
-            _set_identifier_fields(current_item_data, item_data, result_info_key, identifier_keys)
+            _set_identifier_fields(
+                current_item_data, item_data, result_info_key, identifier_keys, extra_ids)
 
             master_data.append(current_item_data)
         else:
             # it's a list
             for item in current_item_data:
-                _set_identifier_fields(item, item_data, result_info_key, identifier_keys)
+                _set_identifier_fields(
+                    item, item_data, result_info_key, identifier_keys, extra_ids)
 
             master_data.extend(current_item_data)
 
     return master_data
 
 
-def _set_identifier_fields(item, item_data, result_info_key, identifier_keys):
+def _set_identifier_fields(item, item_data, result_info_key, identifier_keys, extra_ids):
     result_info = item_data[result_info_key]
     for k in identifier_keys:
         if k == 'meta':
@@ -311,6 +334,8 @@ def _set_identifier_fields(item, item_data, result_info_key, identifier_keys):
         # skip the special query param keys since they are not always returned in the result info
         elif k not in ['client_value', 'client_value_sqft', 'num_bins', 'property_type']:
             item[k] = result_info[k]
+
+    item.update(extra_ids)
 
 
 def flatten_top_level_keys(data, top_level_keys):

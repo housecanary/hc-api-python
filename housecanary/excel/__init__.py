@@ -15,7 +15,8 @@ from .. import ApiClient
 from .. import exceptions
 
 
-def export_analytics_data_to_excel(data, output_file_name, result_info_key, identifier_keys):
+def export_analytics_data_to_excel(data, output_file_name, result_info_key,
+                                   identifier_keys, extra_identifiers):
     """Creates an Excel file containing data returned by the Analytics API
 
     Args:
@@ -23,12 +24,13 @@ def export_analytics_data_to_excel(data, output_file_name, result_info_key, iden
         output_file_name: File name for output Excel file (use .xlsx extension).
 
     """
-    workbook = create_excel_workbook(data, result_info_key, identifier_keys)
+    workbook = create_excel_workbook(data, result_info_key, identifier_keys, extra_identifiers)
     workbook.save(output_file_name)
     print('Saved Excel file to {}'.format(output_file_name))
 
 
-def export_analytics_data_to_csv(data, output_folder, result_info_key, identifier_keys):
+def export_analytics_data_to_csv(data, output_folder, result_info_key,
+                                 identifier_keys, extra_identifiers):
     """Creates CSV files containing data returned by the Analytics API.
        Creates one file per requested endpoint and saves it into the
        specified output_folder
@@ -37,7 +39,7 @@ def export_analytics_data_to_csv(data, output_folder, result_info_key, identifie
         data: Analytics API data as a list of dicts
         output_folder: Path to a folder to save the CSV files into
     """
-    workbook = create_excel_workbook(data, result_info_key, identifier_keys)
+    workbook = create_excel_workbook(data, result_info_key, identifier_keys, extra_identifiers)
 
     suffix = '.csv'
 
@@ -234,9 +236,10 @@ def _save_individual_file(workbook, files_path, addr):
     print('Saved output to {}'.format(file_path))
 
 
-def create_excel_workbook(data, result_info_key, identifier_keys):
+def create_excel_workbook(data, result_info_key, identifier_keys, extra_identifiers):
     """Calls the analytics_data_excel module to create the Workbook"""
-    workbook = analytics_data_excel.get_excel_workbook(data, result_info_key, identifier_keys)
+    workbook = analytics_data_excel.get_excel_workbook(
+        data, result_info_key, identifier_keys, extra_identifiers)
     adjust_column_width_workbook(workbook)
     return workbook
 
