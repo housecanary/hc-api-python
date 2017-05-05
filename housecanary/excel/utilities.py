@@ -33,35 +33,31 @@ def convert_title_to_snake_case(key):
 
 
 def get_addresses_from_input_file(input_file_name):
-    """Read addresses from input file into list of tuples.
-       This only supports address and zipcode headers
+    """Read identifiers from input file into list of dicts with the header row values
+       as keys, and the rest of the rows as values.
+       This is used by hc_api_excel_concat.
     """
     mode = 'r'
     if sys.version_info[0] < 3:
         mode = 'rb'
     with io.open(input_file_name, mode) as input_file:
-        reader = csv.reader(input_file, delimiter=',', quotechar='"')
+        result = [{identifier: val for identifier, val in list(row.items())}
+                  for row in csv.DictReader(input_file, skipinitialspace=True)]
 
-        addresses = list(map(tuple, reader))
-
-        if len(addresses) == 0:
-            raise Exception('No addresses found in input file')
-
-        header_columns = list(column.lower() for column in addresses.pop(0))
-
-        try:
-            address_index = header_columns.index('address')
-            zipcode_index = header_columns.index('zipcode')
-        except ValueError:
-            raise Exception("""The first row of the input CSV must be a header that contains \
+        if len(result) > 0:
+            first_row = result[0]
+            keys = [k.lower() for k in first_row.keys()]
+            if 'address' not in keys or 'zipcode' not in keys:
+                raise Exception("""The first row of the input CSV must be a header that contains \
 a column labeled 'address' and a column labeled 'zipcode'.""")
 
-        return list((row[address_index], row[zipcode_index]) for row in addresses)
+        return result
 
 
 def get_identifiers_from_input_file(input_file_name):
     """Read identifiers from input file into list of dicts with the header row values
        as keys, and the rest of the rows as values.
+       This is used by hc_api_export.
     """
     valid_identifiers = ['address', 'zipcode', 'unit', 'city', 'state', 'slug', 'block_id', 'msa',
                          'num_bins', 'property_type', 'client_value', 'client_value_sqft', 'meta']
@@ -79,6 +75,7 @@ def get_extra_identifiers_from_input_file(input_file_name):
     """Read extra identifiers from input file into list of dicts with the header row values
        as keys, and the rest of the rows as values.
        These extra identifiers are those that are not used for making the API requests.
+       This is used by hc_api_export.
     """
     identifiers_to_skip = ['address', 'zipcode', 'unit', 'city', 'state', 'slug', 'block_id', 'msa',
                            'num_bins', 'property_type', 'client_value', 'client_value_sqft', 'meta']

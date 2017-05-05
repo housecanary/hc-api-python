@@ -27,8 +27,8 @@ class ExcelUtilitiesTestCase(unittest.TestCase):
 
     def test_get_addresses_from_input_file(self):
         result = utilities.get_addresses_from_input_file('./tests/test_files/test_input.csv')
-        self.assertEqual(('43 Valmonte Plaza', '90274'), result[0])
-        self.assertEqual(('244 S ALTADENA DR', '91107'), result[1])
+        self.assertEqual({'other_field': 'field1', 'zipcode': '90274', 'address': '43 Valmonte Plaza'}, result[0])
+        self.assertEqual({'other_field': 'field2', 'zipcode': '91107', 'address': '244 S ALTADENA DR'}, result[1])
 
     def test_get_identifiers_from_input_file_with_extra_field(self):
         result = utilities.get_identifiers_from_input_file('./tests/test_files/test_input.csv')

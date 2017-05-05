@@ -89,19 +89,19 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
     # for each address, call the API and load the xlsx content in a workbook.
     for index, addr in enumerate(addresses):
-        print('Processing {}'.format(addr[0]))
+        print('Processing {}'.format(addr['address']))
         result = _get_excel_report(
-            client, endpoint, addr[0], addr[1], report_type, retry)
+            client, endpoint, addr['address'], addr['zipcode'], report_type, retry)
 
         if not result['success']:
-            print('Error retrieving report for {}'.format(addr[0]))
+            print('Error retrieving report for {}'.format(addr['address']))
             print(result['content'])
-            errors.append({'address': addr[0], 'message': result['content']})
+            errors.append({'address': addr['address'], 'message': result['content']})
             continue
 
         orig_wb = openpyxl.load_workbook(filename=io.BytesIO(result['content']))
 
-        _save_individual_file(orig_wb, files_path, addr[0])
+        _save_individual_file(orig_wb, files_path, addr['address'])
 
         # for each worksheet for this address
         for sheet_name in orig_wb.get_sheet_names():
@@ -138,11 +138,10 @@ def concat_excel_reports(addresses, output_file_name, endpoint, report_type,
 
 
 def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
-    # if this is the first address, add headers for address and zipcode
-    # in the first two columns of the first row of the master worksheet
+    # if this is the first address, add headers for identifier columns passed into the input
     if address_index == 0:
-        master_ws.cell(row=1, column=1, value='Address')
-        master_ws.cell(row=1, column=2, value='Zipcode')
+        for idx, key in enumerate(addr.keys()):
+            master_ws.cell(row=1, column=idx+1, value=key)
 
     # get the next row in the master worksheet to start writing to.
     # this actually sets the next row to the last row with values in it,
@@ -155,39 +154,49 @@ def _process_standard_sheet(master_ws, orig_rows, addr, address_index):
         if address_index > 0 and orig_row_idx == 0:
             # after the first address, skip the header rows
             continue
-        # write the address and zipcode columns
+
+        # write the header columns
         if orig_row_idx > 0:
-            master_ws.cell(row=next_row_idx + orig_row_idx, column=1, value=addr[0])
-            master_ws.cell(row=next_row_idx + orig_row_idx, column=2, value=addr[1])
+            for idx, header_val in enumerate(addr.values()):
+                master_ws.cell(row=next_row_idx + orig_row_idx, column=idx+1, value=header_val)
+
+        start_cell_idx = len(addr.keys())
 
         # copy over the address sheet's cells
-        # starting at the row we left off at and two columns over
-        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
+        # starting at the row we left off at
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx, start_cell_idx)
 
 
 def _process_non_standard_sheet(master_ws, orig_rows, addr, address_index):
     # for the Summary sheet, there are multiple rows with different data,
     # so we'll simply copy the rows as they are
 
+    if address_index == 0:
+        # add headers for identifier columns passed into the input
+        for idx, key in enumerate(addr.keys()):
+            master_ws.cell(row=1, column=idx+1, value=key)
+
     # first, let's get the next row to write to,
     # leaving a space between the data from the previous address
-    next_row_idx = 1 if address_index == 0 else master_ws.max_row + 2
+    next_row_idx = 2 if address_index == 0 else master_ws.max_row + 2
 
-    # write the address and zipcode
-    master_ws.cell(row=next_row_idx, column=1, value=addr[0])
-    master_ws.cell(row=next_row_idx, column=2, value=addr[1])
+    # add identifier values passed into the input
+    for idx, header_val in enumerate(addr.values()):
+        master_ws.cell(row=next_row_idx, column=idx+1, value=header_val)
+
+    start_cell_idx = len(addr.keys())
 
     for orig_row_idx, orig_row in enumerate(orig_rows):
         # copy over the address sheet's cells
-        # starting at the row we left off at and two columns over
-        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx)
+        # starting at the row we left off at
+        _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx, start_cell_idx)
 
 
-def _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx):
+def _copy_row_to_worksheet(master_ws, orig_row, next_row_idx, orig_row_idx, start_cell_idx):
     for orig_cell_idx, orig_cell in enumerate(orig_row):
         master_ws.cell(
             row=next_row_idx + orig_row_idx,
-            column=orig_cell_idx + 3,
+            column=orig_cell_idx + start_cell_idx + 1,  # start_cell_idx accounts for identifier columns
             value=orig_cell.value
         )
 

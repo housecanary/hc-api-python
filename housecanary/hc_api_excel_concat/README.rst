@@ -6,7 +6,7 @@ Value Report or Rental Report API for multiple addresses by passing in a CSV fil
 containing addresses and zip codes.
 
 The input CSV file must contain a header row with columns for ``address`` and ``zipcode``.
-Other columns can be included but will be ignored.
+Other columns can be included as identifiers.
 See an example input `here <../../sample_input/sample-input.csv>`_.
 
 It generates a single .xlsx file which combines the Excel output of each address.
