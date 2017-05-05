@@ -21,9 +21,10 @@ class PropertyTestCase(unittest.TestCase):
                 'city': 'Palos Verdes Estates', 'county_fips': '06037', 'geo_precision': 'rooftop',
                 'block_id': '060376703241005', 'zipcode': '90274',
                 'address_full': '43 Valmonte Plz Palos Verdes Estates CA 90274',
-                'state': 'CA', 'zipcode_plus4': '1444', 'address': '43 Valmonte Plz',
-                'lat': 33.79814, 'lng': -118.36455,
-                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None
+                'state': 'CA', 'zipcode_plus4': '1444',
+                'address': '43 Valmonte Plz', 'lat': 33.79814, 'lng': -118.36455,
+                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None,
+                'msa': '31080'
             },
             'meta': 'Test Meta'
         }
@@ -45,6 +46,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual(self.prop.slug, "43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274")
         self.assertEqual(self.prop.unit, None)
         self.assertEqual(self.prop.meta, 'Test Meta')
+        self.assertEqual(self.prop.msa, '31080')
         self.assertEqual(len(self.prop.component_results), 1)
         self.assertEqual(self.prop.component_results[0].api_code, 0)
         self.assertEqual(self.prop.component_results[0].api_code_description, 'ok')
@@ -70,9 +72,10 @@ class PropertyTestCase(unittest.TestCase):
                 'city': 'Palos Verdes Estates', 'county_fips': '06037', 'geo_precision': 'rooftop',
                 'block_id': '060376703241005', 'zipcode': '90274',
                 'address_full': '43 Valmonte Plz Palos Verdes Estates CA 90274',
-                'state': 'CA', 'zipcode_plus4': '1444', 'address': '43 Valmonte Plz',
-                'lat': 33.79814, 'lng': -118.36455,
-                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None
+                'state': 'CA', 'zipcode_plus4': '1444',
+                'address': '43 Valmonte Plz', 'lat': 33.79814, 'lng': -118.36455,
+                'slug': '43-Valmonte-Plz-Palos-Verdes-Estates-CA-90274', 'unit': None,
+                'msa': '31080'
             },
             'meta': 'Test Meta'
         }
