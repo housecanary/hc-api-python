@@ -91,6 +91,9 @@ def hc_api_export(docopt_args):
 
     try:
         identifiers = housecanary.excel_utilities.get_identifiers_from_input_file(input_file_name)
+        extra_identifiers = housecanary.excel.utilities.get_extra_identifiers_from_input_file(
+            input_file_name
+        )
     except Exception as ex:
         print(str(ex))
         sys.exit(2)
@@ -125,15 +128,20 @@ def hc_api_export(docopt_args):
 
     all_data = api_result.json()
 
+    if 'message' in all_data:
+        print('API error:')
+        print(all_data['message'])
+        return
+
     result_info_key = _get_result_info_key(endpoints[0].split('/')[0])
     identifier_keys = list(identifiers[0].keys())
 
     if output_type.lower() == 'csv':
         housecanary.export_analytics_data_to_csv(
-            all_data, output_csv_path, result_info_key, identifier_keys)
+            all_data, output_csv_path, result_info_key, identifier_keys, extra_identifiers)
     else:
         housecanary.export_analytics_data_to_excel(
-            all_data, output_file_name, result_info_key, identifier_keys)
+            all_data, output_file_name, result_info_key, identifier_keys, extra_identifiers)
 
 
 def __get_results_from_api_with_retry(identifiers, endpoints, api_key, api_secret):

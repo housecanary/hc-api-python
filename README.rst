@@ -602,16 +602,21 @@ address and it's returned data.
            
 
 -  **address**
--  **zipcode**
--  **zipcode\_plus4**
 -  **address\_full**
+-  **block_id**
 -  **city**
 -  **country\_fips**
+-  **geo\_precision**
 -  **lat**
 -  **lng**
+-  **msa**
+-  **meta**
+-  **slug**
 -  **state**
 -  **unit**
--  **meta**
+-  **zipcode**
+-  **zipcode\_plus4**
+
 
 **Example:**
         

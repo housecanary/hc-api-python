@@ -97,6 +97,7 @@ class Property(HouseCanaryObject):
         self.state = None
         self.unit = None
         self.meta = None
+        self.msa = None
 
     @classmethod
     def create_from_json(cls, json_data):
@@ -124,6 +125,7 @@ class Property(HouseCanaryObject):
         prop.slug = address_info["slug"]
         prop.state = address_info["state"]
         prop.unit = address_info["unit"]
+        prop.msa = address_info["msa"]
 
         prop.meta = None
         if "meta" in json_data:

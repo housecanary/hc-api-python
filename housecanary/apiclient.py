@@ -301,6 +301,10 @@ class PropertyComponentWrapper(ComponentWrapper):
         """Call the flood endpoint"""
         return self.fetch_identifier_component("property/flood", data)
 
+    def geocode(self, data):
+        """Call the geocode endpoint"""
+        return self.fetch_identifier_component("property/geocode", data)
+
     def ltv(self, data):
         """Call the ltv endpoint"""
         return self.fetch_identifier_component("property/ltv", data)

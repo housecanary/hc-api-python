@@ -256,6 +256,12 @@ class PropertyComponentWrapperApiCallsTestCase(unittest.TestCase):
         self.assertTrue(isinstance(response, PropertyResponse))
         self.assertEqual(response.endpoint_name, "property/flood")
 
+    def test_geocode(self, mock):
+        mock_request(mock, "/v2/property/geocode")
+        response = self.client.property.geocode(self.test_data)
+        self.assertTrue(isinstance(response, PropertyResponse))
+        self.assertEqual(response.endpoint_name, "property/geocode")
+
     def test_ltv(self, mock):
         mock_request(mock, "/v2/property/ltv")
         response = self.client.property.ltv(self.test_data)

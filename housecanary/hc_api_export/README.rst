@@ -5,7 +5,7 @@ HouseCanary Analytics API Export is a command line tool that allows you to call 
 with a CSV file containing properties, blocks, zip codes and MSAs.
 
 The input CSV file must contain a header row with columns indicating the identifiers.
-Allowed identifiers are:
+Allowed identifiers for the API are:
 
 -  **address**
 -  **zipcode**
@@ -21,7 +21,7 @@ Allowed identifiers are:
 -  **property_type**
 -  **meta**
 
-Other columns can be included but will be ignored.
+Other columns can be included as identifiers.
 See some example inputs `here <../../sample_input/>`_.
 
 It generates an export of the Analytics API data in Excel or CSV format.
