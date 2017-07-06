@@ -262,7 +262,7 @@ Kwargs:
 
     # get Value Report in PDF format with "full" report_type.
     result = client.property.value_report("10216 N Willow Ave", "64157", format_type="pdf")
-    # result is binary data of the PDF.
+    # result is binary data of the PDF (See http://docs.python-requests.org/en/master/user/quickstart/#binary-response-content).
 
 Rental Report:
 ^^^^^^^^^^^^^^
