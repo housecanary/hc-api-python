@@ -89,10 +89,10 @@ class ResponseOutputGenerator(OutputGenerator):
         return Response.create(endpoint_name, response_json, response)
 
     def process_pdf_response(self, response):
-        return response.text
+        return response.content
 
     def process_zip_response(self, response):
-        return response.text
+        return response.content
 
     @staticmethod
     def _parse_endpoint_name_from_url(request_url):
