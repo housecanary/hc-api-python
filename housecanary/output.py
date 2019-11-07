@@ -49,11 +49,11 @@ class ResponseOutputGenerator(OutputGenerator):
     def process_response(self, response):
         content_type = response.headers['content-type']
 
-        if content_type == "application/json":
+        if 'application/json' in content_type:
             return self.process_json_response(response)
-        elif content_type == "application/pdf":
+        elif 'application/pdf' in content_type:
             return self.process_pdf_response(response)
-        elif content_type == "appliction/zip":
+        elif 'appliction/zip' in content_type:
             return self.process_zip_response(response)
         else:
             return response
