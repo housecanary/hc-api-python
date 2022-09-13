@@ -1,4 +1,4 @@
 requests
 docopt==0.6.2
-openpyxl==2.4.0
+openpyxl==2.4.2
 python-slugify
